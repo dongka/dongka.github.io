@@ -5,15 +5,23 @@
   
 
   
-  <title>Hexo</title>
+  <title>内存管理（一）硬件篇 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="一.经典存储结构图  L0(寄存器)-&amp;gt;CPU 寄存器保存来自高速缓存的字 L1(SRAM）-&amp;gt;高速缓存取自L2高速缓存行 L2(SRAM)-&amp;gt;高速缓存取自L3高速缓存的高速缓存行 L3(SRAM)-&amp;gt;高速缓存保存自内存的高速缓存行 L4(内存)-&amp;gt;内存保存自磁盘缓存的磁盘块 L5(磁盘缓存)-&amp;gt;磁盘缓存保存取自磁盘的磁盘块 L6磁盘 cpu从磁盘中加载数据,放">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内存管理（一）硬件篇">
+<meta property="og:url" content="http://yoursite.com/2018/06/17/memory-hardware-md/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="一.经典存储结构图  L0(寄存器)-&amp;gt;CPU 寄存器保存来自高速缓存的字 L1(SRAM）-&amp;gt;高速缓存取自L2高速缓存行 L2(SRAM)-&amp;gt;高速缓存取自L3高速缓存的高速缓存行 L3(SRAM)-&amp;gt;高速缓存保存自内存的高速缓存行 L4(内存)-&amp;gt;内存保存自磁盘缓存的磁盘块 L5(磁盘缓存)-&amp;gt;磁盘缓存保存取自磁盘的磁盘块 L6磁盘 cpu从磁盘中加载数据,放">
 <meta property="og:locale" content="default">
+<meta property="og:image" content="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaghCuOMjibmmJgymLicFZBkXdwOReYVV1WfJHPhsU23ibEzhSsbdK87aGg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1">
+<meta property="og:image" content="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaBdia2Vt94nvPcnj4aYqWRrLibeKQONayr9azNLWEeiabiay7ibIF3ooxibBw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1">
+<meta property="og:image" content="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaMfh510NLONxyc2CSvYr3Vrwqyf9tiajI1jPAuD16Kzm9mOvqQdZTiaJg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1">
+<meta property="og:updated_time" content="2018-06-21T16:04:00.974Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
+<meta name="twitter:title" content="内存管理（一）硬件篇">
+<meta name="twitter:description" content="一.经典存储结构图  L0(寄存器)-&amp;gt;CPU 寄存器保存来自高速缓存的字 L1(SRAM）-&amp;gt;高速缓存取自L2高速缓存行 L2(SRAM)-&amp;gt;高速缓存取自L3高速缓存的高速缓存行 L3(SRAM)-&amp;gt;高速缓存保存自内存的高速缓存行 L4(内存)-&amp;gt;内存保存自磁盘缓存的磁盘块 L5(磁盘缓存)-&amp;gt;磁盘缓存保存取自磁盘的磁盘块 L6磁盘 cpu从磁盘中加载数据,放">
+<meta name="twitter:image" content="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaghCuOMjibmmJgymLicFZBkXdwOReYVV1WfJHPhsU23ibEzhSsbdK87aGg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -60,96 +68,7 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-    <article id="post-memroy-process" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/06/19/memroy-process/" class="article-date">
-  <time datetime="2018-06-19T08:00:03.000Z" itemprop="datePublished">2018-06-19</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/19/memroy-process/">程序的内存空间</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="一：内核空间和用户空间"><a href="#一：内核空间和用户空间" class="headerlink" title="一：内核空间和用户空间"></a>一：内核空间和用户空间</h1><p>Linux的虚拟地址空间范围是0~4G,linux内核将这4G空间分为两部分，将最高的1G字节（从虚拟地址0xC0000000到0xFFFFFFFF）供内核使用，称为“内核空间”。而将较低的3G字节（从虚拟地址0X00000000到0xBFFFFFFFF）供各个进程使用，称为“用户空间”。因为每个进程可以通过系统调用进入内核，因此，Linux内核由系统内的所有进程共享。于是，从具体进程的角度来看，每个进程可以拥有4G字节的虚拟空间<br>每个进程的用户空间都是完全独立，互不相干，用户进程各自有不同的页表。而内核空间是有内核负责映射的，不随进程改变，是固定的。内核空间有自己对应的页表；<br>这里指的32位内核地址空间划分，64位内核地址空间是不同的<br><img src="../image/memory_process/进程空间.png" alt="进程空间分布"></p>
-<h2 id="1-1-内核空间"><a href="#1-1-内核空间" class="headerlink" title="1.1:内核空间"></a>1.1:内核空间</h2><p><img src="../image/memory_process/内核空间.png" alt="内核空间"></p>
-<p>内核空间分为三部分：ZONE_DMA(16M),ZONE_NORMAL(16~896),ZONE_HIGMEM(896~1G),高端内存<br>内核地址空间分为物理内存映射区，虚拟内存分配区，高端页面映射区，专用页面映射区保留区<br>内核空间中存放的是内核代码和数据，而进程的用户空间中存放的是用户程序的代码和数据。不管是内核空间还是用户空间，它们都处于虚拟空间中，虽然内核空间占据了每个虚拟空间的最高1GB字节，但映射到物理内存却总是从最低（0X00000000），另外，使用虚拟地址可以很好的保护内核空间不被破坏，虚拟地址到物理地址转换过程中有操作系统和CPU共同完成<br>内核空间是持续存在的，并且在所有进程中都映射到同样的物理内存，内核代码和数据总是可寻址的，随时准备处理中断和系统调用。</p>
-<h2 id="1-2-用户空间分布"><a href="#1-2-用户空间分布" class="headerlink" title="1.2:用户空间分布"></a>1.2:用户空间分布</h2><p>程序段（Text）:程序代码在内存中的映射，存放函数体的二进制代码。<br>初始化过的数据（Data）:在程序运行初已经对变量进行初始化的数据<br>未初始化过的数据（BSS）:在程序运行初未对变量进行初始化的数据<br>栈（Stack）：存储局部，临时变量，函数调用时，存储函数的返回指针，用于控制函数的调用和返回。在程序块开始时自动分配内存，结束时自动释放内存，其操作方式类似于结构中的栈；<br>堆（Heap）：存储动态内存分配，需要程序员手工分配，手工释放；</p>
-<h2 id="三：内存溢出，内存泄漏，内存越界，缓存区溢出，栈溢出"><a href="#三：内存溢出，内存泄漏，内存越界，缓存区溢出，栈溢出" class="headerlink" title="三：内存溢出，内存泄漏，内存越界，缓存区溢出，栈溢出"></a>三：内存溢出，内存泄漏，内存越界，缓存区溢出，栈溢出</h2><p>内存溢出：要求分配的内存超出了系统能给予的<br>内存越界：申请了一块内存，在使用这块的时候，超出了你申请的范围<br>缓冲区溢出：当计算机向缓冲区填充区内填充数据位数</p>
-<p>参考资料：<br><a href="https://blog.csdn.net/tommy_wxie/article/details/17122923/" target="_blank" rel="noopener">linux用户空间与内核空间——高端内存详解</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/19/memroy-process/" data-id="cjilvochz0001cjxuipvbg973" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/06/19/hello-world/" class="article-date">
-  <time datetime="2018-06-19T06:45:52.407Z" itemprop="datePublished">2018-06-19</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/19/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/19/hello-world/" data-id="cjilvochp0000cjxudfx1a1gh" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-memory-hardware-md" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-memory-hardware-md" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/06/17/memory-hardware-md/" class="article-date">
   <time datetime="2018-06-17T00:07:09.000Z" itemprop="datePublished">2018-06-17</time>
@@ -162,8 +81,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/17/memory-hardware-md/">内存管理（一）硬件篇</a>
+    <h1 class="article-title" itemprop="name">
+      内存管理（一）硬件篇
     </h1>
   
 
@@ -197,11 +116,23 @@ b.根据物理地址获取数据
     </footer>
   </div>
   
-</article>
-
+    
+<nav id="article-nav">
+  
+    <a href="/2018/06/19/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Hello World
+        
+      </div>
+    </a>
+  
+  
+</nav>
 
   
-
+</article>
 
 </section>
         
