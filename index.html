@@ -62,6 +62,95 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-ds5-userguide" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/25/ds5-userguide/" class="article-date">
+  <time datetime="2018-06-25T00:07:09.000Z" itemprop="datePublished">2018-06-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/25/ds5-userguide/">DS5相关介绍</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="一-DS5-与-DSTREAM"><a href="#一-DS5-与-DSTREAM" class="headerlink" title="一. DS5 与 DSTREAM"></a>一. DS5 与 DSTREAM</h1><h2 id="1-DS5-是一个软件开发工具"><a href="#1-DS5-是一个软件开发工具" class="headerlink" title="1. DS5 是一个软件开发工具"></a>1. DS5 是一个软件开发工具</h2><p><img src="../image/ds5/ds5.png" alt="ds5"><br>  从以下工具发展而来：DS5&lt;RVDS&lt;ADS&lt;SDT,目前除DS5外其他都已停用；<br>  有图形化的streamline性能分析器，可基于C源码，汇编程序，地址对bare裸机程序，uboot,kernel,驱动，app进行热点，程序瓶颈，CPU使用，Cache hit/miss,功耗分析</p>
+<h2 id="2-DSTREAM-是一个硬件仿真工具"><a href="#2-DSTREAM-是一个硬件仿真工具" class="headerlink" title="2. DSTREAM 是一个硬件仿真工具"></a>2. DSTREAM 是一个硬件仿真工具</h2><p><img src="../image/ds5/dstream.png" alt="dstream"><br>    共有7个接口，其中ARM JTAG 14，TI JTAG 14，ARM JTAG 20和Coresight 10这4个接口仅有debug功能，同时MICTOR 38，MIPI34，Coresight 20这3个接口有debug+trace功能</p>
+<h1 id="二-安装DS5"><a href="#二-安装DS5" class="headerlink" title="二. 安装DS5"></a>二. 安装DS5</h1><ol>
+<li>安装虚拟网卡；</li>
+<li>安装DS5-19和完成licence注册</li>
+<li>拷贝模型到安装目录下</li>
+<li>打开DS5</li>
+</ol>
+<h1 id="三-DS5的使用"><a href="#三-DS5的使用" class="headerlink" title="三. DS5的使用"></a>三. DS5的使用</h1><h2 id="1-新建debug-control"><a href="#1-新建debug-control" class="headerlink" title="1.新建debug control"></a>1.新建debug control</h2><p><img src="../image/ds5/use1.png" alt="use1"></p>
+<h2 id="2-建立连接"><a href="#2-建立连接" class="headerlink" title="2.建立连接"></a>2.建立连接</h2><p><img src="../image/ds5/use2.jpg" alt="use2"></p>
+<h2 id="3-load-vmlinux"><a href="#3-load-vmlinux" class="headerlink" title="3.load vmlinux"></a>3.load vmlinux</h2><p>   当建立连接后一般都是一些汇编语言，这时候需要将vmlinux load进DS5方便debug<br><img src="../image/ds5/load.png" alt="load"></p>
+<h2 id="4-查看logbuf"><a href="#4-查看logbuf" class="headerlink" title="4.查看logbuf"></a>4.查看logbuf</h2><p>   logbuf的大小由.config中的CONIFG_LOG_BUF_SHIFT决定，在init/Kconfig中有对应的说明<br><img src="../image/ds5/logbuf.jpg" alt="load"></p>
+<h1 id="四：csat的使用"><a href="#四：csat的使用" class="headerlink" title="四：csat的使用"></a>四：csat的使用</h1><h2 id="1-cast-CoreSight-Access-Tool-CAST"><a href="#1-cast-CoreSight-Access-Tool-CAST" class="headerlink" title="1.cast:CoreSight Access Tool(CAST)"></a>1.cast:CoreSight Access Tool(CAST)</h2><p>  DS-5的命令行工具，处理器挂住了，通过DS-5无法连接上，只能用CAST连接上，但是CSAT无法访问到处理器内部的寄存器</p>
+<h2 id="2-CAST-amp-DS-5-diff"><a href="#2-CAST-amp-DS-5-diff" class="headerlink" title="2.CAST &amp; DS-5 diff"></a>2.CAST &amp; DS-5 diff</h2><p>  CAST:通过APB总线连接，CPU挂死之后还能连接上，不能访问到CPU内部的寄存器<br>  DS5：通过CPU连接，CPU挂死之后无法连接上，能够访问到CPU内部的寄存器</p>
+<h2 id="3-CAST的命令"><a href="#3-CAST的命令" class="headerlink" title="3.CAST的命令"></a>3.CAST的命令</h2><ol>
+<li>打开DS5的命令行；</li>
+<li>输入以下命令：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cast</span><br><span class="line">  con USB</span><br><span class="line">  chain dev=auto clk=A</span><br><span class="line">  dvo 0</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th style="text-align:right">short name</th>
+<th style="text-align:center">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dpmemread</td>
+<td style="text-align:right">dmr</td>
+<td style="text-align:center">Read mememory</td>
+</tr>
+<tr>
+<td>dpmemwrite</td>
+<td style="text-align:right">dmw</td>
+<td style="text-align:center">Write memory</td>
+</tr>
+<tr>
+<td>dpfileload</td>
+<td style="text-align:right">dfl</td>
+<td style="text-align:center">Load a file into memory</td>
+</tr>
+<tr>
+<td>dpfilesave</td>
+<td style="text-align:right">dfs</td>
+<td style="text-align:center">Save a block of memory to file.</td>
+</tr>
+</tbody>
+</table>
+<p>example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dmr 0 0x00010000 0x50</span><br><span class="line">#save a block of memory to file</span><br><span class="line">dfs 0 0x06000000 0x100</span><br><span class="line">#load a file into memory</span><br><span class="line">dfl 0 bin 0x8000 myfile.bin Load binary file into 0x8000 on AP 0</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/25/ds5-userguide/" data-id="cjiyp0cn10000gxxu2ju0byyx" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ds5介绍/">ds5介绍</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-memory-process" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/06/19/memory-process/" class="article-date">
@@ -85,16 +174,17 @@
     <div class="article-entry" itemprop="articleBody">
       
         <h1 id="一：内核空间和用户空间"><a href="#一：内核空间和用户空间" class="headerlink" title="一：内核空间和用户空间"></a>一：内核空间和用户空间</h1><p>Linux的虚拟地址空间范围是0~4G,linux内核将这4G空间分为两部分，将最高的1G字节（从虚拟地址0xC0000000到0xFFFFFFFF）供内核使用，称为“内核空间”。而将较低的3G字节（从虚拟地址0X00000000到0xBFFFFFFFF）供各个进程使用，称为“用户空间”。因为每个进程可以通过系统调用进入内核，因此，Linux内核由系统内的所有进程共享。于是，从具体进程的角度来看，每个进程可以拥有4G字节的虚拟空间<br>每个进程的用户空间都是完全独立，互不相干，用户进程各自有不同的页表。而内核空间是有内核负责映射的，不随进程改变，是固定的。内核空间有自己对应的页表；<br>这里指的32位内核地址空间划分，64位内核地址空间是不同的<br><img src="../image/memory_process/进程空间.png" alt="进程空间分布"></p>
-<h2 id="1-1-内核空间"><a href="#1-1-内核空间" class="headerlink" title="1.1:内核空间"></a>1.1:内核空间</h2><p><img src="../image/memory_process/内核空间.png" alt="内核空间"></p>
+<h2 id="1-1-内核空间"><a href="#1-1-内核空间" class="headerlink" title="1.1:内核空间"></a>1.1:内核空间</h2><p>linux内核在启动的时候会打印出内核空间的布局图：<br>init/mian.c:<br>    start_kernel-&gt;mm_init-&gt;mem_init<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Memory: 996228K/1048576K available (9216K kernel code, 1381K rwdata, 2940K rodata, 1024K init, 397K bss, 44156K reserved, 8192K cma-reserved, 253952K highmem)</span><br><span class="line">[    0.000000] Virtual kernel memory layout:</span><br><span class="line">[    0.000000]     vector  : 0xffff0000 - 0xffff1000   (   4 kB)</span><br><span class="line">[    0.000000]     fixmap  : 0xffc00000 - 0xfff00000   (3072 kB)</span><br><span class="line">[    0.000000]     vmalloc : 0xf0800000 - 0xff800000   ( 240 MB)</span><br><span class="line">[    0.000000]     lowmem  : 0xc0000000 - 0xf0000000   ( 768 MB)</span><br><span class="line">[    0.000000]     pkmap   : 0xbfe00000 - 0xc0000000   (   2 MB)</span><br><span class="line">[    0.000000]     modules : 0xbf000000 - 0xbfe00000   (  14 MB)</span><br><span class="line">[    0.000000]       .text : 0xc0008000 - 0xc0a00000   (10208 kB) //代码段</span><br><span class="line">[    0.000000]       .init : 0xc0e00000 - 0xc0f00000   (1024 kB)  //init段 包含了大部分模块的初始化数据</span><br><span class="line">[    0.000000]       .data : 0xc0f00000 - 0xc1059518   (1382 kB)  //数据段的起始和结束地址，保存大部分内核的变量</span><br><span class="line">[    0.000000]        .bss : 0xc105b000 - 0xc10be54c   ( 398 kB)  //BSS段的开始和结束地址，包含初始化为0的所有静态全局变量</span><br><span class="line">[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1</span><br></pre></td></tr></table></figure></p>
+<p><img src="../image/memory_process/内核空间.png" alt="内核空间"></p>
 <p>内核空间分为三部分：ZONE_DMA(16M),ZONE_NORMAL(16~896),ZONE_HIGMEM(896~1G),高端内存<br>内核地址空间分为物理内存映射区，虚拟内存分配区，高端页面映射区，专用页面映射区保留区<br>内核空间中存放的是内核代码和数据，而进程的用户空间中存放的是用户程序的代码和数据。不管是内核空间还是用户空间，它们都处于虚拟空间中，虽然内核空间占据了每个虚拟空间的最高1GB字节，但映射到物理内存却总是从最低（0X00000000），另外，使用虚拟地址可以很好的保护内核空间不被破坏，虚拟地址到物理地址转换过程中有操作系统和CPU共同完成<br>内核空间是持续存在的，并且在所有进程中都映射到同样的物理内存，内核代码和数据总是可寻址的，随时准备处理中断和系统调用。</p>
 <h2 id="1-2-用户空间分布"><a href="#1-2-用户空间分布" class="headerlink" title="1.2:用户空间分布"></a>1.2:用户空间分布</h2><p>程序段（Text）:程序代码在内存中的映射，存放函数体的二进制代码。<br>初始化过的数据（Data）:在程序运行初已经对变量进行初始化的数据<br>未初始化过的数据（BSS）:在程序运行初未对变量进行初始化的数据<br>栈（Stack）：存储局部，临时变量，函数调用时，存储函数的返回指针，用于控制函数的调用和返回。在程序块开始时自动分配内存，结束时自动释放内存，其操作方式类似于结构中的栈；<br>堆（Heap）：存储动态内存分配，需要程序员手工分配，手工释放；</p>
 <h2 id="三：内存溢出，内存泄漏，内存越界，缓存区溢出，栈溢出"><a href="#三：内存溢出，内存泄漏，内存越界，缓存区溢出，栈溢出" class="headerlink" title="三：内存溢出，内存泄漏，内存越界，缓存区溢出，栈溢出"></a>三：内存溢出，内存泄漏，内存越界，缓存区溢出，栈溢出</h2><p>内存溢出：要求分配的内存超出了系统能给予的<br>内存越界：申请了一块内存，在使用这块的时候，超出了你申请的范围<br>缓冲区溢出：当计算机向缓冲区填充区内填充数据位数</p>
-<p>参考资料：<br><a href="https://blog.csdn.net/tommy_wxie/article/details/17122923/" target="_blank" rel="noopener">linux用户空间与内核空间——高端内存详解</a></p>
+<p>参考资料：<br><a href="https://blog.csdn.net/tommy_wxie/article/details/17122923/" target="_blank" rel="noopener">linux用户空间与内核空间——高端内存详解</a><br><a href="https://blog.csdn.net/u010246947/article/details/9413275" target="_blank" rel="noopener">ARM架构内核启动分析-head.S(1.1).vmlinux.lds链接脚本分析</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/19/memory-process/" data-id="cjiqxw64u0002ioxuaqkiga5g" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/06/19/memory-process/" data-id="cjiyp0cni0003gxxufwtksfwo" class="article-share-link">Share</a>
       
       
     </footer>
@@ -139,7 +229,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/19/hello-world/" data-id="cjiqxw64d0000ioxud7t2p61x" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/06/19/hello-world/" data-id="cjiyp0cnc0001gxxu8ekcahro" class="article-share-link">Share</a>
       
       
     </footer>
@@ -191,7 +281,7 @@ b.根据物理地址获取数据
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/17/memory-hardware-md/" data-id="cjiqxw64q0001ioxuds6uc4cz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/06/17/memory-hardware-md/" data-id="cjiyp0cnf0002gxxuk3xgvym8" class="article-share-link">Share</a>
       
       
     </footer>
@@ -211,9 +301,23 @@ b.根据物理地址获取数据
 
   
     
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ds5介绍/">ds5介绍</a></li></ul>
+    </div>
+  </div>
+
 
   
     
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ds5介绍/" style="font-size: 10px;">ds5介绍</a>
+    </div>
+  </div>
+
   
     
   <div class="widget-wrap">
@@ -230,6 +334,10 @@ b.根据物理地址获取数据
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/06/25/ds5-userguide/">DS5相关介绍</a>
+          </li>
         
           <li>
             <a href="/2018/06/19/memory-process/">程序的内存空间</a>
