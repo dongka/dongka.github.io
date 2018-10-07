@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="categories," />
+  <meta name="keywords" content="thermal thermal_zone," />
 
 
 
@@ -80,7 +80,7 @@
 
 
 <meta name="description" content="theraml框架框图 thermal_zone_device：获取温度设备的抽象 thermal_cooling_device: 降低温度措施的抽象 thermal_governor:温控策略，step wise, bangbang,user space,power_allocator，fair_share thermal_core : 作为user space和kernel的接口，同时也是Th">
-<meta name="keywords" content="categories">
+<meta name="keywords" content="thermal thermal_zone">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Thermal 框架梳理">
 <meta property="og:url" content="http://yoursite.com/2018/06/25/thermal/thermal_framework/index.html">
@@ -95,7 +95,7 @@
 <meta property="og:image" content="http://yoursite.com/2018/06/25/thermal/thermal_framework/thermal_pid.png">
 <meta property="og:image" content="http://yoursite.com/2018/06/25/thermal/thermal_framework/power_allocate_throttle.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/06/25/thermal/thermal_framework/step_wise.jpg">
-<meta property="og:updated_time" content="2018-09-30T09:12:33.218Z">
+<meta property="og:updated_time" content="2018-10-07T08:26:51.772Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Thermal 框架梳理">
 <meta name="twitter:description" content="theraml框架框图 thermal_zone_device：获取温度设备的抽象 thermal_cooling_device: 降低温度措施的抽象 thermal_governor:温控策略，step wise, bangbang,user space,power_allocator，fair_share thermal_core : 作为user space和kernel的接口，同时也是Th">
@@ -211,21 +211,11 @@
       
         
         <li class="menu-item menu-item-categories">
-          <a href="/categories/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            Categories
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-power_manager">
-          <a href="/categories/电源管理" rel="section">
+          <a href="/categories" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
             
-            power_manager
+            Categories
           </a>
         </li>
       
@@ -368,7 +358,27 @@
 <li>thermal_core : 作为user space和kernel的接口，同时也是Thermal框架的中枢</li>
 </ol>
 <p>相关的节点：/sys/class/thermal<br><img src="/2018/06/25/thermal/thermal_framework/thermal.jpg" alt="thermal"></p>
-<h1><span id="thermal_zone_device">thermal_zone_device</span></h1><pre><code>struct thermal_zone_of_device_ops {
+<h1><span id="thermal_zone_device">thermal_zone_device</span></h1><pre><code>dts
+    cpu_thermal_zone{
+
+                            polling-delay-passive = &lt;1000&gt;;
+                            polling-delay = &lt;2000&gt;;
+                            thermal-sensors = &lt;&amp;ths_combine0 0&gt;;
+
+                            trips{
+                                    cpu_trip0:t0{
+                                            temperature = &lt;65&gt;;
+                                            type = &quot;passive&quot;;
+                                            hysteresis = &lt;0&gt;; 
+                                    };   
+                                    cpu_trip1:t1{
+                                            temperature = &lt;75&gt;;
+                                            type = &quot;passive&quot;;
+                                            hysteresis = &lt;0&gt;; 
+                                    };   
+    ....
+
+struct thermal_zone_of_device_ops {
     int (*get_temp)(void *, int *);  
     int (*get_trend)(void *, int, enum thermal_trend *); 
     int (*set_trips)(void *, int, int); // 设置温度窗口，当温度超过设置点需要通过thermal_zone_device_update
@@ -412,7 +422,40 @@ ths_driver_reg_to_temp(reg_data, id, ths_data-&gt;ths_driver_version, ths_data-&
 <h2><span id="3thermal轮询流程">3.thermal轮询流程</span></h2><p>在thermal core中通过不断的轮询来检测温度变化，如果温度没有达到crital则调用governor的throttle，通过governor的throttle决定下一次轮询的时间；如果温度为crital则走关机流程；</p>
 <p><img src="/2018/06/25/thermal/thermal_framework/thermal_core.jpg" alt="thermal_core调用流程"></p>
 <h1><span id="cooling_device">cooling_device</span></h1><p>嵌入式设备通过改变频率电压，来达到改变功耗的目的，cooling_device提供了获取当前设备的温控状态以及设置等接口；<br><img src="/2018/06/25/thermal/thermal_framework/cooling_device.png" alt="cooling_device"></p>
-<h2><span id="thermal_cooling_device">thermal_cooling_device</span></h2><pre><code>struct thermal_cooling_device_ops {
+<h2><span id="thermal_cooling_device">thermal_cooling_device</span></h2><pre><code>dts:
+cooling-maps{
+                                    bind0{
+                                            contribution = &lt;0&gt;;
+                                            trip = &lt;&amp;cpu_trip0&gt;;
+                                            cooling-device
+                                            = &lt;&amp;cpu_budget_cooling 1 1&gt;;
+                                    };
+                                    bind1{
+                                            contribution = &lt;0&gt;;
+                                            trip = &lt;&amp;cpu_trip1&gt;;
+                                            cooling-device
+                                            = &lt;&amp;cpu_budget_cooling 2 2&gt;;
+                                    };
+...
+               cpu_budget_cooling:cpu_budget_cool{
+                    compatible = &quot;allwinner,budget_cooling&quot;;
+                    device_type = &quot;cpu_budget_cooling&quot;;
+                    #cooling-cells = &lt;2&gt;;
+                    status = &quot;okay&quot;;
+                    state_cnt = &lt;7&gt;;
+                    cluster_num = &lt;1&gt;;
+                    state0 = &lt;1800000 4&gt;;
+                    state1 = &lt;1512000 4&gt;;
+                    state2 = &lt;1416000 4&gt;;
+                    state3 = &lt;1200000 4&gt;;
+                    state4 = &lt;1008000 3&gt;;
+                    state5 = &lt;1008000 2&gt;;
+                    state6 = &lt;1008000 1&gt;;
+            };
+...
+
+
+struct thermal_cooling_device_ops {
     int (*get_max_state) (struct thermal_cooling_device *, unsigned long *);   //获取最高的cooling状态的回调函数，指最低功耗的OPP                       
     int (*get_cur_state) (struct thermal_cooling_device *, unsigned long *); //获取当前cooling状态的回调函数                          
     int (*set_cur_state) (struct thermal_cooling_device *, unsigned long);   //根据cooling_state执行cpufreq的回调函数，是执行的实体                         
@@ -618,7 +661,7 @@ k_d 为求导，一般设置为0
       
         <div class="post-tags">
           
-            <a href="/tags/categories/" rel="tag"># categories</a>
+            <a href="/tags/thermal-thermal-zone/" rel="tag"># thermal thermal_zone</a>
           
         </div>
       
@@ -720,7 +763,7 @@ k_d 为求导，一般设置为0
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -730,10 +773,10 @@ k_d 为求导，一般设置为0
               
               
               <div class="site-state-item site-state-categories">
-                
-                  <span class="site-state-item-count">5</span>
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">categories</span>
-                
+                </a>
               </div>
             
 
@@ -741,10 +784,10 @@ k_d 为求导，一般设置为0
               
               
               <div class="site-state-item site-state-tags">
-                
-                  <span class="site-state-item-count">4</span>
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">tags</span>
-                
+                </a>
               </div>
             
 

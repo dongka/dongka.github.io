@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="爬虫," />
 
 
 
@@ -79,20 +79,18 @@
 
 
 
-<meta name="description" content="一：内核空间和用户空间Linux的虚拟地址空间范围是0~4G,linux内核将这4G空间分为两部分，将最高的1G字节（从虚拟地址0xC0000000到0xFFFFFFFF）供内核使用，称为“内核空间”。而将较低的3G字节（从虚拟地址0X00000000到0xBFFFFFFFF）供各个进程使用，称为“用户空间”。因为每个进程可以通过系统调用进入内核，因此，Linux内核由系统内的所有进程共享。于是，">
+<meta name="description" content="“大数据时代” 数据获取方式 企业生产的用户数据腾讯指数 百度指数 阿里指数 微博指数  数据管理咨询公司艾瑞咨询 麦肯锡  政府/机构提供的公开数据国家数据 纳斯达克股票数据  第三方数据平台购买数据数据堂 贵阳大数据交易所  爬虫爬取数据   爬虫介绍爬虫按照场景分为两种，通用爬虫和聚焦爬虫 通用爬虫 通用爬虫即搜索引擎用的爬虫系统，如百度，谷歌 1.尽可能把互联网上所有的网页下载下来，放到本">
+<meta name="keywords" content="爬虫">
 <meta property="og:type" content="article">
-<meta property="og:title" content="程序的内存空间">
-<meta property="og:url" content="http://yoursite.com/2018/06/19/memory/memory-process/index.html">
+<meta property="og:title" content="爬虫介绍">
+<meta property="og:url" content="http://yoursite.com/2018/10/07/python/spider/spider_summary/index.html">
 <meta property="og:site_name" content="知识总结">
-<meta property="og:description" content="一：内核空间和用户空间Linux的虚拟地址空间范围是0~4G,linux内核将这4G空间分为两部分，将最高的1G字节（从虚拟地址0xC0000000到0xFFFFFFFF）供内核使用，称为“内核空间”。而将较低的3G字节（从虚拟地址0X00000000到0xBFFFFFFFF）供各个进程使用，称为“用户空间”。因为每个进程可以通过系统调用进入内核，因此，Linux内核由系统内的所有进程共享。于是，">
+<meta property="og:description" content="“大数据时代” 数据获取方式 企业生产的用户数据腾讯指数 百度指数 阿里指数 微博指数  数据管理咨询公司艾瑞咨询 麦肯锡  政府/机构提供的公开数据国家数据 纳斯达克股票数据  第三方数据平台购买数据数据堂 贵阳大数据交易所  爬虫爬取数据   爬虫介绍爬虫按照场景分为两种，通用爬虫和聚焦爬虫 通用爬虫 通用爬虫即搜索引擎用的爬虫系统，如百度，谷歌 1.尽可能把互联网上所有的网页下载下来，放到本">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://yoursite.com/2018/06/19/memory/memory-process/memory_process/进程空间.png">
-<meta property="og:image" content="http://yoursite.com/2018/06/19/memory/memory-process/memory_process/内核空间.png">
-<meta property="og:updated_time" content="2018-06-30T06:34:27.000Z">
+<meta property="og:updated_time" content="2018-10-07T07:57:41.236Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="程序的内存空间">
-<meta name="twitter:description" content="一：内核空间和用户空间Linux的虚拟地址空间范围是0~4G,linux内核将这4G空间分为两部分，将最高的1G字节（从虚拟地址0xC0000000到0xFFFFFFFF）供内核使用，称为“内核空间”。而将较低的3G字节（从虚拟地址0X00000000到0xBFFFFFFFF）供各个进程使用，称为“用户空间”。因为每个进程可以通过系统调用进入内核，因此，Linux内核由系统内的所有进程共享。于是，">
-<meta name="twitter:image" content="http://yoursite.com/2018/06/19/memory/memory-process/memory_process/进程空间.png">
+<meta name="twitter:title" content="爬虫介绍">
+<meta name="twitter:description" content="“大数据时代” 数据获取方式 企业生产的用户数据腾讯指数 百度指数 阿里指数 微博指数  数据管理咨询公司艾瑞咨询 麦肯锡  政府/机构提供的公开数据国家数据 纳斯达克股票数据  第三方数据平台购买数据数据堂 贵阳大数据交易所  爬虫爬取数据   爬虫介绍爬虫按照场景分为两种，通用爬虫和聚焦爬虫 通用爬虫 通用爬虫即搜索引擎用的爬虫系统，如百度，谷歌 1.尽可能把互联网上所有的网页下载下来，放到本">
 
 
 
@@ -122,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/06/19/memory/memory-process/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/10/07/python/spider/spider_summary/"/>
 
 
 
 
 
-  <title>程序的内存空间 | 知识总结</title>
+  <title>爬虫介绍 | 知识总结</title>
   
 
 
@@ -255,7 +253,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/19/memory/memory-process/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/07/python/spider/spider_summary/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dongka">
@@ -272,7 +270,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">程序的内存空间</h1>
+          <h1 class="post-title" itemprop="name headline">爬虫介绍</h1>
         
 
         <div class="post-meta">
@@ -284,8 +282,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-19T08:00:03+00:00">
-                2018-06-19
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-07T07:57:41+00:00">
+                2018-10-07
               </time>
             
 
@@ -307,8 +305,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/内存管理/" itemprop="url" rel="index">
-                    <span itemprop="name">内存管理</span>
+                  <a href="/categories/spider/" itemprop="url" rel="index">
+                    <span itemprop="name">spider</span>
                   </a>
                 </span>
 
@@ -344,14 +342,84 @@
       
 
       
-        <h1><span id="一内核空间和用户空间">一：内核空间和用户空间</span></h1><p>Linux的虚拟地址空间范围是0~4G,linux内核将这4G空间分为两部分，将最高的1G字节（从虚拟地址0xC0000000到0xFFFFFFFF）供内核使用，称为“内核空间”。而将较低的3G字节（从虚拟地址0X00000000到0xBFFFFFFFF）供各个进程使用，称为“用户空间”。因为每个进程可以通过系统调用进入内核，因此，Linux内核由系统内的所有进程共享。于是，从具体进程的角度来看，每个进程可以拥有4G字节的虚拟空间<br>每个进程的用户空间都是完全独立，互不相干，用户进程各自有不同的页表。而内核空间是有内核负责映射的，不随进程改变，是固定的。内核空间有自己对应的页表；<br>这里指的32位内核地址空间划分，64位内核地址空间是不同的<br><img src="/2018/06/19/memory/memory-process/memory_process/进程空间.png" alt="进程空间分布"></p>
-<h2><span id="11内核空间">1.1:内核空间</span></h2><p>linux内核在启动的时候会打印出内核空间的布局图：<br>init/mian.c:<br>    start_kernel-&gt;mm_init-&gt;mem_init<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Memory: 996228K/1048576K available (9216K kernel code, 1381K rwdata, 2940K rodata, 1024K init, 397K bss, 44156K reserved, 8192K cma-reserved, 253952K highmem)</span><br><span class="line">[    0.000000] Virtual kernel memory layout:</span><br><span class="line">[    0.000000]     vector  : 0xffff0000 - 0xffff1000   (   4 kB)</span><br><span class="line">[    0.000000]     fixmap  : 0xffc00000 - 0xfff00000   (3072 kB)</span><br><span class="line">[    0.000000]     vmalloc : 0xf0800000 - 0xff800000   ( 240 MB)</span><br><span class="line">[    0.000000]     lowmem  : 0xc0000000 - 0xf0000000   ( 768 MB)</span><br><span class="line">[    0.000000]     pkmap   : 0xbfe00000 - 0xc0000000   (   2 MB)</span><br><span class="line">[    0.000000]     modules : 0xbf000000 - 0xbfe00000   (  14 MB)</span><br><span class="line">[    0.000000]       .text : 0xc0008000 - 0xc0a00000   (10208 kB) //代码段</span><br><span class="line">[    0.000000]       .init : 0xc0e00000 - 0xc0f00000   (1024 kB)  //init段 包含了大部分模块的初始化数据</span><br><span class="line">[    0.000000]       .data : 0xc0f00000 - 0xc1059518   (1382 kB)  //数据段的起始和结束地址，保存大部分内核的变量</span><br><span class="line">[    0.000000]        .bss : 0xc105b000 - 0xc10be54c   ( 398 kB)  //BSS段的开始和结束地址，包含初始化为0的所有静态全局变量</span><br><span class="line">[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1</span><br></pre></td></tr></table></figure></p>
-<p><img src="/2018/06/19/memory/memory-process/memory_process/内核空间.png" alt="内核空间"></p>
-<p>内核空间分为三部分：ZONE_DMA(16M),ZONE_NORMAL(16~896),ZONE_HIGMEM(896~1G),高端内存<br>内核地址空间分为物理内存映射区，虚拟内存分配区，高端页面映射区，专用页面映射区保留区<br>内核空间中存放的是内核代码和数据，而进程的用户空间中存放的是用户程序的代码和数据。不管是内核空间还是用户空间，它们都处于虚拟空间中，虽然内核空间占据了每个虚拟空间的最高1GB字节，但映射到物理内存却总是从最低（0X00000000），另外，使用虚拟地址可以很好的保护内核空间不被破坏，虚拟地址到物理地址转换过程中有操作系统和CPU共同完成<br>内核空间是持续存在的，并且在所有进程中都映射到同样的物理内存，内核代码和数据总是可寻址的，随时准备处理中断和系统调用。</p>
-<h2><span id="12用户空间分布">1.2:用户空间分布</span></h2><p>程序段（Text）:程序代码在内存中的映射，存放函数体的二进制代码。<br>初始化过的数据（Data）:在程序运行初已经对变量进行初始化的数据<br>未初始化过的数据（BSS）:在程序运行初未对变量进行初始化的数据<br>栈（Stack）：存储局部，临时变量，函数调用时，存储函数的返回指针，用于控制函数的调用和返回。在程序块开始时自动分配内存，结束时自动释放内存，其操作方式类似于结构中的栈；<br>堆（Heap）：存储动态内存分配，需要程序员手工分配，手工释放；</p>
-<h2><span id="三内存溢出内存泄漏内存越界缓存区溢出栈溢出">三：内存溢出，内存泄漏，内存越界，缓存区溢出，栈溢出</span></h2><p>内存溢出：要求分配的内存超出了系统能给予的<br>内存越界：申请了一块内存，在使用这块的时候，超出了你申请的范围<br>缓冲区溢出：当计算机向缓冲区填充区内填充数据位数</p>
-<p>参考资料：<br><a href="https://blog.csdn.net/tommy_wxie/article/details/17122923/" target="_blank" rel="noopener">linux用户空间与内核空间——高端内存详解</a><br><a href="https://blog.csdn.net/u010246947/article/details/9413275" target="_blank" rel="noopener">ARM架构内核启动分析-head.S(1.1).vmlinux.lds链接脚本分析</a></p>
+        <h1><span id="大数据时代-数据获取方式">“大数据时代” 数据获取方式</span></h1><ol>
+<li><p>企业生产的用户数据<br><a href="https://tbi.tencent.com/" target="_blank" rel="noopener">腾讯指数</a> <a href="https://index.baidu.com/" target="_blank" rel="noopener">百度指数</a> <a href="https://index.1688.com/" target="_blank" rel="noopener">阿里指数</a> <a href="https://data.weibo.com/index" target="_blank" rel="noopener">微博指数</a></p>
+</li>
+<li><p>数据管理咨询公司<br><a href="https://www.iresearch.com.cn/" target="_blank" rel="noopener">艾瑞咨询</a> <a href="http://mckinseychina.com/" target="_blank" rel="noopener">麦肯锡</a></p>
+</li>
+<li><p>政府/机构提供的公开数据<br><a href="http://data.stats.gov.cn/" target="_blank" rel="noopener">国家数据</a> <a href="https://www.nasdaq.com/" target="_blank" rel="noopener">纳斯达克股票数据</a></p>
+</li>
+<li><p>第三方数据平台购买数据<br><a href="http://www.datatang.com/" target="_blank" rel="noopener">数据堂</a> <a href="http://www.gbdex.com/" target="_blank" rel="noopener">贵阳大数据交易所</a></p>
+</li>
+<li><p>爬虫爬取数据</p>
+</li>
+</ol>
+<h1><span id="爬虫介绍">爬虫介绍</span></h1><p>爬虫按照场景分为两种，通用爬虫和聚焦爬虫</p>
+<h2><span id="通用爬虫">通用爬虫</span></h2><hr>
+<p>通用爬虫即搜索引擎用的爬虫系统，如百度，谷歌</p>
+<p>1.尽可能把互联网上所有的网页下载下来，放到本地服务器里形成备份，再对这些网页做相关的处理（提取关键字，去掉广告），最后提供一个用户检索的窗口；</p>
+<p>2.抓取流程</p>
+<pre><code>首先选取一部分已有的URL,把这些URL放到爬取队列；
 
+从队列里取出这些URL，然后解析DNS得到主机IP;然后去这个IP对应的服务器里下载HTML页面，保存到搜索引擎对应的数据；之后把这个爬过的URL放入已爬取队列。
+
+分析网页内容，找出网页里其他的URL连接，继续执行第二步，直到爬取条件结束；
+</code></pre><p>3.搜索引擎如何获取一个新网站的URL</p>
+<pre><code>1.主动向搜索引擎提交网址： [百度搜索资源平台](https://ziyuan.baidu.com/)
+
+
+2.在其他网站里设置外链
+
+
+3.搜索引擎会和DNS服务商进行合作，可以快速收录新的网站
+</code></pre><p>4.通用爬虫并不是万物皆可爬，它也需要遵守规则：</p>
+<pre><code>Robots协议： 协议会指明通用爬虫可以爬取网页的权限
+
+Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大型的搜索引擎爬虫才会遵守，个人爬虫可以不管；
+</code></pre><p>5.通用爬虫工作流程:  爬去网页 –&gt; 存储数据 –&gt;内容处理–&gt;提供检索/排名服务<br>6.收索引擎排名</p>
+<pre><code>1.PageRank(流量越高，越值钱)
+
+2.竞价排名,谁给钱多，谁排名就高
+</code></pre><p>7.通用爬虫的缺点：</p>
+<ul>
+<li><p>只能提供文本信息，但不能提供多媒体文件（音乐，视频）</p>
+</li>
+<li><p>提供的结果千篇一律，不能针对不同背景领域的人提供不同的搜索结果</p>
+</li>
+<li><p>不能理解人类语义</p>
+</li>
+</ul>
+<h2><span id="聚焦爬虫">聚焦爬虫</span></h2><hr>
+<p>聚焦爬虫指的就是程序员写的针对某些内容的爬虫</p>
+<h3><span id="网页三大特征">网页三大特征</span></h3><ol>
+<li><p>每个网页都有自己的URL(同一资源定位符)来进行定位</p>
+</li>
+<li><p>网页都是用HTML(超文本标记语言)来描述页面信息</p>
+</li>
+<li><p>网页都使用HTTP/HTTPS(超文本传输协议)来传输HTML数据</p>
+</li>
+</ol>
+<h3><span id="爬虫的思路">爬虫的思路</span></h3><ol>
+<li>首先确定爬取的网页URL地址</li>
+<li>通过HTTP/HTTP协议来获取对应的HTML页面</li>
+<li>提取HTML页面有用的数据,如果是页面的其他URL,那就继续执行第二步</li>
+</ol>
+<p>常见步骤：</p>
+<pre><code>- HTTP请求的处理，urllib,urllib2,requests,处理后的请求可以模拟浏览器请求，获取服务器响应的文件
+
+- 通过动态页面采集： Selenium+PhantomJS(无界面)：模拟真实浏览器加载js,ajax等非静态页面数据    
+
+- Tesseract: 机器学习库，机器图像识别系统，可以处理简单验证码，复杂的验证码可以通过手动输入
+- 保存数据     re,xpath,BeautifulSoup4(bs4),jsonpath,pyquery等 使用某种描述性一样来给我们需要提取的数据定义一个匹配规则，符合这个规则的数据就会被匹配，如果是需要的数据，就保存起来
+</code></pre><h3><span id="爬虫框架">爬虫框架</span></h3><p><strong>Scrapy,Pyspider</strong></p>
+<pre><code>高定制性高性能（异步网络框架twisted）,所以数据下载熟读非常快，提供了数据下载，数据存储，数据下载，提取规则
+</code></pre><p><strong>分布式策略</strong></p>
+<pre><code>scrapy redis，在scrapy的基础上添加了以redis数据库为核心的一套组件,让scrapy框架支持分布式的功能，主要是Redis里做指纹去重，请求分配，数据临时存储
+</code></pre><h1><span id="结语">结语</span></h1><p><strong>爬虫 反爬虫 反反爬虫之间的斗争</strong></p>
+<pre><code>其实爬虫做到最后，最头疼的不是负杂的页面，也不是晦涩的数据，而是网站另外一头的运维人员
+
+反爬虫： User Agent,代理，验证码，动态数据加载，加密数据
+</code></pre>
       
     </div>
     
@@ -366,6 +434,12 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/爬虫/" rel="tag"># 爬虫</a>
+          
+        </div>
+      
 
       
       
@@ -375,8 +449,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/06/17/memory/memory-hardware-md/" rel="next" title="内存管理（一）硬件篇">
-                <i class="fa fa-chevron-left"></i> 内存管理（一）硬件篇
+              <a href="/2018/06/25/cpu/cpu_freq/" rel="next" title="CPUFreq">
+                <i class="fa fa-chevron-left"></i> CPUFreq
               </a>
             
           </div>
@@ -384,10 +458,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/06/25/tools/ds5-userguide/" rel="prev" title="DS5相关介绍">
-                DS5相关介绍 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -519,7 +589,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">一：内核空间和用户空间</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.</span> <span class="nav-text">1.1:内核空间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.2.</span> <span class="nav-text">1.2:用户空间分布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.3.</span> <span class="nav-text">三：内存溢出，内存泄漏，内存越界，缓存区溢出，栈溢出</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">“大数据时代” 数据获取方式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">爬虫介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.1.</span> <span class="nav-text">通用爬虫</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.</span> <span class="nav-text">聚焦爬虫</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.1.</span> <span class="nav-text">网页三大特征</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.2.</span> <span class="nav-text">爬虫的思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.3.</span> <span class="nav-text">爬虫框架</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">结语</span></a></li></ol></div>
             
 
           </div>

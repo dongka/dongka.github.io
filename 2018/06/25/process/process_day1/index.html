@@ -79,19 +79,19 @@
 
 
 
-<meta name="description" content="一：进程结构体 进程的状态 进程的进程标识 进程标记 表示进程亲属关系的成员 进程内核栈 ptrace系统调用 优先级 调度策略相关字段   task_struct的初始化   一：进程结构体1声明目录：include/linux/sched.h 进程的状态123456volatile long state; /* -1 unrunnable, 0 runnable, &amp;gt;0 stoppe">
+<meta name="description" content="一：进程结构体1声明目录：include/linux/sched.h 进程的状态123456volatile long state; /* -1 unrunnable, 0 runnable, &amp;gt;0 stopped */ //1. R:运行(正在运行或在运行队列中等待)//2. S:中断(休眠中，受阻，在等待某个条件形成或接受到信号)//3. D:不可中断(收到信号不唤醒和不可运行，进程必须">
 <meta name="keywords" content="进程介绍">
 <meta property="og:type" content="article">
 <meta property="og:title" content="进程初识">
 <meta property="og:url" content="http://yoursite.com/2018/06/25/process/process_day1/index.html">
 <meta property="og:site_name" content="知识总结">
-<meta property="og:description" content="一：进程结构体 进程的状态 进程的进程标识 进程标记 表示进程亲属关系的成员 进程内核栈 ptrace系统调用 优先级 调度策略相关字段   task_struct的初始化   一：进程结构体1声明目录：include/linux/sched.h 进程的状态123456volatile long state; /* -1 unrunnable, 0 runnable, &amp;gt;0 stoppe">
+<meta property="og:description" content="一：进程结构体1声明目录：include/linux/sched.h 进程的状态123456volatile long state; /* -1 unrunnable, 0 runnable, &amp;gt;0 stopped */ //1. R:运行(正在运行或在运行队列中等待)//2. S:中断(休眠中，受阻，在等待某个条件形成或接受到信号)//3. D:不可中断(收到信号不唤醒和不可运行，进程必须">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2018/06/25/process/process_day1/process_life.jpg">
-<meta property="og:updated_time" content="2018-07-30T07:23:44.000Z">
+<meta property="og:updated_time" content="2018-10-07T06:17:56.174Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="进程初识">
-<meta name="twitter:description" content="一：进程结构体 进程的状态 进程的进程标识 进程标记 表示进程亲属关系的成员 进程内核栈 ptrace系统调用 优先级 调度策略相关字段   task_struct的初始化   一：进程结构体1声明目录：include/linux/sched.h 进程的状态123456volatile long state; /* -1 unrunnable, 0 runnable, &amp;gt;0 stoppe">
+<meta name="twitter:description" content="一：进程结构体1声明目录：include/linux/sched.h 进程的状态123456volatile long state; /* -1 unrunnable, 0 runnable, &amp;gt;0 stopped */ //1. R:运行(正在运行或在运行队列中等待)//2. S:中断(休眠中，受阻，在等待某个条件形成或接受到信号)//3. D:不可中断(收到信号不唤醒和不可运行，进程必须">
 <meta name="twitter:image" content="http://yoursite.com/2018/06/25/process/process_day1/process_life.jpg">
 
 
@@ -204,21 +204,11 @@
       
         
         <li class="menu-item menu-item-categories">
-          <a href="/categories/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            Categories
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-power_manager">
-          <a href="/categories/电源管理" rel="section">
+          <a href="/categories" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
             
-            power_manager
+            Categories
           </a>
         </li>
       
@@ -354,23 +344,7 @@
       
 
       
-        <!-- toc -->
-<ul>
-<li><a href="#一进程结构体">一：进程结构体</a><ul>
-<li><a href="#进程的状态">进程的状态</a></li>
-<li><a href="#进程的进程标识">进程的进程标识</a></li>
-<li><a href="#进程标记">进程标记</a></li>
-<li><a href="#表示进程亲属关系的成员">表示进程亲属关系的成员</a></li>
-<li><a href="#进程内核栈">进程内核栈</a></li>
-<li><a href="#ptrace系统调用">ptrace系统调用</a></li>
-<li><a href="#优先级">优先级</a></li>
-<li><a href="#调度策略相关字段">调度策略相关字段</a></li>
-</ul>
-</li>
-<li><a href="#task_struct的初始化">task_struct的初始化</a></li>
-</ul>
-<!-- tocstop -->
-<h1><span id="一进程结构体">一：进程结构体</span></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">声明目录：include/linux/sched.h</span><br></pre></td></tr></table></figure>
+        <h1><span id="一进程结构体">一：进程结构体</span></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">声明目录：include/linux/sched.h</span><br></pre></td></tr></table></figure>
 <h2><span id="进程的状态">进程的状态</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">volatile long state; /* -1 unrunnable, 0 runnable, &gt;0 stopped */ </span><br><span class="line">//1. R:运行(正在运行或在运行队列中等待)</span><br><span class="line">//2. S:中断(休眠中，受阻，在等待某个条件形成或接受到信号)</span><br><span class="line">//3. D:不可中断(收到信号不唤醒和不可运行，进程必须等待直到有中断发生): </span><br><span class="line">//4. T:僵死(进程已终止，但进程描述符存在，直到父进程调用wait4()系统调用后释放)</span><br><span class="line">//5. Z:停止(进程收到SIGSTOP,STGSTP,SIGIN,SIGOU信号后停止运行)</span><br></pre></td></tr></table></figure>
 <p><img src="/2018/06/25/process/process_day1/process_life.jpg" alt="进程的生命周期"></p>
 <h2><span id="进程的进程标识">进程的进程标识</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pid_t pid;</span><br><span class="line">pid_t tgid;</span><br></pre></td></tr></table></figure>
@@ -511,7 +485,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -521,10 +495,10 @@
               
               
               <div class="site-state-item site-state-categories">
-                
-                  <span class="site-state-item-count">5</span>
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">categories</span>
-                
+                </a>
               </div>
             
 
@@ -532,10 +506,10 @@
               
               
               <div class="site-state-item site-state-tags">
-                
-                  <span class="site-state-item-count">4</span>
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">tags</span>
-                
+                </a>
               </div>
             
 

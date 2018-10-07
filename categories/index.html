@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="中断," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -79,18 +79,14 @@
 
 
 
-<meta name="description" content="1. arm中断模式   1. arm中断模式usr(用户空间的AP所处于的模式)；fiq(快速中断模式):irq(中断模式):svc(即SVC mode,大部分内核代码都处于这种mode):abt(当发生data abort exception 或者 prefetch abort exception的时候进入的模式):sys(系统模式):und(未定义指令模式):">
-<meta name="keywords" content="中断">
-<meta property="og:type" content="article">
-<meta property="og:title" content="中断介绍">
-<meta property="og:url" content="http://yoursite.com/2018/06/25/intr/intr/index.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="categories">
+<meta property="og:url" content="http://yoursite.com/categories/index.html">
 <meta property="og:site_name" content="知识总结">
-<meta property="og:description" content="1. arm中断模式   1. arm中断模式usr(用户空间的AP所处于的模式)；fiq(快速中断模式):irq(中断模式):svc(即SVC mode,大部分内核代码都处于这种mode):abt(当发生data abort exception 或者 prefetch abort exception的时候进入的模式):sys(系统模式):und(未定义指令模式):">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-09-02T06:17:34.000Z">
+<meta property="og:updated_time" content="2018-10-07T08:24:26.063Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="中断介绍">
-<meta name="twitter:description" content="1. arm中断模式   1. arm中断模式usr(用户空间的AP所处于的模式)；fiq(快速中断模式):irq(中断模式):svc(即SVC mode,大部分内核代码都处于这种mode):abt(当发生data abort exception 或者 prefetch abort exception的时候进入的模式):sys(系统模式):und(未定义指令模式):">
+<meta name="twitter:title" content="categories">
 
 
 
@@ -120,13 +116,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/06/25/intr/intr/"/>
+  <link rel="canonical" href="http://yoursite.com/categories/"/>
 
 
 
 
 
-  <title>中断介绍 | 知识总结</title>
+  <title>categories | 知识总结</title>
   
 
 
@@ -202,21 +198,11 @@
       
         
         <li class="menu-item menu-item-categories">
-          <a href="/categories/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            Categories
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-power_manager">
-          <a href="/categories/电源管理" rel="section">
+          <a href="/categories" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
             
-            power_manager
+            Categories
           </a>
         </li>
       
@@ -251,175 +237,40 @@
 
   <div id="posts" class="posts-expand">
     
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/intr/intr/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
     
+    
+    <div class="post-block page">
       <header class="post-header">
 
-        
-        
-          <h1 class="post-title" itemprop="name headline">中断介绍</h1>
-        
+	<h1 class="post-title" itemprop="name headline">categories</h1>
 
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
-                2018-06-25
-              </time>
-            
 
-            
 
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/中断/" itemprop="url" rel="index">
-                    <span itemprop="name">中断</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+</header>
 
       
       
-
       
-        <!-- toc -->
-<ul>
-<li><a href="#1-arm中断模式">1. arm中断模式</a></li>
-</ul>
-<!-- tocstop -->
-<h1><span id="1-arm中断模式">1. arm中断模式</span></h1><p>usr(用户空间的AP所处于的模式)；<br>fiq(快速中断模式):<br>irq(中断模式):<br>svc(即SVC mode,大部分内核代码都处于这种mode):<br>abt(当发生data abort exception 或者 prefetch abort exception的时候进入的模式):<br>sys(系统模式):<br>und(未定义指令模式):</p>
-
+      <div class="post-body">
+        
+        
+          <div class="category-all-page">
+            <div class="category-all-title">
+                6 categories in total
+            </div>
+            <div class="category-all">
+              <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/cpu/">cpu</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spider/">spider</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/thermal/">thermal</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/内存管理/">内存管理</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/工具使用/">工具使用</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/进程/">进程</a><span class="category-list-count">1</span></li></ul>
+            </div>
+          </div>
+        
+      </div>
+      
+      
       
     </div>
     
     
     
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/中断/" rel="tag"># 中断</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2018/06/25/thermal/thermal_framework/" rel="next" title="Thermal 框架梳理">
-                <i class="fa fa-chevron-left"></i> Thermal 框架梳理
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/06/25/cpu/cpu概述/" rel="prev" title="CPU概述">
-                CPU概述 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-
-    <div class="post-spread">
-      
-    </div>
   </div>
 
 
@@ -452,17 +303,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            Table of Contents
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            Overview
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -477,7 +319,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -487,10 +329,10 @@
               
               
               <div class="site-state-item site-state-categories">
-                
+                <a href="/categories/index.html">
                   <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">categories</span>
-                
+                </a>
               </div>
             
 
@@ -498,10 +340,10 @@
               
               
               <div class="site-state-item site-state-tags">
-                
-                  <span class="site-state-item-count">5</span>
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">tags</span>
-                
+                </a>
               </div>
             
 
@@ -522,22 +364,6 @@
         </div>
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">1. arm中断模式</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
