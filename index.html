@@ -249,6 +249,139 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/22/cpu/arm体系架构的发展/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/22/cpu/arm体系架构的发展/" itemprop="url">Untitled</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-22T15:01:10+00:00">
+                2018-10-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1><span id="arm体系架构的发展">ARM体系架构的发展</span></h1><p>本文将从以下几点去展开介绍arm体系架构的发展：</p>
+<ol>
+<li>指令集架构</li>
+<li>arm公司的发展历史以及授权模式</li>
+<li>arm的体系架构 </li>
+</ol>
+<h1><span id="指令集架构isa">指令集架构（ISA）</span></h1><p>CPU执行计算任务时都需要遵从一定的规范，程序在被执行时都需要先翻译成CPU可以理解的语言。这种规范就是指令集<strong>（ISA，Intruction Set Architecrure）;</strong></p>
+<p>指令集一般分为两种：<strong>精简指令集</strong>（RISC:reduced instruction set computer)和<strong>复杂指令集</strong>（CISC：Complex Instrution Set Computer）,以洗衣机洗衣服为例，RISC架构为，加水-&gt;漂洗-&gt;风干；而复杂指令集则可以发出洗衣服的指令，从而让洗衣机自动帮忙做这一整套的流程；CISC可以通过一条复杂的指令来完成许多事情，性能在处理复杂的任务时，会比RISC更为高效；但随之而来的是面积和功耗的提升；基于2/8理论，程序大部分时间（80%）都是在做重复而简单的事情；所以RISC架构就应运而生，更为精简的指令，使其大部分场合能够取得更小的面积和功耗；</p>
+<p>采用精简指令集的微处理，常见为ARM,MIPS，Power Architecture(包括PowerPC,PowerXCell),SPARC，RISC-V等而采用CISC则为X86</p>
+<p>至于arm为代表RISC架构与以X86为代表的CISC之间的优劣比较还有是否存在替代一说，笔者认为，不会，而且从目前的发展来看，已经出现了你中有我，我中有你的局面；<br><a href="https://www.zhihu.com/question/20783321" target="_blank" rel="noopener">更进一步的探讨可以看下知乎上关于精简指令集与负杂指令集的讨论</a>,我也很赞同其中一个答主的观点，这已经不是个技术问题了，而是一个商业的问题</p>
+<p>总结完RISC和CISC之间的关系，再讲讲基于RISC阵营里面的ARM和最近比较火热的RISC-V，arm大家都熟悉，而RISC-V又是个什么东西呢？</p>
+<p>RISC-V是加州大学伯克利分校的开源指令集，由计算机架构的宗师级任务David Patterson领衔打造，通过将核心指令集以及<br>关键IP开源，意图改变半导体生态；详细的可以看这篇文档；<a href="http://www.semiinsights.com/s/electronic_components/23/30744.shtml" target="_blank" rel="noopener">名家专栏丨一文看懂RISC-V</a></p>
+<p>总结如下：RISC-V具有以下优点：1.可模块化配置的指令集。 2.支持可扩展的指令集 3.一套指令集支持所有架构，基本指令集仅40余条指令，以此为共用基础，加上其他常用模块子集指令总指令集也仅几十条 4.硬件设计和编译器非常简单</p>
+<h1><span id="arm公司的发展历史">arm公司的发展历史</span></h1><p>arm的发展历程在此文章讲的非常详细，故不再赘述<a href="http://www.elecfans.com/d/716428.html" target="_blank" rel="noopener">一文带你了解ARM的发展历程</a></p>
+<h1><span id="arm的体系架构">arm的体系架构</span></h1>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/07/python/spider/spider_summary/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -420,149 +553,6 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
 
 反爬虫： User Agent,代理，验证码，动态数据加载，加密数据
 </code></pre>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/cpu/cpu_freq/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/25/cpu/cpu_freq/" itemprop="url">CPUFreq</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
-                2018-06-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cpu/" itemprop="url" rel="index">
-                    <span itemprop="name">cpu</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1><span id="代码主要的功能">代码主要的功能</span></h1><p>1) 平台相关的初始化动作，包括CPU core的clock/regulator获取，初始化<br>2) 生成frequency table,即 CPU core所支持的频率/电压列表。并在初始化的时候将该table保存在policy<br>3) 定义一个strcut cpufreq_driver变量，填充必要的字段，并根据平台的特性，实现其中的回调函数；<br>4) 调用cpufreq_register_driver将driver注册到cpufreq framework中<br>5) cpufreq core会在CPU设备添加时，调用driver的init接口。driver需要在接口中初始化struct cpufreq变量<br>6) 系统运行过程中，cpufreq core会根据实际情况，调用driver的sepolicy或者target/target_index等接口，设置<br>CPU的调频策略或者频率值<br>7) 系统suspend的时候，会将CPU的频率设置为指定的值，或者调用driver的suspend回调函数；系统resume时调用driver的resume回调函数；</p>
-<h1><span id="cpufreq-driver">cpufreq driver</span></h1><p>frequency table是CPU core可以正确运行的一组频率/电压组合</p>
-
           
         
       
@@ -937,6 +927,149 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/cpu/cpu_freq/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/25/cpu/cpu_freq/" itemprop="url">CPUFreq</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index">
+                    <span itemprop="name">cpu</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1><span id="代码主要的功能">代码主要的功能</span></h1><p>1) 平台相关的初始化动作，包括CPU core的clock/regulator获取，初始化<br>2) 生成frequency table,即 CPU core所支持的频率/电压列表。并在初始化的时候将该table保存在policy<br>3) 定义一个strcut cpufreq_driver变量，填充必要的字段，并根据平台的特性，实现其中的回调函数；<br>4) 调用cpufreq_register_driver将driver注册到cpufreq framework中<br>5) cpufreq core会在CPU设备添加时，调用driver的init接口。driver需要在接口中初始化struct cpufreq变量<br>6) 系统运行过程中，cpufreq core会根据实际情况，调用driver的sepolicy或者target/target_index等接口，设置<br>CPU的调频策略或者频率值<br>7) 系统suspend的时候，会将CPU的频率设置为指定的值，或者调用driver的suspend回调函数；系统resume时调用driver的resume回调函数；</p>
+<h1><span id="cpufreq-driver">cpufreq driver</span></h1><p>frequency table是CPU core可以正确运行的一组频率/电压组合</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/process/process_day1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1052,6 +1185,223 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
 <p>#renice -n -5 -g 9394</p>
 <p>#nice -n 5 ./a.out</p>
 <h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.ibm.com/developerworks/cn/linux/l-cn-scheduler/index.html" target="_blank" rel="noopener">linux调度器发展简述</a><br><a href="https://blog.csdn.net/gatieme/article/details/51383272" target="_blank" rel="noopener">linux进程描述符task_struct结构体详解–linux进程的管理与调度(一)</a><br><a href="https://blog.csdn.net/gatieme/article/details/51484562" target="_blank" rel="noopener">Linux下0号进程的前世(init_task进程)今生(idle进程)—-Linux进程的管理与调度（五）</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/tools/ds5-userguide/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/25/tools/ds5-userguide/" itemprop="url">DS5相关介绍</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/工具使用/" itemprop="url" rel="index">
+                    <span itemprop="name">工具使用</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <!-- toc -->
+<ul>
+<li><a href="#一-ds5-与-dstream">一. DS5 与 DSTREAM</a><ul>
+<li><a href="#1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</a></li>
+<li><a href="#2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</a></li>
+</ul>
+</li>
+<li><a href="#二-安装ds5">二. 安装DS5</a></li>
+<li><a href="#三-ds5的使用">三. DS5的使用</a><ul>
+<li><a href="#1新建debug-control">1.新建debug control</a></li>
+<li><a href="#2建立连接">2.建立连接</a></li>
+<li><a href="#3load-vmlinux">3.load vmlinux</a></li>
+<li><a href="#4查看logbuf">4.查看logbuf</a></li>
+<li><a href="#5load-源码单步调试">5.load 源码单步调试</a></li>
+</ul>
+</li>
+<li><a href="#四csat的使用">四：csat的使用</a><ul>
+<li><a href="#1castcoresight-access-toolcast">1.cast:CoreSight Access Tool(CAST)</a></li>
+<li><a href="#2cast-ds-5-diff">2.CAST &amp; DS-5 diff</a></li>
+<li><a href="#3cast的命令">3.CAST的命令</a></li>
+</ul>
+</li>
+</ul>
+<!-- tocstop -->
+<h1><span id="一-ds5-与-dstream">一. DS5 与 DSTREAM</span></h1><h2><span id="1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/ds5.png" alt="ds5"><br>  从以下工具发展而来：DS5&lt;RVDS&lt;ADS&lt;SDT,目前除DS5外其他都已停用；<br>  有图形化的streamline性能分析器，可基于C源码，汇编程序，地址对bare裸机程序，uboot,kernel,驱动，app进行热点，程序瓶颈，CPU使用，Cache hit/miss,功耗分析</p>
+<h2><span id="2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/dstream.png" alt="dstream"><br>    共有7个接口，其中ARM JTAG 14，TI JTAG 14，ARM JTAG 20和Coresight 10这4个接口仅有debug功能，同时MICTOR 38，MIPI34，Coresight 20这3个接口有debug+trace功能</p>
+<h1><span id="二-安装ds5">二. 安装DS5</span></h1><ol>
+<li>安装虚拟网卡；</li>
+<li>安装DS5-19和完成licence注册</li>
+<li>拷贝模型到安装目录下</li>
+<li>打开DS5</li>
+</ol>
+<h1><span id="三-ds5的使用">三. DS5的使用</span></h1><h2><span id="1新建debug-control">1.新建debug control</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use1.png" alt="use1"></p>
+<h2><span id="2建立连接">2.建立连接</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use2.jpg" alt="use2"></p>
+<h2><span id="3load-vmlinux">3.load vmlinux</span></h2><p>   当建立连接后一般都是一些汇编语言，这时候需要将vmlinux load进DS5方便debug<br><img src="/2018/06/25/tools/ds5-userguide/ds5/load.png" alt="load"></p>
+<h2><span id="4查看logbuf">4.查看logbuf</span></h2><p>   logbuf的大小由.config中的CONIFG_LOG_BUF_SHIFT决定，在init/Kconfig中有对应的说明<br>   如何确定log_buf的地址：<br>   目前在arm64中log_buf的地址对应的是system.map中__log_buf对应的地址；<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf.jpg" alt="load"><br>   arm32对应的地址为system.map的log_buf对应地址的地址，需要ds5找到映射位置后在通过此地址去查看log_buf中的内容：<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf_arm32.jpg" alt="load"></p>
+<h2><span id="5load-源码单步调试">5.load 源码单步调试</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/load_code.jpg" alt="load"></p>
+<h1><span id="四csat的使用">四：csat的使用</span></h1><h2><span id="1castcoresight-access-toolcast">1.cast:CoreSight Access Tool(CAST)</span></h2><p>  DS-5的命令行工具，处理器挂住了，通过DS-5无法连接上，只能用CAST连接上，但是CSAT无法访问到处理器内部的寄存器</p>
+<h2><span id="2cast-amp-ds-5-diff">2.CAST &amp; DS-5 diff</span></h2><p>  CAST:通过APB总线连接，CPU挂死之后还能连接上，不能访问到CPU内部的寄存器<br>  DS5：通过CPU连接，CPU挂死之后无法连接上，能够访问到CPU内部的寄存器</p>
+<h2><span id="3cast的命令">3.CAST的命令</span></h2><ol>
+<li>打开DS5的命令行；</li>
+<li>输入以下命令：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cast</span><br><span class="line">  con USB</span><br><span class="line">  chain dev=auto clk=A</span><br><span class="line">  dvo 0</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th style="text-align:right">short name</th>
+<th style="text-align:center">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dpmemread</td>
+<td style="text-align:right">dmr</td>
+<td style="text-align:center">Read mememory</td>
+</tr>
+<tr>
+<td>dpmemwrite</td>
+<td style="text-align:right">dmw</td>
+<td style="text-align:center">Write memory</td>
+</tr>
+<tr>
+<td>dpfileload</td>
+<td style="text-align:right">dfl</td>
+<td style="text-align:center">Load a file into memory</td>
+</tr>
+<tr>
+<td>dpfilesave</td>
+<td style="text-align:right">dfs</td>
+<td style="text-align:center">Save a block of memory to file.</td>
+</tr>
+</tbody>
+</table>
+<p>example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dmr 0 0x00010000 0x50</span><br><span class="line">#save a block of memory to file</span><br><span class="line">dfs 0 0x047fb000 0x350 dram2.bin</span><br><span class="line">#load a file into memory</span><br><span class="line">dfl 0 bin 0x8000 myfile.bin Load binary file into 0x8000 on AP 0</span><br></pre></td></tr></table></figure></p>
 
           
         
@@ -1534,223 +1884,6 @@ k_d 为求导，一般设置为0
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/tools/ds5-userguide/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/25/tools/ds5-userguide/" itemprop="url">DS5相关介绍</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
-                2018-06-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/工具使用/" itemprop="url" rel="index">
-                    <span itemprop="name">工具使用</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <!-- toc -->
-<ul>
-<li><a href="#一-ds5-与-dstream">一. DS5 与 DSTREAM</a><ul>
-<li><a href="#1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</a></li>
-<li><a href="#2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</a></li>
-</ul>
-</li>
-<li><a href="#二-安装ds5">二. 安装DS5</a></li>
-<li><a href="#三-ds5的使用">三. DS5的使用</a><ul>
-<li><a href="#1新建debug-control">1.新建debug control</a></li>
-<li><a href="#2建立连接">2.建立连接</a></li>
-<li><a href="#3load-vmlinux">3.load vmlinux</a></li>
-<li><a href="#4查看logbuf">4.查看logbuf</a></li>
-<li><a href="#5load-源码单步调试">5.load 源码单步调试</a></li>
-</ul>
-</li>
-<li><a href="#四csat的使用">四：csat的使用</a><ul>
-<li><a href="#1castcoresight-access-toolcast">1.cast:CoreSight Access Tool(CAST)</a></li>
-<li><a href="#2cast-ds-5-diff">2.CAST &amp; DS-5 diff</a></li>
-<li><a href="#3cast的命令">3.CAST的命令</a></li>
-</ul>
-</li>
-</ul>
-<!-- tocstop -->
-<h1><span id="一-ds5-与-dstream">一. DS5 与 DSTREAM</span></h1><h2><span id="1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/ds5.png" alt="ds5"><br>  从以下工具发展而来：DS5&lt;RVDS&lt;ADS&lt;SDT,目前除DS5外其他都已停用；<br>  有图形化的streamline性能分析器，可基于C源码，汇编程序，地址对bare裸机程序，uboot,kernel,驱动，app进行热点，程序瓶颈，CPU使用，Cache hit/miss,功耗分析</p>
-<h2><span id="2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/dstream.png" alt="dstream"><br>    共有7个接口，其中ARM JTAG 14，TI JTAG 14，ARM JTAG 20和Coresight 10这4个接口仅有debug功能，同时MICTOR 38，MIPI34，Coresight 20这3个接口有debug+trace功能</p>
-<h1><span id="二-安装ds5">二. 安装DS5</span></h1><ol>
-<li>安装虚拟网卡；</li>
-<li>安装DS5-19和完成licence注册</li>
-<li>拷贝模型到安装目录下</li>
-<li>打开DS5</li>
-</ol>
-<h1><span id="三-ds5的使用">三. DS5的使用</span></h1><h2><span id="1新建debug-control">1.新建debug control</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use1.png" alt="use1"></p>
-<h2><span id="2建立连接">2.建立连接</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use2.jpg" alt="use2"></p>
-<h2><span id="3load-vmlinux">3.load vmlinux</span></h2><p>   当建立连接后一般都是一些汇编语言，这时候需要将vmlinux load进DS5方便debug<br><img src="/2018/06/25/tools/ds5-userguide/ds5/load.png" alt="load"></p>
-<h2><span id="4查看logbuf">4.查看logbuf</span></h2><p>   logbuf的大小由.config中的CONIFG_LOG_BUF_SHIFT决定，在init/Kconfig中有对应的说明<br>   如何确定log_buf的地址：<br>   目前在arm64中log_buf的地址对应的是system.map中__log_buf对应的地址；<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf.jpg" alt="load"><br>   arm32对应的地址为system.map的log_buf对应地址的地址，需要ds5找到映射位置后在通过此地址去查看log_buf中的内容：<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf_arm32.jpg" alt="load"></p>
-<h2><span id="5load-源码单步调试">5.load 源码单步调试</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/load_code.jpg" alt="load"></p>
-<h1><span id="四csat的使用">四：csat的使用</span></h1><h2><span id="1castcoresight-access-toolcast">1.cast:CoreSight Access Tool(CAST)</span></h2><p>  DS-5的命令行工具，处理器挂住了，通过DS-5无法连接上，只能用CAST连接上，但是CSAT无法访问到处理器内部的寄存器</p>
-<h2><span id="2cast-amp-ds-5-diff">2.CAST &amp; DS-5 diff</span></h2><p>  CAST:通过APB总线连接，CPU挂死之后还能连接上，不能访问到CPU内部的寄存器<br>  DS5：通过CPU连接，CPU挂死之后无法连接上，能够访问到CPU内部的寄存器</p>
-<h2><span id="3cast的命令">3.CAST的命令</span></h2><ol>
-<li>打开DS5的命令行；</li>
-<li>输入以下命令：</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cast</span><br><span class="line">  con USB</span><br><span class="line">  chain dev=auto clk=A</span><br><span class="line">  dvo 0</span><br></pre></td></tr></table></figure>
-<table>
-<thead>
-<tr>
-<th>command</th>
-<th style="text-align:right">short name</th>
-<th style="text-align:center">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>dpmemread</td>
-<td style="text-align:right">dmr</td>
-<td style="text-align:center">Read mememory</td>
-</tr>
-<tr>
-<td>dpmemwrite</td>
-<td style="text-align:right">dmw</td>
-<td style="text-align:center">Write memory</td>
-</tr>
-<tr>
-<td>dpfileload</td>
-<td style="text-align:right">dfl</td>
-<td style="text-align:center">Load a file into memory</td>
-</tr>
-<tr>
-<td>dpfilesave</td>
-<td style="text-align:right">dfs</td>
-<td style="text-align:center">Save a block of memory to file.</td>
-</tr>
-</tbody>
-</table>
-<p>example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dmr 0 0x00010000 0x50</span><br><span class="line">#save a block of memory to file</span><br><span class="line">dfs 0 0x047fb000 0x350 dram2.bin</span><br><span class="line">#load a file into memory</span><br><span class="line">dfl 0 bin 0x8000 myfile.bin Load binary file into 0x8000 on AP 0</span><br></pre></td></tr></table></figure></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/19/memory/memory-process/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2043,166 +2176,13 @@ b.根据物理地址获取数据
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-mtp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/17/memory/memory-mtp/" itemprop="url">内存管理（二）mtp拷贝流程</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-17T00:07:09+00:00">
-                2018-06-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/内存管理/" itemprop="url" rel="index">
-                    <span itemprop="name">内存管理</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2><span id="背景知识介绍">背景知识介绍</span></h2><p>android 从3.0开始集成MTP功能，主要原因有三个：<br>1.手机要支持UMS的话，必须要有一个sd卡，因为sd卡往往采用Windows支持的分区格式。如果想把内部存储空间通过UMS挂载到Windows上，则内部存储空间需采用特定的分区格式。这对某些手机而言根本不可行。因为内部存储空间本身可能就是一个设备，它们采用统一的分区格式。不能因为需要使用UMS，而再增加一块特定的分区格式的存储设备。<br>2.UMS挂载到PC后，PC操作系统拥有绝对的控制权。此时，Android系统无法操作这些设备。<br>3.window所占市场份额较大，故即使linux，MacOS支持力度不够，Android也要集成的；<br>MTP的主要缺点：<br>1.传输大文件的速度较慢 ??<br>2.MTP不能直接修改文件本身，只能先拷贝到本地修改，完毕后再拷贝回去</p>
-<h2><span id="mtp协议介绍">MTP协议介绍</span></h2><p>MTP使用者包括两个部分，分别为Initiator和Resoponder</p>
-<ol>
-<li>Initiator:主要是指USB Host,例如PC机，笔记本等，协议规定所有的MTP操作只能由Initator发起</li>
-<li>Responder:一般是诸如数码相机，智能手机等存储媒体文件的设备，Responder在MTP中的作用就是处理Initator发起的请求。同时，它还会根据自身状态的变化发送Event以通知Initator.</li>
-</ol>
-<h1><span id="mtp-协议栈">MTP 协议栈</span></h1><ol>
-<li>Pyshical Layer(物理层)：物理层在MTP协议中用来传输数据。目前有三种物理层可供MTP使用。它们分别是USB:其主要特点是传输文件，同步媒体文件时速度快，而且可以变工作边充电，这是目前用的最多的一种方式；IP：基于IP的MTP(简称MTP/TP)将通过UPnp来匹配和发现设备。它是家庭网络中最理想的传输方式；Bluetooth:MTP/BT是最省电，同时速度最慢的一种传输方式，用处较少；</li>
-<li>传输层：MTP中，数据传输格式遵循PTP协议</li>
-<li>命令层：实现了MTP协议中的各种命令；</li>
-</ol>
-<p>MTP采用命令-应答方式来工作，(Initator发送命令给Responder处理，Responser反馈处理结果)，这种方式主要特点有：</p>
-<ol>
-<li>所有MTP命令均以Package(数据包)的方式在设备两端进行传递</li>
-<li>Initiator必须接收到前一条消息处理结果，无论是成功或者超时后，才能发送下一条消息</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
 
 
           </div>
@@ -2246,7 +2226,7 @@ b.根据物理地址获取数据
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>

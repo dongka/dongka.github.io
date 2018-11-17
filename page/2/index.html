@@ -81,7 +81,7 @@
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="知识总结">
-<meta property="og:url" content="http://yoursite.com/categories/内存管理/index.html">
+<meta property="og:url" content="http://yoursite.com/page/2/index.html">
 <meta property="og:site_name" content="知识总结">
 <meta property="og:locale" content="default">
 <meta name="twitter:card" content="summary">
@@ -115,13 +115,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/categories/内存管理/"/>
+  <link rel="canonical" href="http://yoursite.com/page/2/"/>
 
 
 
 
 
-  <title>Category: 内存管理 | 知识总结</title>
+  <title>知识总结</title>
   
 
 
@@ -140,7 +140,8 @@
     
   
 
-  <div class="container sidebar-position-left ">
+  <div class="container sidebar-position-left 
+  page-home">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -233,111 +234,171 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
+  <section id="posts" class="posts-expand">
+    
+      
+
+  
 
   
   
   
-  <div class="post-block category">
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>内存管理<small>Category</small>
-        </h1>
-      </div>
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-mtp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/17/memory/memory-mtp/" itemprop="url">内存管理（二）mtp拷贝流程</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-17T00:07:09+00:00">
+                2018-06-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/内存管理/" itemprop="url" rel="index">
+                    <span itemprop="name">内存管理</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
 
       
         
+          
+            <h2><span id="背景知识介绍">背景知识介绍</span></h2><p>android 从3.0开始集成MTP功能，主要原因有三个：<br>1.手机要支持UMS的话，必须要有一个sd卡，因为sd卡往往采用Windows支持的分区格式。如果想把内部存储空间通过UMS挂载到Windows上，则内部存储空间需采用特定的分区格式。这对某些手机而言根本不可行。因为内部存储空间本身可能就是一个设备，它们采用统一的分区格式。不能因为需要使用UMS，而再增加一块特定的分区格式的存储设备。<br>2.UMS挂载到PC后，PC操作系统拥有绝对的控制权。此时，Android系统无法操作这些设备。<br>3.window所占市场份额较大，故即使linux，MacOS支持力度不够，Android也要集成的；<br>MTP的主要缺点：<br>1.传输大文件的速度较慢 ??<br>2.MTP不能直接修改文件本身，只能先拷贝到本地修改，完毕后再拷贝回去</p>
+<h2><span id="mtp协议介绍">MTP协议介绍</span></h2><p>MTP使用者包括两个部分，分别为Initiator和Resoponder</p>
+<ol>
+<li>Initiator:主要是指USB Host,例如PC机，笔记本等，协议规定所有的MTP操作只能由Initator发起</li>
+<li>Responder:一般是诸如数码相机，智能手机等存储媒体文件的设备，Responder在MTP中的作用就是处理Initator发起的请求。同时，它还会根据自身状态的变化发送Event以通知Initator.</li>
+</ol>
+<h1><span id="mtp-协议栈">MTP 协议栈</span></h1><ol>
+<li>Pyshical Layer(物理层)：物理层在MTP协议中用来传输数据。目前有三种物理层可供MTP使用。它们分别是USB:其主要特点是传输文件，同步媒体文件时速度快，而且可以变工作边充电，这是目前用的最多的一种方式；IP：基于IP的MTP(简称MTP/TP)将通过UPnp来匹配和发现设备。它是家庭网络中最理想的传输方式；Bluetooth:MTP/BT是最省电，同时速度最慢的一种传输方式，用处较少；</li>
+<li>传输层：MTP中，数据传输格式遵循PTP协议</li>
+<li>命令层：实现了MTP协议中的各种命令；</li>
+</ol>
+<p>MTP采用命令-应答方式来工作，(Initator发送命令给Responder处理，Responser反馈处理结果)，这种方式主要特点有：</p>
+<ol>
+<li>所有MTP命令均以Package(数据包)的方式在设备两端进行传递</li>
+<li>Initiator必须接收到前一条消息处理结果，无论是成功或者超时后，才能发送下一条消息</li>
+</ol>
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
+          
         
-            <a class="post-title-link" href="/2018/06/19/memory/memory-process/" itemprop="url">
-              
-                <span itemprop="name">程序的内存空间</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-06-19T08:00:03+00:00"
-              content="2018-06-19" >
-          06-19
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/06/17/memory/memory-hardware-md/" itemprop="url">
-              
-                <span itemprop="name">内存管理（一）硬件篇</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-06-17T00:07:09+00:00"
-              content="2018-06-17" >
-          06-17
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-      
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/06/17/memory/memory-mtp/" itemprop="url">
-              
-                <span itemprop="name">内存管理（二）mtp拷贝流程</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-06-17T00:07:09+00:00"
-              content="2018-06-17" >
-          06-17
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
       
     </div>
+    
+    
+    
 
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
   </div>
   
   
   
+  </article>
+
+
+    
+  </section>
 
   
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+  </nav>
 
 
 
