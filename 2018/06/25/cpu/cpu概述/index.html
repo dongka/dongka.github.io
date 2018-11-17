@@ -90,7 +90,7 @@
 <meta property="og:image" content="http://yoursite.com/2018/06/25/cpu/cpu概述/cpu拓扑.png">
 <meta property="og:image" content="http://yoursite.com/2018/06/25/cpu/cpu概述/kirin960.png">
 <meta property="og:image" content="http://yoursite.com/2018/06/25/cpu/cpu概述/cpu代码框架.png">
-<meta property="og:updated_time" content="2018-07-11T05:05:45.000Z">
+<meta property="og:updated_time" content="2018-11-17T07:23:40.414Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CPU概述">
 <meta name="twitter:description" content="cpu topology1.1. cpu拓扑cluster(socket)-&amp;gt;core-&amp;gt;Threads(目前为止arm没有提出多线程的概念)  1.2 多核技术  基于制程，扩充性等考虑，芯片厂商会把多个core封装在一个chip上，称为socket。socket的概念在X86架构上使用尤其多，可以理解为插槽；假设一个插槽上有两个core,那么我在主板上插2个插槽，就是4核系统，插">
@@ -378,6 +378,18 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu 信息的获取（cpuinfo）</span><br><span class="line">cpu拓扑结构的获取（cpu topology）</span><br><span class="line">底层的CPU操作（init,disable等）的实现，cpu ops</span><br><span class="line">SMP相关的初始化（smp）</span><br></pre></td></tr></table></figure>
 <p>arch-independent负责实现平台无关的抽象，包括</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu control模块，屏蔽底层平台相关实现细节，提供控制CPU(enable,disable等)的统一API，供系统启动，进程调度等模块调用</span><br><span class="line">cpu subsystem driver像用户空间提供CPU hotplug有关的功能；</span><br><span class="line">cpuidle,处理CPU idle有关的逻辑</span><br><span class="line">cpufreq 处理CPU frequency调整有关的逻辑</span><br></pre></td></tr></table></figure>
+<h1><span id="cpu的状态表示">cpu的状态表示</span></h1><ol>
+<li><strong>possible CPU:</strong> 就是在DTS中指定了的，物理存在的CPU core</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;boot_cpu_init-&gt;smp_process_id用于获取cpu id</span><br><span class="line">		           -&gt;set_cpu_xxx,用于将指定的CPU设置为（或清除）指定状态</span><br><span class="line">	    -&gt;setup_arch-&gt;smp_init_cpus-&gt;sunxi_smp_init_cpus-&gt;set_cpu_possible(i, true)</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li><strong>present cpu:</strong> 被kernel标识的，具备执行代码条件，后续可以在需要的时候（如hotplug的时候），启动该CPU </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;rest_init-&gt;kernel_init-&gt;kernel_init_freeable</span><br><span class="line">				     -&gt;smp_prepare_cpus</span><br><span class="line">			     	if (cpu_prepare(cpu)) /**/</span><br><span class="line">					set_cpu_present(cpu,true);</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li><strong>online CPU:</strong> 某个CPU是present的，不一定是boot,所谓CPU boot,就是让CPU执行（取指译码/执行）代码</li>
+<li><strong>active CPU</strong> 只是为了方便调度器操作</li>
+</ol>
 <h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cool3c.com/article/124149" target="_blank" rel="noopener">一图看懂ARM DynamIQ运作原理</a><br><a href="http://www.wowotech.net/pm_subsystem/cpu_core_pm_overview.html" target="_blank" rel="noopener">Linux CPU core的电源管理(1)概述</a></p>
 
       
@@ -409,8 +421,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/06/25/cpu/cpu_freq/" rel="next" title="CPUFreq">
-                <i class="fa fa-chevron-left"></i> CPUFreq
+              <a href="/2018/06/25/process/process_day1/" rel="next" title="进程初识">
+                <i class="fa fa-chevron-left"></i> 进程初识
               </a>
             
           </div>
@@ -419,8 +431,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/06/25/cpu/cpu_init/" rel="prev" title="CPU概述">
-                CPU概述 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/06/25/cpu/cpu_freq/" rel="prev" title="CPUFreq">
+                CPUFreq <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -498,7 +510,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -520,7 +532,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
@@ -553,7 +565,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">cpu topology</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.</span> <span class="nav-text">1.1. cpu拓扑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 多核技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.3.</span> <span class="nav-text">1.3HMP(Heterogeneous Multi-Processing)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">cpu内核代码框架</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">cpu topology</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.</span> <span class="nav-text">1.1. cpu拓扑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 多核技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.3.</span> <span class="nav-text">1.3HMP(Heterogeneous Multi-Processing)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">cpu内核代码框架</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">cpu的状态表示</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
 
           </div>

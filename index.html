@@ -712,7 +712,7 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/cpu/cpu_init/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/cpu/cpu_freq/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dongka">
@@ -731,7 +731,7 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/25/cpu/cpu_init/" itemprop="url">CPU概述</a></h1>
+                <a class="post-title-link" href="/2018/06/25/cpu/cpu_freq/" itemprop="url">CPUFreq</a></h1>
         
 
         <div class="post-meta">
@@ -805,18 +805,8 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
       
         
           
-            <h1><span id="1-cpu的状态表示-possiblepresentactive和online">1. cpu的状态表示 possible,present,active和online</span></h1><ol>
-<li><strong>possible CPU:</strong> 就是在DTS中指定了的，物理存在的CPU core</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;boot_cpu_init-&gt;smp_process_id用于获取cpu id</span><br><span class="line">		           -&gt;set_cpu_xxx,用于将指定的CPU设置为（或清除）指定状态</span><br><span class="line">	    -&gt;setup_arch-&gt;smp_init_cpus-&gt;sunxi_smp_init_cpus-&gt;set_cpu_possible(i, true)</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li><strong>present cpu:</strong> 被kernel标识的，具备执行代码条件，后续可以在需要的时候（如hotplug的时候），启动该CPU </li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;rest_init-&gt;kernel_init-&gt;kernel_init_freeable</span><br><span class="line">				     -&gt;smp_prepare_cpus</span><br><span class="line">			     	if (cpu_prepare(cpu)) /**/</span><br><span class="line">					set_cpu_present(cpu,true);</span><br></pre></td></tr></table></figure>
-<ol start="3">
-<li><strong>online CPU:</strong> 某个CPU是present的，不一定是boot,所谓CPU boot,就是让CPU执行（取指译码/执行）代码</li>
-<li><strong>active CPU</strong> 只是为了方便调度器操作</li>
-</ol>
+            <h1><span id="代码主要的功能">代码主要的功能</span></h1><p>1) 平台相关的初始化动作，包括CPU core的clock/regulator获取，初始化<br>2) 生成frequency table,即 CPU core所支持的频率/电压列表。并在初始化的时候将该table保存在policy<br>3) 定义一个strcut cpufreq_driver变量，填充必要的字段，并根据平台的特性，实现其中的回调函数；<br>4) 调用cpufreq_register_driver将driver注册到cpufreq framework中<br>5) cpufreq core会在CPU设备添加时，调用driver的init接口。driver需要在接口中初始化struct cpufreq变量<br>6) 系统运行过程中，cpufreq core会根据实际情况，调用driver的sepolicy或者target/target_index等接口，设置<br>CPU的调频策略或者频率值<br>7) 系统suspend的时候，会将CPU的频率设置为指定的值，或者调用driver的suspend回调函数；系统resume时调用driver的resume回调函数；</p>
+<h1><span id="cpufreq-driver">cpufreq driver</span></h1><p>frequency table是CPU core可以正确运行的一组频率/电压组合</p>
 
           
         
@@ -990,150 +980,19 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu 信息的获取（cpuinfo）</span><br><span class="line">cpu拓扑结构的获取（cpu topology）</span><br><span class="line">底层的CPU操作（init,disable等）的实现，cpu ops</span><br><span class="line">SMP相关的初始化（smp）</span><br></pre></td></tr></table></figure>
 <p>arch-independent负责实现平台无关的抽象，包括</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu control模块，屏蔽底层平台相关实现细节，提供控制CPU(enable,disable等)的统一API，供系统启动，进程调度等模块调用</span><br><span class="line">cpu subsystem driver像用户空间提供CPU hotplug有关的功能；</span><br><span class="line">cpuidle,处理CPU idle有关的逻辑</span><br><span class="line">cpufreq 处理CPU frequency调整有关的逻辑</span><br></pre></td></tr></table></figure>
+<h1><span id="cpu的状态表示">cpu的状态表示</span></h1><ol>
+<li><strong>possible CPU:</strong> 就是在DTS中指定了的，物理存在的CPU core</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;boot_cpu_init-&gt;smp_process_id用于获取cpu id</span><br><span class="line">		           -&gt;set_cpu_xxx,用于将指定的CPU设置为（或清除）指定状态</span><br><span class="line">	    -&gt;setup_arch-&gt;smp_init_cpus-&gt;sunxi_smp_init_cpus-&gt;set_cpu_possible(i, true)</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li><strong>present cpu:</strong> 被kernel标识的，具备执行代码条件，后续可以在需要的时候（如hotplug的时候），启动该CPU </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;rest_init-&gt;kernel_init-&gt;kernel_init_freeable</span><br><span class="line">				     -&gt;smp_prepare_cpus</span><br><span class="line">			     	if (cpu_prepare(cpu)) /**/</span><br><span class="line">					set_cpu_present(cpu,true);</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li><strong>online CPU:</strong> 某个CPU是present的，不一定是boot,所谓CPU boot,就是让CPU执行（取指译码/执行）代码</li>
+<li><strong>active CPU</strong> 只是为了方便调度器操作</li>
+</ol>
 <h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cool3c.com/article/124149" target="_blank" rel="noopener">一图看懂ARM DynamIQ运作原理</a><br><a href="http://www.wowotech.net/pm_subsystem/cpu_core_pm_overview.html" target="_blank" rel="noopener">Linux CPU core的电源管理(1)概述</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/cpu/cpu_freq/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/25/cpu/cpu_freq/" itemprop="url">CPUFreq</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
-                2018-06-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cpu/" itemprop="url" rel="index">
-                    <span itemprop="name">cpu</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1><span id="代码主要的功能">代码主要的功能</span></h1><p>1) 平台相关的初始化动作，包括CPU core的clock/regulator获取，初始化<br>2) 生成frequency table,即 CPU core所支持的频率/电压列表。并在初始化的时候将该table保存在policy<br>3) 定义一个strcut cpufreq_driver变量，填充必要的字段，并根据平台的特性，实现其中的回调函数；<br>4) 调用cpufreq_register_driver将driver注册到cpufreq framework中<br>5) cpufreq core会在CPU设备添加时，调用driver的init接口。driver需要在接口中初始化struct cpufreq变量<br>6) 系统运行过程中，cpufreq core会根据实际情况，调用driver的sepolicy或者target/target_index等接口，设置<br>CPU的调频策略或者频率值<br>7) 系统suspend的时候，会将CPU的频率设置为指定的值，或者调用driver的suspend回调函数；系统resume时调用driver的resume回调函数；</p>
-<h1><span id="cpufreq-driver">cpufreq driver</span></h1><p>frequency table是CPU core可以正确运行的一组频率/电压组合</p>
 
           
         
@@ -2288,13 +2147,166 @@ b.根据物理地址获取数据
 
 
     
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-mtp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/17/memory/memory-mtp/" itemprop="url">内存管理（二）mtp拷贝流程</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-17T00:07:09+00:00">
+                2018-06-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/内存管理/" itemprop="url" rel="index">
+                    <span itemprop="name">内存管理</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2><span id="背景知识介绍">背景知识介绍</span></h2><p>android 从3.0开始集成MTP功能，主要原因有三个：<br>1.手机要支持UMS的话，必须要有一个sd卡，因为sd卡往往采用Windows支持的分区格式。如果想把内部存储空间通过UMS挂载到Windows上，则内部存储空间需采用特定的分区格式。这对某些手机而言根本不可行。因为内部存储空间本身可能就是一个设备，它们采用统一的分区格式。不能因为需要使用UMS，而再增加一块特定的分区格式的存储设备。<br>2.UMS挂载到PC后，PC操作系统拥有绝对的控制权。此时，Android系统无法操作这些设备。<br>3.window所占市场份额较大，故即使linux，MacOS支持力度不够，Android也要集成的；<br>MTP的主要缺点：<br>1.传输大文件的速度较慢 ??<br>2.MTP不能直接修改文件本身，只能先拷贝到本地修改，完毕后再拷贝回去</p>
+<h2><span id="mtp协议介绍">MTP协议介绍</span></h2><p>MTP使用者包括两个部分，分别为Initiator和Resoponder</p>
+<ol>
+<li>Initiator:主要是指USB Host,例如PC机，笔记本等，协议规定所有的MTP操作只能由Initator发起</li>
+<li>Responder:一般是诸如数码相机，智能手机等存储媒体文件的设备，Responder在MTP中的作用就是处理Initator发起的请求。同时，它还会根据自身状态的变化发送Event以通知Initator.</li>
+</ol>
+<h1><span id="mtp-协议栈">MTP 协议栈</span></h1><ol>
+<li>Pyshical Layer(物理层)：物理层在MTP协议中用来传输数据。目前有三种物理层可供MTP使用。它们分别是USB:其主要特点是传输文件，同步媒体文件时速度快，而且可以变工作边充电，这是目前用的最多的一种方式；IP：基于IP的MTP(简称MTP/TP)将通过UPnp来匹配和发现设备。它是家庭网络中最理想的传输方式；Bluetooth:MTP/BT是最省电，同时速度最慢的一种传输方式，用处较少；</li>
+<li>传输层：MTP中，数据传输格式遵循PTP协议</li>
+<li>命令层：实现了MTP协议中的各种命令；</li>
+</ol>
+<p>MTP采用命令-应答方式来工作，(Initator发送命令给Responder处理，Responser反馈处理结果)，这种方式主要特点有：</p>
+<ol>
+<li>所有MTP命令均以Package(数据包)的方式在设备两端进行传递</li>
+<li>Initiator必须接收到前一条消息处理结果，无论是成功或者超时后，才能发送下一条消息</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
   </section>
 
   
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
-  </nav>
-
 
 
           </div>
@@ -2338,7 +2350,7 @@ b.根据物理地址获取数据
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2360,7 +2372,7 @@ b.根据物理地址获取数据
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
