@@ -94,7 +94,7 @@
 <meta property="og:image" content="http://yoursite.com/2018/06/25/other/TYPE-C耳机适配工作/TYPE-C关键电路.png">
 <meta property="og:image" content="http://yoursite.com/2018/06/25/other/TYPE-C耳机适配工作/cc_logic.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/06/25/other/TYPE-C耳机适配工作/type_c_detect.jpg">
-<meta property="og:updated_time" content="2018-11-21T12:20:29.216Z">
+<meta property="og:updated_time" content="2018-11-21T12:24:14.325Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="全志TYPE-C使用介绍">
 <meta name="twitter:description" content="有无TYPE-C方案，主从识别和耳机的插拔检测不同;有TYPE-C情况下，主要为TYPE-C逻辑进行侦测;而没有TYPE-C的方案;主从区分需要USB-ID detect管脚进行判断,耳机则靠HP-DET进行区分; 传统侦测方式主从侦测 在没有TYPE-C的硬件上，主要靠USB-ID管脚的上下拉来区分主从; 耳机侦测耳机结构3.5mm耳机插头有三段（TRS,Tip-Ring-Sleeve）和四段（">
@@ -376,7 +376,7 @@ echo 0x37 &gt; /sys/class/axp_reg &amp;&amp; cat /sys/class/axp/axp_reg
 <p> 用于将D-,D+在(USB0-DM,USB0-DP),(HPOUTL,HPOUTR)两种模式之间切换；由于VBUS默认低后，无法满足通过SEL切换状态，故VBUS一般设置为高；通过ASEL来设置高低实现切换</p>
 <p><strong>TS3A226AE</strong>:</p>
 <p>可以用于区分三四节耳机，并且可以将MIC和GROUND区分出来，降低软件设计复杂度；</p>
-<p>使用TYPE-C方案时，TYPE-C 中断服务程序负责选择D-,D+选择为USB的Dp,Dm或者为HP-OUTL,HP-OUTR;并通知音频驱动耳机接入;</p>
+<p>使用TYPE-C方案时，TYPE-C 中断服务程序负责将D-,D+选择为USB模式的Dp,Dm或者为耳机模式HP-OUTL,HP-OUTR;并通知音频驱动耳机接入;</p>
 <h2><span id="软件流程为">软件流程为：</span></h2><p>一：bmu驱动产生中断：</p>
 <pre><code>irqreturn_t axp_tc_in_isr(int irq, void *data)
 {
@@ -559,7 +559,7 @@ pmu_battery_rdc            = 100
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
