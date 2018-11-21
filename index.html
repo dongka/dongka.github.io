@@ -249,6 +249,197 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/21/other/TYPE-C耳机适配工作/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/21/other/TYPE-C耳机适配工作/" itemprop="url">Untitled</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-11-21T09:03:48+00:00">
+                2018-11-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>#耳机结构<br>3.5mm耳机插头有三段（TRS,Tip-Ring-Sleeve）和四段（TRRS,Tip-Ring-Sleeve）之分，其中三段的不带麦克风，尾段（Sleeve)是公共地；中间环（Ring）是右声道，尖部（Tip）是左声道，四节的分两种，一种是CTIA,一种是OMTP;</p>
+<p><img src="/2018/11/21/other/TYPE-C耳机适配工作/耳机结构.png" alt="耳机结构"></p>
+<p>HP-L耳机左声道，HP-R耳机右声道，GND接地，V-Mic语音麦克风</p>
+<h1><span id="耳机座接口介绍">耳机座接口介绍</span></h1><p>耳机座分为支持欧标设计的耳机座和支持美标的耳机座。另外从耳机座左声道的检测方式来又可以分为”Normal-closed type”(常闭型)和“Normal  -type”(常开型)两种。设计图如下：</p>
+<p><img src="/2018/11/21/other/TYPE-C耳机适配工作/耳机座子.png" alt="TYPE-C关键电路"></p>
+<p>. 在常闭型中，不接耳机时，耳机座左声道和检测端HS-DET接触，接入耳机时，HS-DET与HPH-L不导通</p>
+<p>. 在常开型中，不接耳机时，耳机座左声道和检测端HS-DET不接触，插入耳机时，HS-DET与HPH-L导通</p>
+<p><strong>简化电路如下：</strong></p>
+<p><img src="/2018/11/21/other/TYPE-C耳机适配工作/侦测电路示意图.png" alt="侦测电路"></p>
+<p>正常情况下，CDC_HPH_L会有一点电压存在，通过电阻分压，于是CDC_HS_DET接收到了高电平，引起软件中断。软件上通过debounce后，检测到持续的高电平，于是认为耳机插入；这时候需要判断，插入的还是三段还是四段，平台上打开mic_bias,当插入的是三段耳机，MIC被拉低，于是判断为三段耳机；若为四段耳机，MIC接近于MIC_BIAS，软件判断该处的直流电压为四段耳机；当按键按下时，MIC的电压发生变化，触发了系统中断，之后软件通过采样该处的电压值确定按下了哪一个按键；</p>
+<p>#全志TYPE-C硬件电路讲解</p>
+<p>如使用TYPE-C耳机，则主要为BMU TYPE-C中断服务程序负责通知耳机的切换；</p>
+<p>软件流程为：</p>
+<p>一：bmu驱动产生中断：</p>
+<pre><code>irqreturn_t axp_tc_in_isr(int irq, void *data)
+{
+    struct axp_charger_dev *chg_dev = data;
+    #ifdef CONFIG_TYPE_C_AUDIO
+    struct axp_usb_info *usb = chg_dev-&gt;spy_info-&gt;usb;
+    u8 cc_mode = 0; 
+    /*axp_usbac_in(chg_dev);*/
+    cc_mode = usb-&gt;get_cc_mode(chg_dev); //获取cc 侦测结果
+    if (cc_mode == AUDIO_ACSY) {    //如果为音频设备
+            usb-&gt;set_sel_mode(chg_dev, 1);  //D+ D- 连接到耳机的左右声道
+            call_notifier_call_chain(1);    //通知耳机驱动耳机接入
+    } else {
+            usb-&gt;set_sel_mode(chg_dev, 0); //D+ D- 连接到 USB的 Dp,Dm口
+            call_notifier_call_chain(0);   //通知耳机驱动拔出
+    }    
+    #endif
+    axp_change(chg_dev);
+    return IRQ_HANDLED;
+}
+</code></pre><p>二：耳机接受到通知：</p>
+<pre><code>static int type_c_chain_notify(struct notifier_block *nb, unsigned long mode, void *_unused)
+{
+    struct mc_private *ctx = container_of(nb, struct mc_private, type_c_chain_nb);
+
+    if (mode) {
+            ctx-&gt;detect_state = PLUG_IN; //切换接入状态
+            printk(&quot;%s PLUG_IN&quot;, __func__);
+    } else {
+            ctx-&gt;detect_state = PLUG_OUT;
+            printk(&quot;%s PLUG_OUT&quot;, __func__);
+    }
+
+    schedule_delayed_work(&amp;ctx-&gt;hs_detect_work,
+                            msecs_to_jiffies(10)); //执行音频相关的处理函数
+    return 0;
+}
+</code></pre><p>TYPE-C主要电路如下</p>
+<p><img src="/2018/11/21/other/TYPE-C耳机适配工作/TYPE-C关键电路.png" alt="TYPE-C关键电路"></p>
+<p><strong>TS5USBA224RSWR</strong>：</p>
+<p> 用于将D-,D+在(USB0-DM,USB0-DP),(HPOUTL,HPOUTR)两种模式之间切换；由于VBUS默认低后，无法满足通过SEL切换状态，故VBUS一般设置为高；通过ASEL来设置高低实现切换</p>
+<p><strong>TS3A226AE</strong>:</p>
+<p>可以用于区分三四节耳机，并且可以将MIC和GROUND区分出来，降低软件设计复杂度；</p>
+<p>#软件配置demo</p>
+<p><strong>使能TYPE-C SINK与SOURCE 检测功能：</strong></p>
+<p>一：sys_config.fex中：</p>
+<pre><code>usb_id_gpio = &quot;axp_ctrl&quot;
+</code></pre><p>二：deconfig中</p>
+<pre><code>CONFIG_TYPE_C=y
+</code></pre><p><strong>使能TYPE-C耳机功能</strong></p>
+<p>一：如原理图所示，使用的是PH10作为选通管脚，故对pmu_typc_c_sel进行配置</p>
+<pre><code>[charger0]
+ compatible                 = &quot;bmu1760-charger&quot;
+pmu_type_c_sel             = port:PH10&lt;1&gt;&lt;default&gt;&lt;default&gt;&lt;0&gt;
+ pmu_chg_ic_temp            = 0
+pmu_battery_rdc            = 100
+ pmu_battery_cap            = 4200
+</code></pre><p>二：deconfig中</p>
+<pre><code>CONFIG_TYPE_C_AUDIO=y
+</code></pre>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/17/cpu/arm体系架构的发展/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -429,9 +620,8 @@
 </tr>
 </tbody>
 </table>
-<p>ARM架构发展图：</p>
-<p><img src="/2018/11/17/cpu/arm体系架构的发展/arm_develop.png" alt="Arm架构发展"></p>
-<p>arm体系的CPU工作模式：<br>1.用户模式(usr):正常的程序执行状态<br>2.快速中断模式（fiq）:用于支持高速数据传输或者通道处理<br>3.中断模式（irq）:用于普通中断处理<br>4.管理模式（svc）:操作系统使用的保护模式<br>5.系统模式（sys）:运行具有特权的操作系统的任务；<br>6.数据访问终止模式（abt）:数据或指令与预取终止时进入该模式<br>7.未定义指令终止模式（und）:未定义的指令执行时进入该模式；</p>
+<h2><span id="arm架构发展图">ARM架构发展图：</span></h2><p><img src="/2018/11/17/cpu/arm体系架构的发展/arm_develop.png" alt="Arm架构发展"></p>
+<h2><span id="arm体系的cpu工作模式">arm体系的CPU工作模式：</span></h2><p>1.用户模式(usr):正常的程序执行状态<br>2.快速中断模式（fiq）:用于支持高速数据传输或者通道处理<br>3.中断模式（irq）:用于普通中断处理<br>4.管理模式（svc）:操作系统使用的保护模式<br>5.系统模式（sys）:运行具有特权的操作系统的任务；<br>6.数据访问终止模式（abt）:数据或指令与预取终止时进入该模式<br>7.未定义指令终止模式（und）:未定义的指令执行时进入该模式；</p>
 <p>linux如何从用户态进入内核态<br>分为两种：主动式和被动式、</p>
 <p>1.主动式：就是linux用户在（ARM在用户模式下）工作，通过发起用户态程序发起命令请求，ARM响应进入特权模式进而Linux切入内核态，就是系统调用；系统调用可被堪称一个内核与用户空间程序交互的接口；把用户进程的请求传达 给内核，待内核把请求处理完毕后再将处理结果送回给用户空间；<br>系统调用的主要用途：</p>
 <p>一：控制硬件-系统调用往往作为硬件资源和用户空间的抽象接口，比如读写文件用到的write/read调用</p>
@@ -2147,166 +2337,13 @@ b.根据物理地址获取数据
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-mtp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/17/memory/memory-mtp/" itemprop="url">内存管理（二）mtp拷贝流程</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-17T00:07:09+00:00">
-                2018-06-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/内存管理/" itemprop="url" rel="index">
-                    <span itemprop="name">内存管理</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2><span id="背景知识介绍">背景知识介绍</span></h2><p>android 从3.0开始集成MTP功能，主要原因有三个：<br>1.手机要支持UMS的话，必须要有一个sd卡，因为sd卡往往采用Windows支持的分区格式。如果想把内部存储空间通过UMS挂载到Windows上，则内部存储空间需采用特定的分区格式。这对某些手机而言根本不可行。因为内部存储空间本身可能就是一个设备，它们采用统一的分区格式。不能因为需要使用UMS，而再增加一块特定的分区格式的存储设备。<br>2.UMS挂载到PC后，PC操作系统拥有绝对的控制权。此时，Android系统无法操作这些设备。<br>3.window所占市场份额较大，故即使linux，MacOS支持力度不够，Android也要集成的；<br>MTP的主要缺点：<br>1.传输大文件的速度较慢 ??<br>2.MTP不能直接修改文件本身，只能先拷贝到本地修改，完毕后再拷贝回去</p>
-<h2><span id="mtp协议介绍">MTP协议介绍</span></h2><p>MTP使用者包括两个部分，分别为Initiator和Resoponder</p>
-<ol>
-<li>Initiator:主要是指USB Host,例如PC机，笔记本等，协议规定所有的MTP操作只能由Initator发起</li>
-<li>Responder:一般是诸如数码相机，智能手机等存储媒体文件的设备，Responder在MTP中的作用就是处理Initator发起的请求。同时，它还会根据自身状态的变化发送Event以通知Initator.</li>
-</ol>
-<h1><span id="mtp-协议栈">MTP 协议栈</span></h1><ol>
-<li>Pyshical Layer(物理层)：物理层在MTP协议中用来传输数据。目前有三种物理层可供MTP使用。它们分别是USB:其主要特点是传输文件，同步媒体文件时速度快，而且可以变工作边充电，这是目前用的最多的一种方式；IP：基于IP的MTP(简称MTP/TP)将通过UPnp来匹配和发现设备。它是家庭网络中最理想的传输方式；Bluetooth:MTP/BT是最省电，同时速度最慢的一种传输方式，用处较少；</li>
-<li>传输层：MTP中，数据传输格式遵循PTP协议</li>
-<li>命令层：实现了MTP协议中的各种命令；</li>
-</ol>
-<p>MTP采用命令-应答方式来工作，(Initator发送命令给Responder处理，Responser反馈处理结果)，这种方式主要特点有：</p>
-<ol>
-<li>所有MTP命令均以Package(数据包)的方式在设备两端进行传递</li>
-<li>Initiator必须接收到前一条消息处理结果，无论是成功或者超时后，才能发送下一条消息</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
 
 
           </div>
@@ -2350,7 +2387,7 @@ b.根据物理地址获取数据
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
