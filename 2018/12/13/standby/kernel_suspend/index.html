@@ -88,7 +88,7 @@
 <meta property="og:description" content="内核休眠流程当安卓合适的时机(wakeup_count = save_count &amp;amp;&amp;amp; inpr == 0),与内核一致，在没有wakeup事件的时候，走进一步的流程，发echo mem &amp;gt; /sys/power/state命令后，内核开始处理休眠流程 ./kernel/power/main.c  state_store     -&amp;gt;pm_suspend">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2018/12/13/standby/kernel_suspend/信号响应时机.jpg">
-<meta property="og:updated_time" content="2018-12-13T12:35:34.701Z">
+<meta property="og:updated_time" content="2018-12-13T12:43:13.679Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="内核的休眠流程">
 <meta name="twitter:description" content="内核休眠流程当安卓合适的时机(wakeup_count = save_count &amp;amp;&amp;amp; inpr == 0),与内核一致，在没有wakeup事件的时候，走进一步的流程，发echo mem &amp;gt; /sys/power/state命令后，内核开始处理休眠流程 ./kernel/power/main.c  state_store     -&amp;gt;pm_suspend">
@@ -530,9 +530,9 @@ suspend_ops-&gt;enter(state);
 IRQF_NO_SUSPEND是旧方法；
 enable_irq_wake是新方法。
 之所以所有的driver都调用这两个接口，有两种可能：一是为兼容；而是不太理解，为保险起见，都调用。
-我认为request只能在内核休眠的时候起到阻止休眠的功能，而enable_irq_wake则可以在休眠后，通过参数传递的方式，告诉cpus什么gpio需要被唤醒
+我认为request只能在内核休眠的时候起到阻止休眠的功能，而enable_irq_wake则可以在深度休眠后仍然能唤醒；在休眠到CPRE的时候CPU的IRQ和FIQ都已关闭，但仍保存着wakeup信号线，
+通过wakeup信号线唤醒从而唤醒cpu,当cpu中断使能开启后再响应中断
 </code></pre><p>#参考资料</p>
-<p><a href="https://zhuanlan.zhihu.com/p/40481653" target="_blank" rel="noopener">一种android快速启动方案</a></p>
 <p><a href="http://www.wowotech.net/pm_subsystem/237.html" target="_blank" rel="noopener">linux进程冻结技术</a></p>
 <p><a href="http://www.wowotech.net/pm_subsystem/suspend_and_resume.html" target="_blank" rel="noopener">Linux电源管理（6）_Generic PM之Suspend功能</a></p>
 <p><a href="http://www.wowotech.net/irq_subsystem/workqueue.html" target="_blank" rel="noopener">Concurrency Managed Workqueue之（一）：workqueue的基本概念</a></p>
