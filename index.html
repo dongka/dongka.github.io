@@ -530,7 +530,8 @@ enable_irq_wake是新方法。
 之所以所有的driver都调用这两个接口，有两种可能：一是为兼容；而是不太理解，为保险起见，都调用。
 我认为request只能在内核休眠的时候起到阻止休眠的功能，而enable_irq_wake则可以在深度休眠后仍然能唤醒；在休眠到CPRE的时候CPU的IRQ和FIQ都已关闭，但仍保存着wakeup信号线，
 通过wakeup信号线唤醒从而唤醒cpu,当cpu中断使能开启后再响应中断
-</code></pre><p>#参考资料</p>
+</code></pre><p><strong>怎么对休眠流程进行分解debug</strong><br>    如当怀疑休眠流程在DEVICE_SUSPEND中挂死的；<br>    可以echo devices &gt; /sys/power/pm_test<br>    然后修改dpm_suspend设备的休眠流程，让其逐一进入休眠后退出，观察是哪个设备休眠唤醒后系统异常；<br>    如果没有异常，那么可以怀疑是否由于cpus中dram进入自刷新后异常导致；或者系统电上下电导致；或者时钟频率不稳导致；    </p>
+<p>#参考资料</p>
 <p><a href="http://www.wowotech.net/pm_subsystem/237.html" target="_blank" rel="noopener">linux进程冻结技术</a></p>
 <p><a href="http://www.wowotech.net/pm_subsystem/suspend_and_resume.html" target="_blank" rel="noopener">Linux电源管理（6）_Generic PM之Suspend功能</a></p>
 <p><a href="http://www.wowotech.net/irq_subsystem/workqueue.html" target="_blank" rel="noopener">Concurrency Managed Workqueue之（一）：workqueue的基本概念</a></p>
