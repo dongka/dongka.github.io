@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="standby linux," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="#安卓休眠唤醒流程 安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REAS">
+<meta name="keywords" content="standby linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="安卓休眠流程">
+<meta property="og:url" content="http://yoursite.com/2018/12/13/standby/android_standby/index.html">
+<meta property="og:site_name" content="知识总结">
+<meta property="og:description" content="#安卓休眠唤醒流程 安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REAS">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-02-01T07:17:48.982Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="安卓休眠流程">
+<meta name="twitter:description" content="#安卓休眠唤醒流程 安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REAS">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/12/13/standby/android_standby/"/>
+
+
+
+
+
+  <title>安卓休眠流程 | 知识总结</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">知识总结</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/13/standby/android_standby/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">安卓休眠流程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-13T00:07:09+00:00">
+                2018-12-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/standby/" itemprop="url" rel="index">
+                    <span itemprop="name">standby</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>#安卓休眠唤醒流程</p>
+<h1><span id="安卓电源状态">安卓电源状态</span></h1><p>首先安卓将电源分为以下几种情况：</p>
+<p><strong>1.sleep：</strong>休眠</p>
+<pre><code>从代码看，安卓将系统的休眠原因分为以下几种：
+goToSleepNoUpdateLocked
+    GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy 
+    GO_TO_SLEEP_REASON_TIMEOUT //Going to sleep due to screen timeout
+    GO_TO_SLEEP_REASON_LID_SWITCH //Going to sleep due to lid switch 滑盖
+    GO_TO_SLEEP_REASON_POWER_BUTTON //Going to sleep due to power button
+    GO_TO_SLEEP_REASON_SLEEP_BUTTON //Going to sleep due to sleep button 头显的远近
+    GO_TO_SLEEP_REASON_HDMI //Going to sleep due to HDMI standby
+    GO_TO_SLEEP_REASON_ACCESSIBILITY//Going to sleep by an accessibility service request
+    如果不是以上几种情况，则默认为应用导致的休眠：
+    GO_TO_SLEEP_REASON_APPLICATION//Going to sleep by application request
+</code></pre><p><strong>2.nap：</strong>进入屏保</p>
+<p><strong>3.wakeup：</strong>唤醒</p>
+<pre><code>wakeUpNoUpdateLocked
+从以下状态中唤醒,reason不固定：
+    WAKEFULNESS_ASLEEP:
+    WAKEFULNESS_DREAMING：
+    WAKEFULNESS_DOZING：
+</code></pre><p><strong>4.shutdown：</strong>关机<br><strong>5.reboot：</strong>重启  </p>
+<p>在此前的内核篇，我们讲到了用户层会去轮询查看是否有唤醒事件需要处理，如果没有则echo mem &gt; /sys/power/state,从而进入内核的休眠唤醒流程；所以在本篇我们主要将这两个流程是怎么衔接上的~</p>
+<p><strong>首先我们keeptesting 老化apk是如何进行调用休眠唤醒的api然后进行老化实验；</strong></p>
+<h1><span id="代码demo">代码demo</span></h1><p><strong>一：apk休眠唤醒源码</strong></p>
+<pre><code>休眠动作：
+单点击开始后，设置闹钟和走休眠流程： 
+runSleepWakeUpTest()
+    mAlarmMgr.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() 
+                                                + (mSleepTime * 1000),
+                                                pendIntent);
+
+    standby();
+        pm.goToSleep(SystemClock.uptimeMillis());
+
+ 唤醒动作：
+ onReceive
+
+    PowerManager pm = (PowerManager) this
+                       .getSystemService(Context.POWER_SERVICE);
+    if (getAndroidSDKVersion() &gt;= 17) {
+          pm.wakeUp(SystemClock.uptimeMillis());
+
+    } else {
+               pm.userActivity(SystemClock.uptimeMillis(), false);
+    }   
+</code></pre><p><strong>framework代码</strong></p>
+<p>powerManager相关代码：</p>
+<pre><code>core/java/android/os/PowerManager.java
+public void goToSleep(long time) {
+     goToSleep(time, GO_TO_SLEEP_REASON_APPLICATION, 0);    
+ }
+
+./services/core/java/com/android/server/power/PowerManagerService.java
+public void goToSleep(long eventTime, int reason, int flags) {
+    if (eventTime &gt; SystemClock.uptimeMillis()) {
+        throw new IllegalArgumentException(&quot;event time must not be in the future&quot;);
+    }
+    goToSleepInternal(eventTime, reason, flags, uid);
+}
+
+private void goToSleepInternal(long eventTime, int reason, int flags, int uid) {
+ synchronized (mLock) {
+     if (goToSleepNoUpdateLocked(eventTime, reason, flags, uid)) {
+         updatePowerStateLocked();
+     }
+ }   
+ } 
+</code></pre><h1><span id="sleep">sleep</span></h1><p>当屏幕超时，按power键休眠，和应用主动调goToSleep；无论是哪种方式，如果系统启动没有异常，都会走到PowerManagerService的核心函数，<strong>updatePowerStateLocked</strong>；按照安卓注释，将updatePowerStateLocked 分为五个阶段，我们也按照五个阶段对该函数的功能进行讲解；</p>
+<p><strong>Phase 0: Basic state updates</strong></p>
+<pre><code>1.USB插播亮屏入口点
+ //如果需要插拔事件不影响到屏幕的亮灭，在overlay/frameworks/base/core/res/res/values/config.xml下
+ //修改&lt;bool name=&quot;config_unplugTurnsOnScreen&quot;&gt;true&lt;/bool&gt;从字面意思貌似是拔出的时候不亮屏；
+ //mWakeUpWhenPluggedOrUnpluggedConfig = resources.getBoolean(                                                                                                                                               
+            com.android.internal.R.bool.config_unplugTurnsOnScreen);//从这里就能完整看到这个配置的用途，插拔都会影响到屏幕
+
+2.更新低电量模式        
+当电池电量状态发生变化的时候，才能调到该方法
+updateIsPoweredLocked(mDirty);
+
+判断系统是否在setting中设置了充电时保持屏幕亮屏
+updateStayOnLocked(mDirty);
+
+updateScreenBrightnessBoostLocked(mDirty);  
+</code></pre><p><strong>Phase 1: Update wakefulness</strong></p>
+<p>wakefulness,安卓将休眠唤醒的电源状态分为四个：  </p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>状态介绍</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WAKEFULNESS_ASLEEP</td>
+<td>设备处于sleep状态，只能被wakeUp函数唤醒，屏幕会被关闭，设备先进入doze状态</td>
+</tr>
+<tr>
+<td>WAKEFULNESS_AWAKE</td>
+<td>设备处于awake状态，可通过goToSleep的接口将设备置于休眠状态，当用户超时时间到了设备将开始dreaming或者进入休眠流程  </td>
+</tr>
+<tr>
+<td>WAKEFULNESS_DREAMING</td>
+<td>设备处于dreaming状态，会被wakeUp唤醒，当dreaming时间结束或者</td>
+</tr>
+<tr>
+<td>WAKEFULNESS_DOZING</td>
+<td>打盹</td>
+</tr>
+</tbody>
+</table>
+<pre><code>// Loop because the wake lock and user activity computations are influenced
+// by changes in wakefulness. 
+//此循环只会循环两次，然后就退出；
+for (;;) {
+    updateWakeLockSummaryLocked(dirtyPhase1);
+        getWakeLockSummaryFlags(wakeLock);
+        adjustWakeLockSummaryLocked(mWakeLockSummary);
+    updateUserActivitySummaryLocked(now, dirtyPhase1);
+    if (!updateWakefulnessLocked(dirtyPhase1)) {
+                 break;  
+     }           
+ }
+</code></pre><p>1.<strong>updateWakeLockSummaryLocked(dirtyPhase1);</strong> ；</p>
+<p><strong>简单先介绍安卓的锁：</strong></p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>属性</th>
+<th>功能介绍</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PARTIAL_WAKE_LOCK</td>
+<td>WAKE_LOCK_CPU</td>
+<td>保持CPU运行，屏幕和键盘灯允许关闭。用户按power键之后，屏幕和键盘灯会关闭，CPU keep on，直到所有该类型所被释放</td>
+</tr>
+<tr>
+<td>FULL_WAKE_LOCK</td>
+<td>WAKE_LOCK_SCREEN_BRIGHT  WAKE_LOCK_BUTTON_BRIGH</td>
+<td>保证屏幕和键盘灯亮（at full brightness）。用户按power键之后，CPU和屏幕键盘灯都会被关闭</td>
+</tr>
+<tr>
+<td>SCREEN_BRIGHT_WAKE_LOCK</td>
+<td>WAKE_LOCK_SCREEN_BRIGHT</td>
+<td>//保证屏幕亮（full brightness），键盘灯允许关闭。用户按power键之后，CPU和屏幕都会被关闭</td>
+</tr>
+<tr>
+<td>SCREEN_DIM_WAKE_LOCK</td>
+<td>WAKE_LOCK_SCREEN_BRIGHT</td>
+<td>//保证屏幕亮（full brightness），键盘灯允许关闭。用户按power键之后，CPU和屏幕都会被关闭</td>
+</tr>
+<tr>
+<td>PROXIMITY_SCREEN_OFF_WAKE_LOCK</td>
+<td>WAKE_LOCK_PROXIMITY_SCREEN_OFF</td>
+<td>pSensor导致的灭屏情况下系统不会进入休眠，正常情况下不影响系统休眠</td>
+</tr>
+<tr>
+<td>DOZE_WAKE_LOCK</td>
+<td>WAKE_LOCK_DOZE</td>
+<td>使屏幕进入low power状态，允许cpu挂起。只有在电源管理进入doze模式时生效</td>
+</tr>
+<tr>
+<td>DRAW_WAKE_LOCK</td>
+<td>WAKE_LOCK_DRAW</td>
+<td>保持设备awake状态已完成绘制事件，只在doze模式下生效</td>
+</tr>
+</tbody>
+</table>
+<p>该函数的主要作用为，遍历申请的所有锁，根据当前mWakefulness的状态(asleep,dozing,wake，dream)，过滤不需要的锁,如DOZE模式下过滤<strong>WAKE_LOCK_SCREEN_BRIGHT</strong>，<strong>WAKE_LOCK_SCREEN_DIM</strong>，<strong>WAKE_LOCK_BUTTON_BRIGHT</strong>，而ASLEEP模式下在基础上过滤<strong>WAKE_LOCK_PROXIMITY_SCREEN_OFF</strong>,在Dream模式下会添加<strong>WAKE_LOCK_CPU</strong>.</p>
+<p>2.<strong>updateUserActivitySummaryLocked(now, dirtyPhase1);</strong></p>
+<p>mUserActivitySummary的种类如下：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>类型介绍</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>USER_ACTIVITY_SCREEN_BRIGHT</td>
+<td>点亮屏幕</td>
+</tr>
+<tr>
+<td>USER_ACTIVITY_SCREEN_DIM</td>
+<td>屏幕变暗</td>
+</tr>
+<tr>
+<td>USER_ACTIVITY_SCREEN_DREAM</td>
+<td>屏保模式</td>
+</tr>
+</tbody>
+</table>
+<pre><code>这里有三个时间参数：
+sleepTimeout:设备完全休眠的时间，该值可以理解为保持唤醒或屏保的最大值或者上限，并且该值要大 
+             Settings.System.SCREEN_OFF_TIMEOUT,默认为-1；表示禁用此功能项；
+screenOffTimeoutSetting:表示设备在一段不活动进入睡眠或者屏保的时间，也称为用户超时时间，但屏幕不一定关闭，可能进入屏保
+screenDimDuration 亮屏后不操作，多久变暗；
+根据这三个时间参数计算nextTimeout的时间：
+         scheduleUserInactivityTimeout(nextTimeout);
+</code></pre><p>故该函数的主要作用为，更新用户活动时间，当设备和用户有交互的时，都会根据当前时间和休眠时长，dim时长，所处状态而计算下次休眠的时间，从而完成活动超时时的操作，如由亮屏进入Dim的时长，Dim到灭屏的时长，亮屏到屏保的时长；</p>
+<p>3.<strong>updateWakefulnessLocked</strong></p>
+<pre><code>if (shouldNapAtBedTimeLocked()) {                                            
+changed = napNoUpdateLocked(time, Process.SYSTEM_UID);
+    --&gt;mSandmanSummoned = true;
+       setWakefulnessLocked(WAKEFULNESS_DREAMING, 0);
+       --&gt;mNotifier.onWakefulnessChangeStarted(wakefulness, reason);                     
+ } else {                                                                      
+changed = goToSleepNoUpdateLocked(time,                                   
+        PowerManager.GO_TO_SLEEP_REASON_TIMEOUT, 0, Process.SYSTEM_UID);  
+       --&gt; mSandmanSummoned = true;
+           setWakefulnessLocked(WAKEFULNESS_DOZING, reason);
+           --&gt;mNotifier.onWakefulnessChangeStarted(wakefulness, reason); 
+
+ }                                                                             
+</code></pre><p>该函数的主要作用在与更新电源状态；</p>
+<p><strong>Phase2:Lock profiles that became inactive/not kept awake.</strong></p>
+<pre><code>updateProfilesLocked(now); //估计是cts的时候使用，这个不再赘述
+</code></pre><p><strong>Phase 3: Update display power state.</strong></p>
+<pre><code>updateDisplayPowerStateLocked(dirtyPhase2); 
+--&gt;mDisplayPowerRequest.policy = getDesiredScreenPolicyLocked(); 
+--&gt;requestPowerState
+    --&gt;return mDisplayPowerController.requestPowerState(request,waitForNegativeProximity);
+        --&gt;requestPowerState
+            --&gt;sendUpdatePowerStateLocked
+                --&gt;Message msg = mHandler.obtainMessage(MSG_UPDATE_POWER_STATE);
+                    mHandler.sendMessage(msg);
+handleMessage(Message msg)
+   --&gt;updatePowerState();
+      --&gt;animateScreenStateChange
+        --&gt;setScreenState
+            --&gt;mWindowManagerPolicy.screenTurningOff(mPendingScreenOffUnblocker)
+</code></pre><p>函数作用：决策屏幕的量灭状态</p>
+<pre><code>如果当前是WAKEFULNESS_ASLEEP状态，直接设置屏幕为POLICY_OFF
+
+如果包含以下一种状态，就设置屏幕为POLICY_BRIGHT
+
+1.mWakeLockSummary 如果有 WAKE_LOCK_SCREEN_BRIGHT类型的wakeLock 
+
+2.mUserActivitySummary 屏幕状态为USER_ACTIVITY_SCREEN_BRIGHT
+
+3.当前系统未启动完成
+
+4.当前处于最大屏幕亮度
+
+可以看出屏幕的状态和前面设置的wakeLock，stayon,userActivity，screenBrightness等有关
+</code></pre><p><strong>Phase 4: Update dream state (depends on display ready signal).</strong>        </p>
+<pre><code>updateDreamLocked(dirtyPhase2, displayBecameReady);
+--&gt;scheduleSandmanLocked();
+    --&gt;if (!mSandmanScheduled) {
+         Message msg = mHandler.obtainMessage(MSG_SANDMAN);
+      }
+</code></pre><p>函数作用：决定是否进入屏保状态</p>
+<p><strong>Phase 5: Send notifications, if needed.</strong></p>
+<pre><code>finishWakefulnessChangeIfNeededLocked();
+</code></pre><p>函数作用：发出wakefulness发生改变的通知</p>
+<p><strong>Phase 6: Update suspend blocker.</strong></p>
+<pre><code>// Because we might release the last suspend blocker here, we need to make sure
+// we finished everything else first!  
+updateSuspendBlockerLocked(); 
+    --&gt;needWakeLockSuspendBlocker = ((mWakeLockSummary &amp; WAKE_LOCK_CPU) != 0);//根据是否有CPU的wakelock，来决定cpu是否保持唤醒
+    --&gt;needDisplaySuspendBlockerLocked//根据前面屏幕的状态，屏幕是否需要亮屏，来决定是否需要持持有屏幕的锁             
+</code></pre><p>函数作用：进行锁的申请和释放</p>
+<p>分析完整个函数的调用流程，依然找不到怎么跟内核休眠的流程衔接起来；那么安卓是什么是否才会去调用内核休眠流程对接起来的？原来安卓在上面的函数调到灭屏的接口时候，才会去使能autosuspend的流程；想想也没有什么毛病，毕竟对于用户来说灭屏时标识着系统要走到休眠的标志；</p>
+<p>代码流程如下：</p>
+<pre><code>onDisplayStateChange
+--&gt;if (state == Display.STATE_OFF) {
+    if (!mDecoupleHalAutoSuspendModeFromDisplayConfig) {
+           setHalInteractiveModeLocked(true);
+    }
+ }
+ nativeSetAutoSuspend(enable);
+    autosuspend_enable();
+
+system/core/libsuspend/autosuspend.c
+int autosuspend_enable(void)
+{
+    autosuspend_init();
+        autosuspend_ops = autosuspend_wakeup_count_init(); 
+    autosuspend_ops-&gt;enable();   
+        autosuspend_wakeup_count_enable（）
+}
+system/core/libsuspend/autosuspend_wakeup_count.cpp
+autosuspend_wakeup_count_enable（）
+    autosuspend_init();
+        创建一个进程：suspend_thread_func 这个进程主要就是用来做轮询的动作
+    sem_post(&amp;suspend_lockout);
+suspend_thread_func
+while (true) {
+     if (!ReadFdToString(wakeup_count_fd, &amp;wakeup_count)) { //读取wakeup count值，如果成功，将读取的值回写，否则说明正在处理wakeup events,continue
+        continue; 
+     }
+     int ret = sem_wait(&amp;suspend_lockout);//通过信号量来控制这个流程是否要继续走下去，当disable的时候信号量为0，进程会阻塞在这里等待；
+     if (WriteStringToFd(wakeup_count, wakeup_count_fd)) { //回写后，判断返回值是否成功，如果不成功（说明读写过程中产生了wakeup events）,继续读，写，直到成功。成功后，可以触发电源状态切换
+           success = WriteStringToFd(sleep_state, state_fd);                    
+    }
+    ret = sem_post(&amp;suspend_lockout);
+}
+</code></pre><p>为了呼应上次内核篇上讲的安卓等待的时机，我们在这里把读写wakeup count内核的的相关操作也po出来；<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">	ReadFdToString(wakeup_count_fd, &amp;wakeup_count)</span><br><span class="line">	bool pm_get_wakeup_count(unsigned int *count, bool block)    </span><br><span class="line">	&#123;                                                            </span><br><span class="line">	    unsigned int cnt, inpr;                                  </span><br><span class="line">	                                                             </span><br><span class="line">	    if (block) &#123;                                             </span><br><span class="line">	        DEFINE_WAIT(wait);                                   </span><br><span class="line">	                                                             </span><br><span class="line">	        for (;;) &#123;                                           </span><br><span class="line">	            prepare_to_wait(&amp;wakeup_count_wait_queue, &amp;wait, </span><br><span class="line">	                    TASK_INTERRUPTIBLE);                     </span><br><span class="line">	            split_counters(&amp;cnt, &amp;inpr);                     </span><br><span class="line">	            if (inpr == 0 || signal_pending(current))        </span><br><span class="line">	                break;                                       </span><br><span class="line">	                                                             </span><br><span class="line">	            schedule();                                      </span><br><span class="line">	        &#125;                                                    </span><br><span class="line">	        finish_wait(&amp;wakeup_count_wait_queue, &amp;wait);        </span><br><span class="line">	    &#125;                                                        </span><br><span class="line">	                                                             </span><br><span class="line">	    split_counters(&amp;cnt, &amp;inpr);                             </span><br><span class="line">	    *count = cnt;                                            </span><br><span class="line">	    return !inpr;                                            </span><br><span class="line">	&#125;</span><br><span class="line">可以看到在读函数里面也会去判断是否有唤醒事件在处理，如果没有唤醒事件那么就会不断的阻塞在获取进程当中；</span><br><span class="line"></span><br><span class="line">WriteStringToFd(wakeup_count, wakeup_count_fd)</span><br><span class="line">	bool pm_save_wakeup_count(unsigned int count)     </span><br><span class="line">	&#123;                                                 </span><br><span class="line">	    unsigned int cnt, inpr;                       </span><br><span class="line">	    unsigned long flags;                          </span><br><span class="line">	                                                  </span><br><span class="line">	    events_check_enabled = false;                 </span><br><span class="line">	    spin_lock_irqsave(&amp;events_lock, flags);       </span><br><span class="line">	    split_counters(&amp;cnt, &amp;inpr);                  </span><br><span class="line">	    if (cnt == count &amp;&amp; inpr == 0) &#123;              </span><br><span class="line">	        saved_count = count;                      </span><br><span class="line">	        events_check_enabled = true;              </span><br><span class="line">	    &#125;                                             </span><br><span class="line">	    spin_unlock_irqrestore(&amp;events_lock, flags);  </span><br><span class="line">	    return events_check_enabled;                  </span><br><span class="line">	&#125;</span><br><span class="line">可以看到在写函数中，呼应到了我们内核篇中，当判断是否save_count == wakeup_count &amp;&amp; inpr==0这两个判断为没有唤醒事件，之后就开始写相关的节点，</span><br><span class="line"></span><br><span class="line">success = WriteStringToFd(sleep_state, state_fd);//echo mem &gt; /sys/power/state 发起内核进入休眠流程；</span><br></pre></td></tr></table></figure></p>
+<h1><span id="其他">其他</span></h1><p><strong>如何设置安卓休眠超时时间？</strong></p>
+<pre><code>settings get system screen_off_timeout 10000 
+</code></pre><h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cnblogs.com/dyufei/p/8018016.html" target="_blank" rel="noopener">Android7.0 PowerManagerService 之亮灭屏（二） PMS 电源状态管理updatePowerStateLocked（）</a></p>
+<p><a href="https://www.jianshu.com/p/b40e1b61e6d2" target="_blank" rel="noopener">Android 保持屏幕常亮的几种方法</a></p>
+<p><a href="https://blog.csdn.net/Gaugamela/article/details/52838654" target="_blank" rel="noopener">Android7.0 PowerManagerService(3)核心函数updatePowerStateLocked的主要流程</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/standby-linux/" rel="tag"># standby linux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/17/cpu/arm体系架构的发展/" rel="next" title="ARM体系架构概述">
+                <i class="fa fa-chevron-left"></i> ARM体系架构概述
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/13/standby/kernel_suspend/" rel="prev" title="内核的休眠流程">
+                内核的休眠流程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">dongka</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">安卓电源状态</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">代码demo</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">sleep</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dongka</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
