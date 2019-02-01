@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="知识总结">
 <meta property="og:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-02-01T07:24:12.108Z">
+<meta property="og:updated_time" content="2019-02-01T07:27:54.621Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓休眠流程">
 <meta name="twitter:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
@@ -365,7 +365,7 @@ goToSleepNoUpdateLocked
 </code></pre><p><strong>4.shutdown：</strong>关机<br><strong>5.reboot：</strong>重启  </p>
 <p>在此前的内核篇，我们讲到了用户层会去轮询查看是否有唤醒事件需要处理，如果没有则echo mem &gt; /sys/power/state,从而进入内核的休眠唤醒流程；所以在本篇我们主要将这两个流程是怎么衔接上的~</p>
 <p><strong>首先我们keeptesting 老化apk是如何进行调用休眠唤醒的api然后进行老化实验；</strong></p>
-<h1><span id="keeptest老化apk代码demo">keeptest老化apk代码demo</span></h1><p><strong>一：apk休眠唤醒源码</strong></p>
+<h1><span id="老化休眠唤醒代码demo">老化休眠唤醒代码demo</span></h1><p><strong>一：apk休眠唤醒源码</strong></p>
 <pre><code>休眠动作：
 单点击开始后，设置闹钟和走休眠流程： 
 runSleepWakeUpTest()
@@ -823,7 +823,7 @@ while (true) {
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">安卓电源状态</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">keeptest老化apk代码demo</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">sleep流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">安卓电源状态</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">老化休眠唤醒代码demo</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">sleep流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
 
           </div>

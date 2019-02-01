@@ -747,7 +747,7 @@ goToSleepNoUpdateLocked
 </code></pre><p><strong>4.shutdown：</strong>关机<br><strong>5.reboot：</strong>重启  </p>
 <p>在此前的内核篇，我们讲到了用户层会去轮询查看是否有唤醒事件需要处理，如果没有则echo mem &gt; /sys/power/state,从而进入内核的休眠唤醒流程；所以在本篇我们主要将这两个流程是怎么衔接上的~</p>
 <p><strong>首先我们keeptesting 老化apk是如何进行调用休眠唤醒的api然后进行老化实验；</strong></p>
-<h1><span id="keeptest老化apk代码demo">keeptest老化apk代码demo</span></h1><p><strong>一：apk休眠唤醒源码</strong></p>
+<h1><span id="老化休眠唤醒代码demo">老化休眠唤醒代码demo</span></h1><p><strong>一：apk休眠唤醒源码</strong></p>
 <pre><code>休眠动作：
 单点击开始后，设置闹钟和走休眠流程： 
 runSleepWakeUpTest()
