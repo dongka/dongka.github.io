@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="知识总结">
 <meta property="og:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-02-01T07:27:54.621Z">
+<meta property="og:updated_time" content="2019-02-09T12:35:13.475Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓休眠流程">
 <meta name="twitter:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
@@ -489,15 +489,15 @@ for (;;) {
 <tr>
 <td>SCREEN_BRIGHT_WAKE_LOCK</td>
 <td>WAKE_LOCK_SCREEN_BRIGHT</td>
-<td>//保证屏幕亮（full brightness），键盘灯允许关闭。用户按power键之后，CPU和屏幕都会被关闭</td>
+<td>保证屏幕亮（full brightness），键盘灯允许关闭。用户按power键之后，CPU和屏幕都会被关闭</td>
 </tr>
 <tr>
 <td>SCREEN_DIM_WAKE_LOCK</td>
 <td>WAKE_LOCK_SCREEN_BRIGHT</td>
-<td>//保证屏幕亮（full brightness），键盘灯允许关闭。用户按power键之后，CPU和屏幕都会被关闭</td>
+<td>保证屏幕亮（full brightness），键盘灯允许关闭。用户按power键之后，CPU和屏幕都会被关闭</td>
 </tr>
 <tr>
-<td>PROXIMITY_SCREEN_OFF_WAKE_LOCK</td>
+<td>PROXIMITY_SCREEN_OFF</td>
 <td>WAKE_LOCK_PROXIMITY_SCREEN_OFF</td>
 <td>pSensor导致的灭屏情况下系统不会进入休眠，正常情况下不影响系统休眠</td>
 </tr>
