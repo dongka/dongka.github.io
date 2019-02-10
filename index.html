@@ -747,52 +747,11 @@ goToSleepNoUpdateLocked
 </code></pre><p><strong>4.shutdown：</strong>关机<br><strong>5.reboot：</strong>重启  </p>
 <p>在此前的内核篇，我们讲到了用户层会去轮询查看是否有唤醒事件需要处理，如果没有则echo mem &gt; /sys/power/state,从而进入内核的休眠唤醒流程；所以在本篇我们主要将这两个流程是怎么衔接上的~</p>
 <p><strong>由于通过调用api进行休眠唤醒的流程更为简单，所以我们看下老化apk是如何进行调用休眠唤醒的api，然后进行老化休眠唤醒实验的；</strong></p>
-<h1><span id="老化休眠唤醒代码demo">老化休眠唤醒代码demo</span></h1><p><strong>apk休眠唤醒源码</strong></p>
-<pre><code>休眠动作：
-单点击开始后，设置闹钟和走休眠流程： 
-runSleepWakeUpTest()
-    mAlarmMgr.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() 
-                                                + (mSleepTime * 1000),
-                                                pendIntent);
-
-    standby();
-        pm.goToSleep(SystemClock.uptimeMillis());
-
- 唤醒动作：
- onReceive
-
-    PowerManager pm = (PowerManager) this
-                       .getSystemService(Context.POWER_SERVICE);
-    if (getAndroidSDKVersion() &gt;= 17) {
-          pm.wakeUp(SystemClock.uptimeMillis());
-
-    } else {
-               pm.userActivity(SystemClock.uptimeMillis(), false);
-    }   
-</code></pre><p>从调用流程可以看到就是不断的调用goToSleep,然后设置一个闹钟，当闹钟来临的时候唤醒系统;</p>
-<p><strong>framework代码</strong></p>
-<p>powerManager相关代码：</p>
-<pre><code>core/java/android/os/PowerManager.java
-public void goToSleep(long time) {
-     goToSleep(time, GO_TO_SLEEP_REASON_APPLICATION, 0);    
- }
-
-./services/core/java/com/android/server/power/PowerManagerService.java
-public void goToSleep(long eventTime, int reason, int flags) {
-    if (eventTime &gt; SystemClock.uptimeMillis()) {
-        throw new IllegalArgumentException(&quot;event time must not be in the future&quot;);
-    }
-    goToSleepInternal(eventTime, reason, flags, uid);
-}
-
-private void goToSleepInternal(long eventTime, int reason, int flags, int uid) {
- synchronized (mLock) {
-     if (goToSleepNoUpdateLocked(eventTime, reason, flags, uid)) {
-         updatePowerStateLocked();
-     }
- }   
- } 
-</code></pre><h1><span id="sleep流程">sleep流程</span></h1><p>当屏幕超时，按power键休眠，和应用主动调goToSleep；无论是哪种方式，如果系统启动没有异常，都会走到PowerManagerService的核心函数，<strong>updatePowerStateLocked</strong>；按照安卓注释，将updatePowerStateLocked 分为五个阶段，我们也按照五个阶段对该函数的功能进行讲解；</p>
+<h1><span id="老化休眠唤醒代码demo">老化休眠唤醒代码demo</span></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">**apk休眠唤醒源码**</span><br><span class="line"></span><br><span class="line">	休眠动作：</span><br><span class="line">	单点击开始后，设置闹钟和走休眠流程： </span><br><span class="line">	runSleepWakeUpTest()</span><br><span class="line">		mAlarmMgr.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() </span><br><span class="line">													+ (mSleepTime * 1000),</span><br><span class="line">													pendIntent);</span><br><span class="line">	</span><br><span class="line">		standby();</span><br><span class="line">			pm.goToSleep(SystemClock.uptimeMillis());</span><br><span class="line">	</span><br><span class="line">	 唤醒动作：</span><br><span class="line">	 onReceive</span><br><span class="line">		  </span><br><span class="line">		PowerManager pm = (PowerManager) this</span><br><span class="line">		                   .getSystemService(Context.POWER_SERVICE);</span><br><span class="line">		if (getAndroidSDKVersion() &gt;= 17) &#123;</span><br><span class="line">		      pm.wakeUp(SystemClock.uptimeMillis());</span><br><span class="line">		</span><br><span class="line">		&#125; else &#123;</span><br><span class="line">		           pm.userActivity(SystemClock.uptimeMillis(), false);</span><br><span class="line">		&#125;</span><br></pre></td></tr></table></figure>
+<p>从调用流程可以看到就是不断的调用goToSleep,然后设置一个闹钟，当闹钟来临的时候唤醒系统;</p>
+<p><strong>framework相关代码</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">core/java/android/os/PowerManager.java</span><br><span class="line">public void goToSleep(long time) &#123;</span><br><span class="line">    	goToSleep(time, GO_TO_SLEEP_REASON_APPLICATION, 0);    </span><br><span class="line">	&#125;</span><br><span class="line">  	</span><br><span class="line">./services/core/java/com/android/server/power/PowerManagerService.java</span><br><span class="line">public void goToSleep(long eventTime, int reason, int flags) &#123;</span><br><span class="line">    if (eventTime &gt; SystemClock.uptimeMillis()) &#123;</span><br><span class="line">        throw new IllegalArgumentException(&quot;event time must not be in the future&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">	goToSleepInternal(eventTime, reason, flags, uid);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">private void goToSleepInternal(long eventTime, int reason, int flags, int uid) &#123;</span><br><span class="line">    synchronized (mLock) &#123;</span><br><span class="line">        if (goToSleepNoUpdateLocked(eventTime, reason, flags, uid)) &#123;</span><br><span class="line">            updatePowerStateLocked();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;   </span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<h1><span id="sleep流程">sleep流程</span></h1><p>当屏幕超时，按power键休眠，和应用主动调goToSleep；无论是哪种方式，如果系统启动没有异常，都会走到PowerManagerService的核心函数，<strong>updatePowerStateLocked</strong>；按照安卓注释，将updatePowerStateLocked 分为五个阶段，我们也按照五个阶段对该函数的功能进行讲解；</p>
 <p><strong>Phase 0: Basic state updates</strong></p>
 <pre><code>1.USB插播亮屏入口点
  //如果需要插拔事件不影响到屏幕的亮灭，在overlay/frameworks/base/core/res/res/values/config.xml下
