@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="gpio pinctrl," />
 
 
 
@@ -79,13 +79,20 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="知识总结">
-<meta property="og:url" content="http://yoursite.com/page/2/index.html">
+<meta name="description" content="gpiouboot中gpio的使用对于gpio的操作，封装在include/sys_config.h,用户可在查阅其他驱动（如显示屏）借鉴完成所需的代码；以下是uboot中实现gpio_led的量灭简单demo； uboot中使用gpio demogpio_led.c123456789101112131415161718192021222324252627282930313233343536373">
+<meta name="keywords" content="gpio pinctrl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gpio pinctrl的使用demo">
+<meta property="og:url" content="http://yoursite.com/2018/02/25/sunxi-pinctrl/sunxi_pinctrl/index.html">
 <meta property="og:site_name" content="知识总结">
+<meta property="og:description" content="gpiouboot中gpio的使用对于gpio的操作，封装在include/sys_config.h,用户可在查阅其他驱动（如显示屏）借鉴完成所需的代码；以下是uboot中实现gpio_led的量灭简单demo； uboot中使用gpio demogpio_led.c123456789101112131415161718192021222324252627282930313233343536373">
 <meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/2018/02/25/sunxi-pinctrl/sunxi_pinctrl/sunxi_pinctrl_debug.jpg">
+<meta property="og:updated_time" content="2019-02-25T02:58:09.161Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="知识总结">
+<meta name="twitter:title" content="gpio pinctrl的使用demo">
+<meta name="twitter:description" content="gpiouboot中gpio的使用对于gpio的操作，封装在include/sys_config.h,用户可在查阅其他驱动（如显示屏）借鉴完成所需的代码；以下是uboot中实现gpio_led的量灭简单demo； uboot中使用gpio demogpio_led.c123456789101112131415161718192021222324252627282930313233343536373">
+<meta name="twitter:image" content="http://yoursite.com/2018/02/25/sunxi-pinctrl/sunxi_pinctrl/sunxi_pinctrl_debug.jpg">
 
 
 
@@ -115,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/page/2/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/02/25/sunxi-pinctrl/sunxi_pinctrl/"/>
 
 
 
 
 
-  <title>知识总结</title>
+  <title>gpio pinctrl的使用demo | 知识总结</title>
   
 
 
@@ -140,8 +147,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-  page-home">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -234,471 +240,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/19/memory/memory-process/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/19/memory/memory-process/" itemprop="url">程序的内存空间</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-19T08:00:03+00:00">
-                2018-06-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/内存管理/" itemprop="url" rel="index">
-                    <span itemprop="name">内存管理</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1><span id="一内核空间和用户空间">一：内核空间和用户空间</span></h1><p>Linux的虚拟地址空间范围是0~4G,linux内核将这4G空间分为两部分，将最高的1G字节（从虚拟地址0xC0000000到0xFFFFFFFF）供内核使用，称为“内核空间”。而将较低的3G字节（从虚拟地址0X00000000到0xBFFFFFFFF）供各个进程使用，称为“用户空间”。因为每个进程可以通过系统调用进入内核，因此，Linux内核由系统内的所有进程共享。于是，从具体进程的角度来看，每个进程可以拥有4G字节的虚拟空间<br>每个进程的用户空间都是完全独立，互不相干，用户进程各自有不同的页表。而内核空间是有内核负责映射的，不随进程改变，是固定的。内核空间有自己对应的页表；<br>这里指的32位内核地址空间划分，64位内核地址空间是不同的<br><img src="/2018/06/19/memory/memory-process/memory_process/进程空间.png" alt="进程空间分布"></p>
-<h2><span id="11内核空间">1.1:内核空间</span></h2><p>linux内核在启动的时候会打印出内核空间的布局图：<br>init/mian.c:<br>    start_kernel-&gt;mm_init-&gt;mem_init<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Memory: 996228K/1048576K available (9216K kernel code, 1381K rwdata, 2940K rodata, 1024K init, 397K bss, 44156K reserved, 8192K cma-reserved, 253952K highmem)</span><br><span class="line">[    0.000000] Virtual kernel memory layout:</span><br><span class="line">[    0.000000]     vector  : 0xffff0000 - 0xffff1000   (   4 kB)</span><br><span class="line">[    0.000000]     fixmap  : 0xffc00000 - 0xfff00000   (3072 kB)</span><br><span class="line">[    0.000000]     vmalloc : 0xf0800000 - 0xff800000   ( 240 MB)</span><br><span class="line">[    0.000000]     lowmem  : 0xc0000000 - 0xf0000000   ( 768 MB)</span><br><span class="line">[    0.000000]     pkmap   : 0xbfe00000 - 0xc0000000   (   2 MB)</span><br><span class="line">[    0.000000]     modules : 0xbf000000 - 0xbfe00000   (  14 MB)</span><br><span class="line">[    0.000000]       .text : 0xc0008000 - 0xc0a00000   (10208 kB) //代码段</span><br><span class="line">[    0.000000]       .init : 0xc0e00000 - 0xc0f00000   (1024 kB)  //init段 包含了大部分模块的初始化数据</span><br><span class="line">[    0.000000]       .data : 0xc0f00000 - 0xc1059518   (1382 kB)  //数据段的起始和结束地址，保存大部分内核的变量</span><br><span class="line">[    0.000000]        .bss : 0xc105b000 - 0xc10be54c   ( 398 kB)  //BSS段的开始和结束地址，包含初始化为0的所有静态全局变量</span><br><span class="line">[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1</span><br></pre></td></tr></table></figure></p>
-<p><img src="/2018/06/19/memory/memory-process/memory_process/内核空间.png" alt="内核空间"></p>
-<p>内核空间分为三部分：ZONE_DMA(16M),ZONE_NORMAL(16~896),ZONE_HIGMEM(896~1G),高端内存<br>内核地址空间分为物理内存映射区，虚拟内存分配区，高端页面映射区，专用页面映射区保留区<br>内核空间中存放的是内核代码和数据，而进程的用户空间中存放的是用户程序的代码和数据。不管是内核空间还是用户空间，它们都处于虚拟空间中，虽然内核空间占据了每个虚拟空间的最高1GB字节，但映射到物理内存却总是从最低（0X00000000），另外，使用虚拟地址可以很好的保护内核空间不被破坏，虚拟地址到物理地址转换过程中有操作系统和CPU共同完成<br>内核空间是持续存在的，并且在所有进程中都映射到同样的物理内存，内核代码和数据总是可寻址的，随时准备处理中断和系统调用。</p>
-<h2><span id="12用户空间分布">1.2:用户空间分布</span></h2><p>程序段（Text）:程序代码在内存中的映射，存放函数体的二进制代码。<br>初始化过的数据（Data）:在程序运行初已经对变量进行初始化的数据<br>未初始化过的数据（BSS）:在程序运行初未对变量进行初始化的数据<br>栈（Stack）：存储局部，临时变量，函数调用时，存储函数的返回指针，用于控制函数的调用和返回。在程序块开始时自动分配内存，结束时自动释放内存，其操作方式类似于结构中的栈；<br>堆（Heap）：存储动态内存分配，需要程序员手工分配，手工释放；</p>
-<h2><span id="三内存溢出内存泄漏内存越界缓存区溢出栈溢出">三：内存溢出，内存泄漏，内存越界，缓存区溢出，栈溢出</span></h2><p>内存溢出：要求分配的内存超出了系统能给予的<br>内存越界：申请了一块内存，在使用这块的时候，超出了你申请的范围<br>缓冲区溢出：当计算机向缓冲区填充区内填充数据位数</p>
-<p>参考资料：<br><a href="https://blog.csdn.net/tommy_wxie/article/details/17122923/" target="_blank" rel="noopener">linux用户空间与内核空间——高端内存详解</a><br><a href="https://blog.csdn.net/u010246947/article/details/9413275" target="_blank" rel="noopener">ARM架构内核启动分析-head.S(1.1).vmlinux.lds链接脚本分析</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-hardware-md/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/17/memory/memory-hardware-md/" itemprop="url">内存管理（一）硬件篇</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-17T00:07:09+00:00">
-                2018-06-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/内存管理/" itemprop="url" rel="index">
-                    <span itemprop="name">内存管理</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2><span id="一经典存储结构图">一.经典存储结构图</span></h2><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaghCuOMjibmmJgymLicFZBkXdwOReYVV1WfJHPhsU23ibEzhSsbdK87aGg/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="avatar"> </p>
-<pre><code>L0(寄存器)-&gt;CPU 寄存器保存来自高速缓存的字
-L1(SRAM）-&gt;高速缓存取自L2高速缓存行
-L2(SRAM)-&gt;高速缓存取自L3高速缓存的高速缓存行
-L3(SRAM)-&gt;高速缓存保存自内存的高速缓存行
-L4(内存)-&gt;内存保存自磁盘缓存的磁盘块
-L5(磁盘缓存)-&gt;磁盘缓存保存取自磁盘的磁盘块
-L6磁盘
-</code></pre><p>cpu从磁盘中加载数据,放到内存，之后再放到告诉缓存</p>
-<h2><span id="二虚拟地址和物理地址">二.虚拟地址和物理地址</span></h2><p>在旧的手机中，内存可能只有1G,但是每个进程在执行的时候都仿佛手机有4g内存；<br><strong>物理地址(Physical Address)</strong>：CPU地址总线传来的地址，由硬件电路控制其含义。物理地址中有很大一部分是留给内存条中的内存的但也常被映射到其他存储器上如显存，BIOS等),在没有使用虚拟存储器的机器上，虚拟地址被直接送到内存总线上，使具有相同物理存储器被读写;而在使用了虚拟存储器的情况下，虚拟具体地址不是被直接送到内存地址总线上，而是送到存储器管理单元MMU，把虚拟地址映射为物理地址；我们把上面实际的1G内存叫做：物理地址<br><strong>虚拟地址(Virtual Address)</strong>:是逻辑地址到物理地址变换之间的中间层；进程访问到的叫做虚拟地址；<br>虚拟内存有以下几个作用：<br>1.内存访问保护<br>  有虚拟内存，我们可以通过设置段界限或页表想来设定软件运行时的访问空间，确保软件运行使不越界；<br>2.按需分页（lazy load技术）<br>  可以让软件在没有访问某虚拟内存地址时，不分配虚拟地址，在实际访问的时候，在动态分配物理内存<br>建立虚拟内存到物理内存的页映射关系；<br>3.页换入换出（page swap in/out)<br>  把不经常访问的数据所占的内存空间临时写到硬盘上，这样可以腾出更多的空闲空间出来给到经常访问的数据；当cpu访问到不经常访问的数据时，再把数据从硬件读入到内存中；<br>4.写时复制（copy on write）<br>  两个虚拟页的数据相同时，可只分配一个物理页框，这样如果对两个虚拟页的访问是只读方式，这两个虚拟页可以共享页框，节省空间；如果当CPU对其中一个虚拟页进行了写操作，那么这两个虚拟页的数据内容不同，需要分配一个新的物理页框，并将物理页框标记为可写，这样两个虚拟页面将映射到不同的物理页帧，确保整个内存空间的正确访问。</p>
-<h2><span id="二页页表mmu">二.页，页表，MMU</span></h2><p>在讲虚拟地址到物理地址之中再补充几个概念：<br>页(page)<br>  <em>把APP的虚拟地址切分程若干个大小相等（4K）的片，每一片就是我们说的页</em><br>页框（frame）<br>  *把物理内存页按“页”的大小切分为若干大小相等的片，每一片，就是我们所说的页框 </p>
-<h2><span id="三cpu寻找页面过程">三.cpu寻找页面过程</span></h2><pre><code>CPU获取数据主要有两步：
-a.通过虚拟地址获取物理地址
-b.根据物理地址获取数据
-</code></pre><h3><span id="获取物理地址">获取物理地址</span></h3><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaBdia2Vt94nvPcnj4aYqWRrLibeKQONayr9azNLWEeiabiay7ibIF3ooxibBw/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="获取物理地址"><br>    [a].CPU向MMU发送虚拟地址<br>    [b].MMU查询快表TLB<br>        块表命中：从块表中获取物理地址，由MMU继续根据物理地址匹配数据页步骤[a]<br>        块表不命中：查询页表步骤[c]<br>    [c]:从高速缓存查询页表<br>     “高速缓存”缓存页框，而页表存储于页框中，因此读取页表实际上也是读页（页表的物理地址有单独的寄存器保存）<br>     高速缓存命中：从高速缓存获取物理地址，并更新快表，进入[步骤a]<br>     高速缓存不命中：查询内存中的页表[步骤d]<br>     [d]从内存中查询页表<br>     页表保存了所有虚拟地址的映射关系，而不管页是否有映射物理页框。因此从内存页表中肯定能“命中”页。从页表获取虚拟地址的映射关系后，进入步骤e<br>     [e]把查询的页表想记录到高速缓存<br>     [f]MMU从高速缓存中获取页表项<br>        虚拟地址有分配物理页框；转换物理地址并更新块表，由MMU继续根据物理地址匹配数据页<br>        虚拟地址没分配物理页框：触发缺页中断<br>    [g]进入缺页中断处理程序<br>    [h]为虚拟页分配物理页框<br>        如果无空闲物理页框，则根据LRU算法选择需要淘汰的页，要淘汰的页如果是脏数据就回刷，否则直接丢弃或置换到磁盘的交换分区中<br>        然后，从磁盘中获取页信息更新到物理页框，更新内存页表<br>    [i]缺页中断处理的最后<br>        修改CPU寄存器，使得重新启动导致缺页的指令，返回[步骤a]重新执行</p>
-<h3><span id="根据物理地址获取实际数据">根据物理地址获取实际数据</span></h3><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaMfh510NLONxyc2CSvYr3Vrwqyf9tiajI1jPAuD16Kzm9mOvqQdZTiaJg/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="获取数据"><br>    [A]MMU获取到物理地址后，根据物理地址查询高速缓存<br>        高速缓存命中：CPU直接从高速缓存获取数据<br>        高速缓存不命中：查询物理内存[步骤B]<br>    [B]根据物理地址，获取物理内存中的数据<br>    [C]硬件实现把数据页记录到高速缓存中<br>    [D]cpu直接从高速缓存中获取数据</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-mtp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/17/memory/memory-mtp/" itemprop="url">内存管理（二）mtp拷贝流程</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-17T00:07:09+00:00">
-                2018-06-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/内存管理/" itemprop="url" rel="index">
-                    <span itemprop="name">内存管理</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2><span id="背景知识介绍">背景知识介绍</span></h2><p>android 从3.0开始集成MTP功能，主要原因有三个：<br>1.手机要支持UMS的话，必须要有一个sd卡，因为sd卡往往采用Windows支持的分区格式。如果想把内部存储空间通过UMS挂载到Windows上，则内部存储空间需采用特定的分区格式。这对某些手机而言根本不可行。因为内部存储空间本身可能就是一个设备，它们采用统一的分区格式。不能因为需要使用UMS，而再增加一块特定的分区格式的存储设备。<br>2.UMS挂载到PC后，PC操作系统拥有绝对的控制权。此时，Android系统无法操作这些设备。<br>3.window所占市场份额较大，故即使linux，MacOS支持力度不够，Android也要集成的；<br>MTP的主要缺点：<br>1.传输大文件的速度较慢 ??<br>2.MTP不能直接修改文件本身，只能先拷贝到本地修改，完毕后再拷贝回去</p>
-<h2><span id="mtp协议介绍">MTP协议介绍</span></h2><p>MTP使用者包括两个部分，分别为Initiator和Resoponder</p>
-<ol>
-<li>Initiator:主要是指USB Host,例如PC机，笔记本等，协议规定所有的MTP操作只能由Initator发起</li>
-<li>Responder:一般是诸如数码相机，智能手机等存储媒体文件的设备，Responder在MTP中的作用就是处理Initator发起的请求。同时，它还会根据自身状态的变化发送Event以通知Initator.</li>
-</ol>
-<h1><span id="mtp-协议栈">MTP 协议栈</span></h1><ol>
-<li>Pyshical Layer(物理层)：物理层在MTP协议中用来传输数据。目前有三种物理层可供MTP使用。它们分别是USB:其主要特点是传输文件，同步媒体文件时速度快，而且可以变工作边充电，这是目前用的最多的一种方式；IP：基于IP的MTP(简称MTP/TP)将通过UPnp来匹配和发现设备。它是家庭网络中最理想的传输方式；Bluetooth:MTP/BT是最省电，同时速度最慢的一种传输方式，用处较少；</li>
-<li>传输层：MTP中，数据传输格式遵循PTP协议</li>
-<li>命令层：实现了MTP协议中的各种命令；</li>
-</ol>
-<p>MTP采用命令-应答方式来工作，(Initator发送命令给Responder处理，Responser反馈处理结果)，这种方式主要特点有：</p>
-<ol>
-<li>所有MTP命令均以Package(数据包)的方式在设备两端进行传递</li>
-<li>Initiator必须接收到前一条消息处理结果，无论是成功或者超时后，才能发送下一条消息</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
 
   
 
@@ -728,9 +272,7 @@ b.根据物理地址获取数据
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/25/sunxi-pinctrl/sunxi_pinctrl/" itemprop="url">gpio pinctrl的使用demo</a></h1>
+          <h1 class="post-title" itemprop="name headline">gpio pinctrl的使用demo</h1>
         
 
         <div class="post-meta">
@@ -802,9 +344,7 @@ b.根据物理地址获取数据
       
 
       
-        
-          
-            <h1><span id="gpio">gpio</span></h1><h1><span id="uboot中gpio的使用">uboot中gpio的使用</span></h1><p>对于gpio的操作，封装在include/sys_config.h,用户可在查阅其他驱动（如显示屏）借鉴完成所需的代码；以下是uboot中实现gpio_led的量灭简单demo；</p>
+        <h1><span id="gpio">gpio</span></h1><h1><span id="uboot中gpio的使用">uboot中gpio的使用</span></h1><p>对于gpio的操作，封装在include/sys_config.h,用户可在查阅其他驱动（如显示屏）借鉴完成所需的代码；以下是uboot中实现gpio_led的量灭简单demo；</p>
 <h2><span id="uboot中使用gpio-demo">uboot中使用gpio demo</span></h2><p><strong>gpio_led.c</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#include &lt;common.h&gt;</span><br><span class="line">#include &lt;sys_config.h&gt;</span><br><span class="line">#include &lt;asm/arch/platform.h&gt;</span><br><span class="line">#include &lt;fdt_support.h&gt;    </span><br><span class="line">#include &lt;sys_config_old.h&gt;  </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">static __u32 gpio_red_led_hd;</span><br><span class="line">static __u32 gpio_blue_led_hd;</span><br><span class="line"></span><br><span class="line">int gpio_led_init(void)&#123;</span><br><span class="line">    u8 ret;</span><br><span class="line">    user_gpio_set_t gpio_init;</span><br><span class="line">    memset(&amp;gpio_init, 0, sizeof(user_gpio_set_t)); </span><br><span class="line"></span><br><span class="line">    ret = script_parser_fetch(&quot;gpio_led&quot;, &quot;gpio_red_led&quot;, (void *)&amp;gpio_init, sizeof(user_gpio_set_t)&gt;&gt;2);</span><br><span class="line">    if (!ret) &#123;</span><br><span class="line">		//获取gpio句柄</span><br><span class="line">        gpio_red_led_hd = gpio_request(&amp;gpio_init, 1); </span><br><span class="line">        if(!gpio_red_led_hd)&#123;</span><br><span class="line">            printf(&quot;gpio_red_led_hd request err\n&quot;);</span><br><span class="line">        &#125;   </span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        printf(&quot;gpio red init err\n&quot;);</span><br><span class="line">    &#125;   </span><br><span class="line">    ret = script_parser_fetch(&quot;gpio_led&quot;, &quot;gpio_blue_led&quot;, (void *)&amp;gpio_init, sizeof(user_gpio_set_t)&gt;&gt;2);</span><br><span class="line">    if (!ret) &#123;</span><br><span class="line">        gpio_blue_led_hd = gpio_request(&amp;gpio_init, 1); </span><br><span class="line">        if(!gpio_blue_led_hd)&#123;</span><br><span class="line">            printf(&quot;gpio_blue_led_hd request err\n&quot;);</span><br><span class="line">        &#125;   </span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        printf(&quot;gpio blue init err\n&quot;);</span><br><span class="line">    &#125;   </span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br><span class="line">int gpio_red_led_set_value(int value)&#123;</span><br><span class="line">    u8 ret;</span><br><span class="line">	设置gpio</span><br><span class="line">    ret = gpio_write_one_pin_value(gpio_red_led_hd, value, &quot;gpio_red_led&quot;); </span><br><span class="line">    if (ret) &#123;</span><br><span class="line">         printf(&quot;gpio_red_led_set_value%d err\n&quot;,value);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br><span class="line">int gpio_blue_led_set_value(int value)&#123;</span><br><span class="line">    u8 ret;</span><br><span class="line">    ret = gpio_write_one_pin_value(gpio_blue_led_hd, value, &quot;gpio_blue_led&quot;);</span><br><span class="line">    if (ret) &#123;</span><br><span class="line">         printf(&quot;gpio_blue_led_set_value%d err\n&quot;,value);</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p><strong>gpio_led.h</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#ifndef __GPIO_LED_H</span><br><span class="line">#define __GPIO_LED_H</span><br><span class="line">extern int gpio_led_init(void);</span><br><span class="line">extern int gpio_red_led_set_value(int value);</span><br><span class="line">extern int gpio_blue_led_set_value(int value); </span><br><span class="line">#endif</span><br></pre></td></tr></table></figure></p>
 <p><strong>调用接口流程：</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">--- a/u-boot-2014.07/board/sunxi/common/secondary_main.c</span><br><span class="line">+++ b/u-boot-2014.07/board/sunxi/common/secondary_main.c</span><br><span class="line">@@ -34,6 +34,7 @@</span><br><span class="line"> #include &lt;asm/arch/platsmp.h&gt;</span><br><span class="line"> #include &lt;cputask.h&gt;</span><br><span class="line"> #include &lt;smc.h&gt;</span><br><span class="line">+#include &lt;gpio_led.h&gt;</span><br><span class="line"> #include &lt;securestorage.h&gt;</span><br><span class="line"> #include &lt;fdt_support.h&gt;</span><br><span class="line"> #include &lt;bmp_layout.h&gt;</span><br><span class="line">@@ -196,6 +197,7 @@ static int sunxi_probe_power_state(void)</span><br><span class="line">        int ret = 0, __power_on_cause;</span><br><span class="line">        SUNXI_BOOT_POWER_STATE_E __boot_state;</span><br><span class="line">        int pmu_bat_unused = 0;</span><br><span class="line">+       int gpio_led_used = 0;</span><br><span class="line"> </span><br><span class="line"> /* power_start</span><br><span class="line"> 0: not allow boot by insert dcin,boot condition:</span><br><span class="line">@@ -223,6 +225,13 @@ static int sunxi_probe_power_state(void)</span><br><span class="line">        __power_source = axp_probe_power_source();</span><br><span class="line">        pr_notice(&quot;PowerBus = %d( %d:vBus %d:acBus other: not exist)\n&quot;,</span><br><span class="line">                __power_source,AXP_VBUS_EXIST,AXP_DCIN_EXIST);</span><br><span class="line">+    script_parser_fetch(&quot;gpio_led&quot;, &quot;gpio_led_used&quot;, &amp;gpio_led_used, 1);</span><br><span class="line">+    if (gpio_led_used)&#123;</span><br><span class="line">+                printf(&quot;gpio_led_used 11\n&quot;);</span><br><span class="line">+                gpio_led_init();</span><br><span class="line">+                gpio_red_led_set_value(0);</span><br><span class="line">+                gpio_blue_led_set_value(1);</span><br><span class="line">+    &#125;</span><br></pre></td></tr></table></figure></p>
@@ -939,8 +479,6 @@ if (IS_ERR_VALUE((unsigned long)ret)) {
 <p>#参考资料</p>
 <p><a href="http://www.wowotech.net/gpio_subsystem/pinctrl-and-gpio.html" target="_blank" rel="noopener">linux内核中的GPIO系统之（5）：gpio subsysem和pinctrl subsystem之间的耦合</a></p>
 
-          
-        
       
     </div>
     
@@ -955,14 +493,36 @@ if (IS_ERR_VALUE((unsigned long)ret)) {
 
     <footer class="post-footer">
       
-
+        <div class="post-tags">
+          
+            <a href="/tags/gpio-pinctrl/" rel="tag"># gpio pinctrl</a>
+          
+        </div>
       
 
       
+      
+      
 
       
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/17/memory/memory-mtp/" rel="prev" title="内存管理（二）mtp拷贝流程">
+                内存管理（二）mtp拷贝流程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
       
-        <div class="post-eof"></div>
+
+      
       
     </footer>
   </div>
@@ -972,14 +532,11 @@ if (IS_ERR_VALUE((unsigned long)ret)) {
   </article>
 
 
-    
-  </section>
 
-  
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
-  </nav>
-
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -987,6 +544,10 @@ if (IS_ERR_VALUE((unsigned long)ret)) {
 
 
           
+
+  
+
+
 
         </div>
         
@@ -1007,8 +568,17 @@ if (IS_ERR_VALUE((unsigned long)ret)) {
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -1068,6 +638,22 @@ if (IS_ERR_VALUE((unsigned long)ret)) {
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">gpio</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">uboot中gpio的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.1.</span> <span class="nav-text">uboot中使用gpio demo</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">gpio</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.</span> <span class="nav-text">内核中gpio的一般使用步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.2.</span> <span class="nav-text">中断管脚申请流程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">pinctrl</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.1.</span> <span class="nav-text">pinctrl作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.2.</span> <span class="nav-text">pinctr的使用demo:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.3.</span> <span class="nav-text">pinctrl debug 方法</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -1208,6 +794,10 @@ if (IS_ERR_VALUE((unsigned long)ret)) {
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
