@@ -413,7 +413,7 @@
 <li>ASE：Adaptive Saturation Enhancement(饱和度增强) 主要是对颜色信号进行自适应调整，使画面看起来更鲜艳，亮丽；</li>
 <li>FCC:Fancy color curvature change(丽色曲率改善) 主要是通过颜色空间将RGB转换成HSV，对颜色曲率进行调整，再转换回RGB输出；</li>
 </ol>
-<p>如上图，在RT-Mixer0最后的proc2模块是CSC：Color Space Conversion(颜色空间转换)。由于前端输入格式不同，或者一些图像处理算法需要把图像转成另外的格式，所以需要在输出到显示器前格式统一转换成RGB</p>
+<p><img src="/2019/02/27/display/display_hardware/proc2.jpg" alt="proc1"><br>如上图，在RT-Mixer0最后的proc2模块是CSC：Color Space Conversion(颜色空间转换)。由于前端输入格式不同，或者一些图像处理算法需要把图像转成另外的格式，所以需要在输出到显示器前格式统一转换成RGB</p>
 <p>这一部分就点到这里，如果以后对DE有涉及到再过来补充；</p>
 <p>#TCON(TimingControl)</p>
 <p><img src="/2019/02/27/display/display_hardware/tcon.jpg" alt="tcon结构图"></p>
