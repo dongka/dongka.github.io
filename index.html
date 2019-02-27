@@ -357,8 +357,8 @@
 <li>视角：液晶显示器由于天生的物理特性，使得使用者从不同角度看画质会有所变化；与正眼相比，斜看的时候，转到当前画面品质已经变化到无法接受的临界角度。称为显示器的视角</li>
 <li>Gamma Curve：是指不同灰阶与亮度的关系曲线。把0~255灰阶当x轴，亮度当y轴，画出来的线就叫做gamma curve;因为人眼对不同亮度有不同的辨识效果，比如说低亮度的辨识能力较高</li>
 </ol>
-<h1><span id="常用的显示接口接口">常用的显示接口接口</span></h1><p>LCD常用接口：RGB,LVDS,EDP,MIPI;</p>
-<table>
+<h1><span id="常用的显示接口接口">常用的显示接口接口</span></h1><h2><span id="a83的结构图">A83的结构图</span></h2><p><img src="/2019/02/27/display/display_hardware/A83_system.jpg" alt="A83结构图"><br>从A83的结构图可以看到支持的显示接口有RGB,LVDS,HDMI,MIPI</p>
+<h2><span id="lcd常用接口">LCD常用接口</span></h2><table>
 <thead>
 <tr>
 <th>接口</th>
@@ -390,12 +390,9 @@
 </tbody>
 </table>
 <p>更多的时候，分辨率能支持的大小还是有IC本身设计决定的，与协议本身并没有太大的关系；</p>
-<p>还有一个edp接口，这个接口也是超清的接口，目前的话在pc基本上都有看到，但对于移动设备，目前还是mipi的居多；有些IC甚至没有edp接口；<br>这里我们主要讲mipi;</p>
-<p><strong>如下为allwinner A83的结构图：</strong></p>
-<p><img src="/2019/02/27/display/display_hardware/A83_system.jpg" alt="A83结构图"></p>
-<p><strong>显示硬件流程框图如下：</strong></p>
-<p><img src="/2019/02/27/display/display_hardware/de_hardware.jpg" alt="harware"></p>
-<p>DE合成或从dram中取出显示需要的数据，TCON0中包含RGB和LVDS，可以直接接显示器，MIPI相当于一个独立的IP,将TCON中的RGB信号转换成MIPI信号，再接到显示器；</p>
+<p>还有一个edp接口，这个接口也是超清的接口，目前的话在pc上居多，但对于移动设备，目前还是mipi的居多；有些IC甚至没有edp接口；</p>
+<h1><span id="显示硬件流程框图">显示硬件流程框图</span></h1><p><img src="/2019/02/27/display/display_hardware/de_hardware.jpg" alt="harware"></p>
+<p>DE合成或从dram中取出显示需要的数据，TCON0中包含RGB和LVDS，可以直接接显示器，MIPI相当于一个独立的IP,将TCON中的RGB信号转换成MIPI信号，再接到显示器；下面将按照显示流程框图对每个模块进行介绍；</p>
 <h1><span id="dedisplay-egine">DE(display egine)</span></h1><p>如下为DE硬件结构框图：从结构图我们大致可以猜测到DE就是做些图形的处理和合成；</p>
 <p>如图，该DE主要由两个RT-Mixer(实时合成模块)，一个是Mux(解复用模块)，一个Write-back(回写模块)，主要用于debug,输入依赖内存（DMA）总线，显示内容输出到TCON，再到HDMI/CVBS做显示，回写内容输出返回内存总线。显示内容输出到TCON，再到HDMI/CVBS做显示，回写内容输出返回内存总线。其中RT-Mixer模块为一个核，可以认为是一个独立的DE，通常DE0,DE1对应的就是RT-Mixer0和RT-Mixer1。</p>
 <p>RT-Mixer有四个通道，分别从DMA获取图层内容，然后通过overlay(覆盖)和scale（缩放）模块后依次进行双双混合，最后送给TCON显示。四个通道中，有三个是UI通道和一个视频通道，两种类型通道使用的overlay和scale模块是不一样的，另外视频通道送混合前会进行proc1的处理；</p>
@@ -414,9 +411,8 @@
 <li>FCC:Fancy color curvature change(丽色曲率改善) 主要是通过颜色空间将RGB转换成HSV，对颜色曲率进行调整，再转换回RGB输出；</li>
 </ol>
 <p><img src="/2019/02/27/display/display_hardware/proc2.jpg" alt="proc1"><br>如上图，在RT-Mixer0最后的proc2模块是CSC：Color Space Conversion(颜色空间转换)。由于前端输入格式不同，或者一些图像处理算法需要把图像转成另外的格式，所以需要在输出到显示器前格式统一转换成RGB</p>
-<p>这一部分就点到这里，如果以后对DE有涉及到再过来补充；</p>
 <h1><span id="tcontimingcontrol">TCON(TimingControl)</span></h1><p><img src="/2019/02/27/display/display_hardware/tcon.jpg" alt="tcon结构图"></p>
-<p>从结构图可以推测下，TCON主要的主要事情就是准备显示数据，还有显示上的时序；从TCON出来的数据就包含这RGB和LVDS这两种信号；如果需要转换成MIPI还需要经过硬件上的MIPI模块进行处理；另外TCON有时还负责一些数据处理，如抖色（dither function），简单来讲就是增加像素的位数，以便显示效果能够更加细腻；现在主流的储存/显示方式是用8位记录每种颜色，三种颜色加起来一共24位（再加上用来定义透明度的8位，有时也被称作32位），每位有256级，三种颜色相乘，一共16,777,216种颜色。这就是所谓的8位色深了，这个标准一般被称作True Color，苹果则通俗的称其Millions<br>of Colors。不过最后苹果被好多消费者告了，因为其实苹果早年打着Millions of Colors旗号销售的很多电脑的屏幕都不是真正的24位，而是成本更低的18位；但其他厂家也是如此，只不过大家对苹果的期望更高一点而已；靠抖色从18扩大到24位；从而图像的验色可以更加的细腻；另外还有3D fuction 将一张图片，以左右眼的数据进行输出，以便让用户看到3D的效果，这个也是在这里进行处理的</p>
+<p>从结构图可以推测下，TCON主要的主要事情就是准备显示数据，还有显示上的时序；从TCON出来的数据就包含这RGB和LVDS这两种信号；如果需要转换成MIPI还需要经过硬件上的MIPI模块进行处理；<br>TCON有时还负责一些数据处理，如抖色（dither function），简单来讲就是增加像素的位数，以便显示效果能够更加细腻；现在主流的储存/显示方式是用8位记录每种颜色，三种颜色加起来一共24位（再加上用来定义透明度的8位，有时也被称作32位），每位有256级，三种颜色相乘，一共16,777,216种颜色。这就是所谓的8位色深了，这个标准一般被称作True Color，苹果则通俗的称其Millionsof Colors。不过最后苹果被好多消费者告了，因为其实苹果早年打着Millions of Colors旗号销售的很多电脑的屏幕都不是真正的24位，而是成本更低的18位；但其他厂家也是如此，只不过大家对苹果的期望更高一点而已；靠抖色从18扩大到24位；从而图像的验色可以更加的细腻；另外还有3D fuction的支持，将一张图片，以左右眼的数据进行输出，以便让用户看到3D的效果，这个也是在这里进行处理的，如果要支持这种3D模式，同样的需要佩戴眼镜还有屏幕也需要进行支持；</p>
 <h1><span id="mipimobile-industry-processor-interface">MIPI（Mobile Industry Processor Interface）</span></h1><p>在移动平台上，由于此接口较为常见，所以我们将此接口拿出来讲下；<br>MIPI是2003年由ARM,Nokia,ST,TI等公司成立的一个联盟，目的是把手机内部的接口如摄像头，显示屏接口，视频/基带接口标准化，，从而增加设计灵活性，同时降低成本、设计复杂度、功耗和EMI。。MIPI联盟下面有不同的WorkGroup，分别定义了一系列的手机内部接口标准，比如摄像头接口CSI,显示接口DSI，视频接口DingRF,麦克风、喇叭接口等；由于本篇内容主要将的是显示，故我们就从MIPI-DSI讲起；</p>
 <p>MIPI-DSI是一种应用于显示技术的串行接口，兼容DPI（显示像素接口，Display Pixel Interface）,DBI(显示总线接口，Display Bus Interface)和DCS（显示命令集，Display Command Set）,以串行的方式发送像素信息或指令给外围，而且在传输的过程中享有自己独立的通信协议，包括数据包格式和纠错检错机制；</p>
 <p>MIPI-DSI具备高速和低速模式两种模式，全部数据通道都可以用于单向的高速数据传输，但只有一个数据通道才可用于低速双向传输，从属端的状态信息，像素等式通过该数据通道返回，时钟通道专用于高速传输数据的过程中传输同步时钟信号，此外，一个主机端可允许同时与多个从属端进行通信；下图为MIPI接口的数据链路图示：</p>
@@ -430,7 +426,7 @@
 <p>从硬件原理图看mipi屏主要有三个主要的电路，<strong>供电</strong>：屏供电:VCC-LCD. MIPI信号供电：VCC-LCD-LOGIC；<strong>背光电路：</strong>通过lcd-pwm控制VCC-LED+,VCC-LED- ; <strong>MIPI信号：</strong>DSI-D0N,DSI-D0P,….,DSI-CKN,DSI-CKP;</p>
 <h1><span id="lcd屏电路硬件简示">lcd屏电路硬件简示：</span></h1><p><img src="/2019/02/27/display/display_hardware/lcd_hardware.png" alt="lcd_hardware"></p>
 <p>按照之前的MIPI数据链路，将SOC的MIPI信号转化成屏可以识别的信号，然后进行显示</p>
-<p>以上，就是从DE-&gt;TCON-&gt;MIPI-&gt;LCD的硬件流程图；</p>
+<p><strong>综上，就是从DE-&gt;TCON-&gt;MIPI-&gt;LCD的硬件流程图;</strong></p>
 <h1><span id="参考资料">参考资料</span></h1><p><a href="https://blog.csdn.net/xubin341719/article/details/9125583" target="_blank" rel="noopener">Android LCD(一)：LCD基本原理篇</a></p>
 <p><a href="https://blog.csdn.net/u012719256/article/details/55102836" target="_blank" rel="noopener">LCD主流显示接口介绍</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/33633476" target="_blank" rel="noopener">高兴说 显示行业进阶篇之（三）</a></p>
