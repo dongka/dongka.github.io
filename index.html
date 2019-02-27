@@ -394,7 +394,7 @@
 <h1><span id="显示硬件流程框图">显示硬件流程框图</span></h1><p><img src="/2019/02/27/display/display_hardware/de_hardware.jpg" alt="harware"></p>
 <p>DE合成或从dram中取出显示需要的数据，TCON0中包含RGB和LVDS，可以直接接显示器，MIPI相当于一个独立的IP,将TCON中的RGB信号转换成MIPI信号，再接到显示器；下面将按照显示流程框图对每个模块进行介绍；</p>
 <h1><span id="dedisplay-egine">DE(display egine)</span></h1><p>如下为DE硬件结构框图：从结构图我们大致可以猜测到DE就是做些图形的处理和合成；</p>
-<p>如图，该DE主要由两个RT-Mixer(实时合成模块)，一个是Mux(解复用模块)，一个Write-back(回写模块)，主要用于debug,输入依赖内存（DMA）总线，显示内容输出到TCON，再到HDMI/CVBS做显示，回写内容输出返回内存总线。显示内容输出到TCON，再到HDMI/CVBS做显示，回写内容输出返回内存总线。其中RT-Mixer模块为一个核，可以认为是一个独立的DE，通常DE0,DE1对应的就是RT-Mixer0和RT-Mixer1。</p>
+<p>如图，该DE主要由两个RT-Mixer(实时合成模块)，一个是Mux(解复用模块)，一个Write-back(回写模块)，主要用于debug,输入依赖内存（DMA）总线，显示内容输出到TCON，再到HDMI/CVBS做显示，回写内容输出返回内存总线。 其中RT-Mixer模块为一个核，可以认为是一个独立的DE，通常DE0,DE1对应的就是RT-Mixer0和RT-Mixer1。</p>
 <p>RT-Mixer有四个通道，分别从DMA获取图层内容，然后通过overlay(覆盖)和scale（缩放）模块后依次进行双双混合，最后送给TCON显示。四个通道中，有三个是UI通道和一个视频通道，两种类型通道使用的overlay和scale模块是不一样的，另外视频通道送混合前会进行proc1的处理；</p>
 <p>类似的，RT-Mixer1有两个通道，其中一个UI通道和一个视频通道，它们的功能和RT-Mixer0是一样的；</p>
 <p>Routing(通道选择)模块比较简单就是通过寄存器值把对应的4个通道输出到不同的通道，以便后续做混合，它的作用就是配置通道的Zorder.</p>
