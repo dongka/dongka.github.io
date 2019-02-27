@@ -99,7 +99,7 @@
 <meta property="og:image" content="http://yoursite.com/2019/02/27/display/display_hardware/lcd_backlight.jpg">
 <meta property="og:image" content="http://yoursite.com/2019/02/27/display/display_hardware/lcd_mipi.jpg">
 <meta property="og:image" content="http://yoursite.com/2019/02/27/display/display_hardware/lcd_hardware.png">
-<meta property="og:updated_time" content="2019-02-27T04:35:12.199Z">
+<meta property="og:updated_time" content="2019-02-27T04:38:26.936Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="显示硬件篇">
 <meta name="twitter:description" content="lcd成像由于市场上只有高端产品才用OLED大部分依然是LCD，故以LCD成像原理开启此篇；  偏振光：指单方向的光，自然光为散光，如果不经过偏振片，可以自由穿透液晶，这样就没办法起到选通作用； 接下来我们就可以大胆猜想下OLED，由于自发光的特性，那么背光和偏振片都是不必要的；这样就可以做的更薄；由于没有背光电路，OLED可以做到不漏光，而且响应速度更快，较LCD更适用于VR产品上； 这里讲下偏">
@@ -428,8 +428,7 @@
 </ol>
 <p><img src="/2019/02/27/display/display_hardware/proc2.jpg" alt="proc1"><br>如上图，在RT-Mixer0最后的proc2模块是CSC：Color Space Conversion(颜色空间转换)。由于前端输入格式不同，或者一些图像处理算法需要把图像转成另外的格式，所以需要在输出到显示器前格式统一转换成RGB</p>
 <p>这一部分就点到这里，如果以后对DE有涉及到再过来补充；</p>
-<p>#TCON(TimingControl)</p>
-<p><img src="/2019/02/27/display/display_hardware/tcon.jpg" alt="tcon结构图"></p>
+<h1><span id="tcontimingcontrol">TCON(TimingControl)</span></h1><p><img src="/2019/02/27/display/display_hardware/tcon.jpg" alt="tcon结构图"></p>
 <p>从结构图可以推测下，TCON主要的主要事情就是准备显示数据，还有显示上的时序；从TCON出来的数据就包含这RGB和LVDS这两种信号；如果需要转换成MIPI还需要经过硬件上的MIPI模块进行处理；另外TCON有时还负责一些数据处理，如抖色（dither function），简单来讲就是增加像素的位数，以便显示效果能够更加细腻；现在主流的储存/显示方式是用8位记录每种颜色，三种颜色加起来一共24位（再加上用来定义透明度的8位，有时也被称作32位），每位有256级，三种颜色相乘，一共16,777,216种颜色。这就是所谓的8位色深了，这个标准一般被称作True Color，苹果则通俗的称其Millions<br>of Colors。不过最后苹果被好多消费者告了，因为其实苹果早年打着Millions of Colors旗号销售的很多电脑的屏幕都不是真正的24位，而是成本更低的18位；但其他厂家也是如此，只不过大家对苹果的期望更高一点而已；靠抖色从18扩大到24位；从而图像的验色可以更加的细腻；另外还有3D fuction 将一张图片，以左右眼的数据进行输出，以便让用户看到3D的效果，这个也是在这里进行处理的</p>
 <h1><span id="mipimobile-industry-processor-interface">MIPI（Mobile Industry Processor Interface）</span></h1><p>在移动平台上，由于此接口较为常见，所以我们将此接口拿出来讲下；<br>MIPI是2003年由ARM,Nokia,ST,TI等公司成立的一个联盟，目的是把手机内部的接口如摄像头，显示屏接口，视频/基带接口标准化，，从而增加设计灵活性，同时降低成本、设计复杂度、功耗和EMI。。MIPI联盟下面有不同的WorkGroup，分别定义了一系列的手机内部接口标准，比如摄像头接口CSI,显示接口DSI，视频接口DingRF,麦克风、喇叭接口等；由于本篇内容主要将的是显示，故我们就从MIPI-DSI讲起；</p>
 <p>MIPI-DSI是一种应用于显示技术的串行接口，兼容DPI（显示像素接口，Display Pixel Interface）,DBI(显示总线接口，Display Bus Interface)和DCS（显示命令集，Display Command Set）,以串行的方式发送像素信息或指令给外围，而且在传输的过程中享有自己独立的通信协议，包括数据包格式和纠错检错机制；</p>
@@ -442,12 +441,10 @@
 <p><strong>屏电路</strong></p>
 <p><img src="/2019/02/27/display/display_hardware/lcd_mipi.jpg" alt="lcd_mipi"></p>
 <p>从硬件原理图看mipi屏主要有三个主要的电路，<strong>供电</strong>：屏供电:VCC-LCD. MIPI信号供电：VCC-LCD-LOGIC；<strong>背光电路：</strong>通过lcd-pwm控制VCC-LED+,VCC-LED- ; <strong>MIPI信号：</strong>DSI-D0N,DSI-D0P,….,DSI-CKN,DSI-CKP;</p>
-<p>#lcd屏电路硬件简示：</p>
-<p><img src="/2019/02/27/display/display_hardware/lcd_hardware.png" alt="lcd_hardware"></p>
+<h1><span id="lcd屏电路硬件简示">lcd屏电路硬件简示：</span></h1><p><img src="/2019/02/27/display/display_hardware/lcd_hardware.png" alt="lcd_hardware"></p>
 <p>按照之前的MIPI数据链路，将SOC的MIPI信号转化成屏可以识别的信号，然后进行显示</p>
 <p>以上，就是从DE-&gt;TCON-&gt;MIPI-&gt;LCD的硬件流程图；</p>
-<p>#参考资料</p>
-<p><a href="https://blog.csdn.net/xubin341719/article/details/9125583" target="_blank" rel="noopener">Android LCD(一)：LCD基本原理篇</a></p>
+<h1><span id="参考资料">参考资料</span></h1><p><a href="https://blog.csdn.net/xubin341719/article/details/9125583" target="_blank" rel="noopener">Android LCD(一)：LCD基本原理篇</a></p>
 <p><a href="https://blog.csdn.net/u012719256/article/details/55102836" target="_blank" rel="noopener">LCD主流显示接口介绍</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/33633476" target="_blank" rel="noopener">高兴说 显示行业进阶篇之（三）</a></p>
 <p><a href="https://www.2cm.com.tw/2cm/zh-tw/archives/9A04B31883E84E3A8C3ED8D2C48920D5" target="_blank" rel="noopener">行動裝置顯示器邁向超高畫質　eDP躍升NB/平板主流介面</a></p>
@@ -624,7 +621,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">lcd成像</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.</span> <span class="nav-text">lcd常用到的知识</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">常用的显示接口接口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">DE(display egine)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">MIPI（Mobile Industry Processor Interface）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">mipi屏参考电路</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">lcd成像</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.</span> <span class="nav-text">lcd常用到的知识</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">常用的显示接口接口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">DE(display egine)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">TCON(TimingControl)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">MIPI（Mobile Industry Processor Interface）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">6.</span> <span class="nav-text">mipi屏参考电路</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">7.</span> <span class="nav-text">lcd屏电路硬件简示：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">8.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
 
           </div>
