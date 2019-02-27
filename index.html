@@ -249,6 +249,246 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/27/display/display_hardware/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/02/27/display/display_hardware/" itemprop="url">显示硬件篇</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-02-27T00:07:09+00:00">
+                2019-02-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/standby/" itemprop="url" rel="index">
+                    <span itemprop="name">standby</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1><span id="lcd成像">lcd成像</span></h1><p>由于市场上只有高端产品才用OLED大部分依然是LCD，故以LCD成像原理开启此篇；</p>
+<p><img src="/2019/02/27/display/display_hardware/lcd_display.png" alt="lcd成像原理"></p>
+<p>偏振光：指单方向的光，自然光为散光，如果不经过偏振片，可以自由穿透液晶，这样就没办法起到选通作用；</p>
+<p>接下来我们就可以大胆猜想下OLED，由于自发光的特性，那么背光和偏振片都是不必要的；这样就可以做的更薄；由于没有背光电路，OLED可以做到不漏光，而且响应速度更快，较LCD更适用于VR产品上；</p>
+<p><strong>这里讲下偏振片在3D电影院中的应用：</strong></p>
+<p>我们人眼之所以看到的物体有3D效果，原因在于左眼和右眼存在一定的距离，当人眼将这两种图像传递给大脑后，大脑就会合成一个3D的图像，所以我们如果想看到3D的图像，必定是传递到我们的眼睛的图形存在偏移；在电影院中，3D电影就是横向和纵向的光源叠加，经过3D眼睛时，左眼镜片为只能透过横偏振光，右眼只能透过纵偏振光，所以传递给大脑就能使不同的图像，这样人眼就能看到3D效果；</p>
+<h2><span id="lcd常用到的知识">lcd常用到的知识</span></h2><ol>
+<li>残影: 是指画面切换之后一个画面不会立即消失，而是慢慢不见的现象；</li>
+<li>坏点：是指液晶屏上无法控制的恒亮或者恒暗的点；</li>
+<li>mura: 显示器亮度不均匀造成各种痕迹的现象；</li>
+<li>色饱和度（色域）： 色饱和度是指显示器色彩鲜艳的程度，显示器是由红，绿，蓝三种颜色来组合成任意颜色光；</li>
+<li>亮度： 亮度是显示器在白色画面下的明亮程度，俗话说一亮遮三丑</li>
+<li>视角：液晶显示器由于天生的物理特性，使得使用者从不同角度看画质会有所变化；与正眼相比，斜看的时候，转到当前画面品质已经变化到无法接受的临界角度。称为显示器的视角</li>
+<li>Gamma Curve：是指不同灰阶与亮度的关系曲线。把0~255灰阶当x轴，亮度当y轴，画出来的线就叫做gamma curve;因为人眼对不同亮度有不同的辨识效果，比如说低亮度的辨识能力较高</li>
+</ol>
+<h1><span id="常用的显示接口接口">常用的显示接口接口</span></h1><p>LCD常用接口：RGB,LVDS,EDP,MIPI;</p>
+<table>
+<thead>
+<tr>
+<th>接口</th>
+<th>接口定义</th>
+<th>接口介绍</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RGB</td>
+<td>RGB颜色是工业界的一种颜色标准，是通过对红(R)、绿(G)、蓝(B)三个颜色通道的变化以及它们相互之间的叠加来得到各式各样的颜色的</td>
+<td>接口一般为3.3V电平，需要同步信号，需要时刻刷新图像数据，需要适当的timing</td>
+</tr>
+<tr>
+<td>LVDS</td>
+<td>Low Voltage Differential Signaling，是一种低压差分信号技术接口。它是美国NS公司为克服以TTL电平方式传输宽带高码率数据时功耗大、EMI电磁干扰大等缺点而研制的一种数字视频信号传输方式</td>
+<td>高速率（一般655Mbps）低电压，低功耗，低EMI(摆幅350mv)抗干扰能力强，差分信号</td>
+</tr>
+<tr>
+<td>MIPI</td>
+<td>MIPI联盟定义了一套接口标准，把移动设备内部的接口如摄像头、显示屏、基带、射频接口等标准化，从而增加设计灵活性，同时降低成本、设计复杂度、功耗和EMI，在移动设备十分常见</td>
+<td>高速：1Gbps/Lane，4Gbps吞吐量<br>低功耗：200mV差分摆幅，200mv共模电压<br>噪声抑制<br>更少的pin，PCB layout更方便</td>
+</tr>
+<tr>
+<td>HDMI</td>
+<td>High-Definition Multimedia Interface，数字接口，同时传输视频和音频，传输非压缩视频数据和压缩/非压缩的数字音频数据</td>
+<td>a. TMDS Transition Minimized  Differential Signal 8bit~10bit直流平衡编码<br>每个时钟周期传输10bit数据 <br> b. EDID and DDC 实现设备间只能连接<br> c. Transfer Video and Audio 更低成本、连接更方便 <br>d. HDCP High-Bandwidth Digital Content Protection</td>
+</tr>
+</tbody>
+</table>
+<p>更多的时候，分辨率能支持的大小还是有IC本身设计决定的，与协议本身并没有太大的关系；</p>
+<p>还有一个edp接口，这个接口也是超清的接口，目前的话在pc基本上都有看到，但对于移动设备，目前还是mipi的居多；有些IC甚至没有edp接口；<br>这里我们主要讲mipi;</p>
+<p><strong>如下为allwinner A83的结构图：</strong></p>
+<p><img src="/2019/02/27/display/display_hardware/A83_system.jpg" alt="A83结构图"></p>
+<p><strong>显示硬件流程框图如下：</strong></p>
+<p><img src="/2019/02/27/display/display_hardware/de_hardware.jpg" alt="harware"></p>
+<p>DE合成或从dram中取出显示需要的数据，TCON0中包含RGB和LVDS，可以直接接显示器，MIPI相当于一个独立的IP,将TCON中的RGB信号转换成MIPI信号，再接到显示器；</p>
+<h1><span id="dedisplay-egine">DE(display egine)</span></h1><p>如下为DE硬件结构框图：从结构图我们大致可以猜测到DE就是做些图形的处理和合成；</p>
+<p>如图，该DE主要由两个RT-Mixer(实时合成模块)，一个是Mux(解复用模块)，一个Write-back(回写模块)，主要用于debug,输入依赖内存（DMA）总线，显示内容输出到TCON，再到HDMI/CVBS做显示，回写内容输出返回内存总线。显示内容输出到TCON，再到HDMI/CVBS做显示，回写内容输出返回内存总线。其中RT-Mixer模块为一个核，可以认为是一个独立的DE，通常DE0,DE1对应的就是RT-Mixer0和RT-Mixer1。</p>
+<p>RT-Mixer有四个通道，分别从DMA获取图层内容，然后通过overlay(覆盖)和scale（缩放）模块后依次进行双双混合，最后送给TCON显示。四个通道中，有三个是UI通道和一个视频通道，两种类型通道使用的overlay和scale模块是不一样的，另外视频通道送混合前会进行proc1的处理；</p>
+<p>类似的，RT-Mixer1有两个通道，其中一个UI通道和一个视频通道，它们的功能和RT-Mixer0是一样的；</p>
+<p>Routing(通道选择)模块比较简单就是通过寄存器值把对应的4个通道输出到不同的通道，以便后续做混合，它的作用就是配置通道的Zorder.</p>
+<p>Blender 进行alpha叠加</p>
+<p><img src="/2019/02/27/display/display_hardware/RT-Mixer.jpg" alt="RT-mixer"></p>
+<p>如图所示，视频的通道还会先经过proc1</p>
+<p><img src="/2019/02/27/display/display_hardware/proc1.jpg" alt="proc1"></p>
+<ol>
+<li>FCE:Fresh and Contrast enhancement(鲜艳度和对比度增强)</li>
+<li>BWS：Black and White Stretch(黑白电平拉伸) 又称灰度拉伸，就是检测到图像的灰度如果集中在某个区域，则将灰色值放大，从而获得比较好的视觉效果，例如可以把偏暗的图片变得明亮一些；</li>
+<li>LTI:Lumiance transient improvement(瞬态亮度改善) 让图像中亮度变化过渡分界处变得更加清晰，例如黑白交界处会更加尖锐</li>
+<li>PEAK：Luminance Peak(亮度峰化)，将输入亮度分量通过带通和高通滤波器获取到增益后叠加到原输入亮度，以增加亮度的峰化值；</li>
+<li>ASE：Adaptive Saturation Enhancement(饱和度增强) 主要是对颜色信号进行自适应调整，使画面看起来更鲜艳，亮丽；</li>
+<li>FCC:Fancy color curvature change(丽色曲率改善) 主要是通过颜色空间将RGB转换成HSV，对颜色曲率进行调整，再转换回RGB输出；</li>
+</ol>
+<p>如上图，在RT-Mixer0最后的proc2模块是CSC：Color Space Conversion(颜色空间转换)。由于前端输入格式不同，或者一些图像处理算法需要把图像转成另外的格式，所以需要在输出到显示器前格式统一转换成RGB</p>
+<p>这一部分就点到这里，如果以后对DE有涉及到再过来补充；</p>
+<p>#TCON(TimingControl)</p>
+<p><img src="/2019/02/27/display/display_hardware/tcon.jpg" alt="tcon结构图"></p>
+<p>从结构图可以推测下，TCON主要的主要事情就是准备显示数据，还有显示上的时序；从TCON出来的数据就包含这RGB和LVDS这两种信号；如果需要转换成MIPI还需要经过硬件上的MIPI模块进行处理；另外TCON有时还负责一些数据处理，如抖色（dither function），简单来讲就是增加像素的位数，以便显示效果能够更加细腻；现在主流的储存/显示方式是用8位记录每种颜色，三种颜色加起来一共24位（再加上用来定义透明度的8位，有时也被称作32位），每位有256级，三种颜色相乘，一共16,777,216种颜色。这就是所谓的8位色深了，这个标准一般被称作True Color，苹果则通俗的称其Millions<br>of Colors。不过最后苹果被好多消费者告了，因为其实苹果早年打着Millions of Colors旗号销售的很多电脑的屏幕都不是真正的24位，而是成本更低的18位；但其他厂家也是如此，只不过大家对苹果的期望更高一点而已；靠抖色从18扩大到24位；从而图像的验色可以更加的细腻；另外还有3D fuction 将一张图片，以左右眼的数据进行输出，以便让用户看到3D的效果，这个也是在这里进行处理的</p>
+<h1><span id="mipimobile-industry-processor-interface">MIPI（Mobile Industry Processor Interface）</span></h1><p>在移动平台上，由于此接口较为常见，所以我们将此接口拿出来讲下；<br>MIPI是2003年由ARM,Nokia,ST,TI等公司成立的一个联盟，目的是把手机内部的接口如摄像头，显示屏接口，视频/基带接口标准化，，从而增加设计灵活性，同时降低成本、设计复杂度、功耗和EMI。。MIPI联盟下面有不同的WorkGroup，分别定义了一系列的手机内部接口标准，比如摄像头接口CSI,显示接口DSI，视频接口DingRF,麦克风、喇叭接口等；由于本篇内容主要将的是显示，故我们就从MIPI-DSI讲起；</p>
+<p>MIPI-DSI是一种应用于显示技术的串行接口，兼容DPI（显示像素接口，Display Pixel Interface）,DBI(显示总线接口，Display Bus Interface)和DCS（显示命令集，Display Command Set）,以串行的方式发送像素信息或指令给外围，而且在传输的过程中享有自己独立的通信协议，包括数据包格式和纠错检错机制；</p>
+<p>MIPI-DSI具备高速和低速模式两种模式，全部数据通道都可以用于单向的高速数据传输，但只有一个数据通道才可用于低速双向传输，从属端的状态信息，像素等式通过该数据通道返回，时钟通道专用于高速传输数据的过程中传输同步时钟信号，此外，一个主机端可允许同时与多个从属端进行通信；下图为MIPI接口的数据链路图示：</p>
+<p><img src="/2019/02/27/display/display_hardware/mipi.jpg" alt="mipi数据链路"></p>
+<p><strong>简易物理设备图示</strong></p>
+<p><img src="/2019/02/27/display/display_hardware/CSI_DSI.jpg" alt="CSI_DSI.jpg"></p>
+<h1><span id="mipi屏参考电路">mipi屏参考电路</span></h1><p><strong>电源和背光电路</strong></p>
+<p><img src="/2019/02/27/display/display_hardware/lcd_backlight.jpg" alt="lcd_backlight"></p>
+<p><strong>屏电路</strong></p>
+<p><img src="/2019/02/27/display/display_hardware/lcd_mipi.jpg" alt="lcd_mipi"></p>
+<p>从硬件原理图看mipi屏主要有三个主要的电路，<strong>供电</strong>：屏供电:VCC-LCD. MIPI信号供电：VCC-LCD-LOGIC；<strong>背光电路：</strong>通过lcd-pwm控制VCC-LED+,VCC-LED- ; <strong>MIPI信号：</strong>DSI-D0N,DSI-D0P,….,DSI-CKN,DSI-CKP;</p>
+<p>#lcd屏电路硬件简示：</p>
+<p><img src="/2019/02/27/display/display_hardware/lcd_hardware.png" alt="lcd_hardware"></p>
+<p>按照之前的MIPI数据链路，将SOC的MIPI信号转化成屏可以识别的信号，然后进行显示</p>
+<p>以上，就是从DE-&gt;TCON-&gt;MIPI-&gt;LCD的硬件流程图；</p>
+<p>#参考资料</p>
+<p><a href="https://blog.csdn.net/xubin341719/article/details/9125583" target="_blank" rel="noopener">Android LCD(一)：LCD基本原理篇</a></p>
+<p><a href="https://blog.csdn.net/u012719256/article/details/55102836" target="_blank" rel="noopener">LCD主流显示接口介绍</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/33633476" target="_blank" rel="noopener">高兴说 显示行业进阶篇之（三）</a></p>
+<p><a href="https://www.2cm.com.tw/2cm/zh-tw/archives/9A04B31883E84E3A8C3ED8D2C48920D5" target="_blank" rel="noopener">行動裝置顯示器邁向超高畫質　eDP躍升NB/平板主流介面</a></p>
+<p><a href="https://diy.pconline.com.cn/display/study_screen/1104/2386860_all.html" target="_blank" rel="noopener">硝烟四起！各大3D显示器技术详细解读</a></p>
+<p><a href="https://blog.csdn.net/digent1/article/details/17413187" target="_blank" rel="noopener">MIPI接口介绍</a></p>
+<p><a href="https://blog.csdn.net/liwei16611/article/details/68146912" target="_blank" rel="noopener">LCD之mipi DSI接口驱动调试流程</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/13/standby/kernel_suspend/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2637,223 +2877,6 @@ k_d 为求导，一般设置为0
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/tools/ds5-userguide/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/25/tools/ds5-userguide/" itemprop="url">DS5相关介绍</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
-                2018-06-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/工具使用/" itemprop="url" rel="index">
-                    <span itemprop="name">工具使用</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <!-- toc -->
-<ul>
-<li><a href="#一-ds5-与-dstream">一. DS5 与 DSTREAM</a><ul>
-<li><a href="#1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</a></li>
-<li><a href="#2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</a></li>
-</ul>
-</li>
-<li><a href="#二-安装ds5">二. 安装DS5</a></li>
-<li><a href="#三-ds5的使用">三. DS5的使用</a><ul>
-<li><a href="#1新建debug-control">1.新建debug control</a></li>
-<li><a href="#2建立连接">2.建立连接</a></li>
-<li><a href="#3load-vmlinux">3.load vmlinux</a></li>
-<li><a href="#4查看logbuf">4.查看logbuf</a></li>
-<li><a href="#5load-源码单步调试">5.load 源码单步调试</a></li>
-</ul>
-</li>
-<li><a href="#四csat的使用">四：csat的使用</a><ul>
-<li><a href="#1castcoresight-access-toolcast">1.cast:CoreSight Access Tool(CAST)</a></li>
-<li><a href="#2cast-ds-5-diff">2.CAST &amp; DS-5 diff</a></li>
-<li><a href="#3cast的命令">3.CAST的命令</a></li>
-</ul>
-</li>
-</ul>
-<!-- tocstop -->
-<h1><span id="一-ds5-与-dstream">一. DS5 与 DSTREAM</span></h1><h2><span id="1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/ds5.png" alt="ds5"><br>  从以下工具发展而来：DS5&lt;RVDS&lt;ADS&lt;SDT,目前除DS5外其他都已停用；<br>  有图形化的streamline性能分析器，可基于C源码，汇编程序，地址对bare裸机程序，uboot,kernel,驱动，app进行热点，程序瓶颈，CPU使用，Cache hit/miss,功耗分析</p>
-<h2><span id="2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/dstream.png" alt="dstream"><br>    共有7个接口，其中ARM JTAG 14，TI JTAG 14，ARM JTAG 20和Coresight 10这4个接口仅有debug功能，同时MICTOR 38，MIPI34，Coresight 20这3个接口有debug+trace功能</p>
-<h1><span id="二-安装ds5">二. 安装DS5</span></h1><ol>
-<li>安装虚拟网卡；</li>
-<li>安装DS5-19和完成licence注册</li>
-<li>拷贝模型到安装目录下</li>
-<li>打开DS5</li>
-</ol>
-<h1><span id="三-ds5的使用">三. DS5的使用</span></h1><h2><span id="1新建debug-control">1.新建debug control</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use1.png" alt="use1"></p>
-<h2><span id="2建立连接">2.建立连接</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use2.jpg" alt="use2"></p>
-<h2><span id="3load-vmlinux">3.load vmlinux</span></h2><p>   当建立连接后一般都是一些汇编语言，这时候需要将vmlinux load进DS5方便debug<br><img src="/2018/06/25/tools/ds5-userguide/ds5/load.png" alt="load"></p>
-<h2><span id="4查看logbuf">4.查看logbuf</span></h2><p>   logbuf的大小由.config中的CONIFG_LOG_BUF_SHIFT决定，在init/Kconfig中有对应的说明<br>   如何确定log_buf的地址：<br>   目前在arm64中log_buf的地址对应的是system.map中__log_buf对应的地址；<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf.jpg" alt="load"><br>   arm32对应的地址为system.map的log_buf对应地址的地址，需要ds5找到映射位置后在通过此地址去查看log_buf中的内容：<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf_arm32.jpg" alt="load"></p>
-<h2><span id="5load-源码单步调试">5.load 源码单步调试</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/load_code.jpg" alt="load"></p>
-<h1><span id="四csat的使用">四：csat的使用</span></h1><h2><span id="1castcoresight-access-toolcast">1.cast:CoreSight Access Tool(CAST)</span></h2><p>  DS-5的命令行工具，处理器挂住了，通过DS-5无法连接上，只能用CAST连接上，但是CSAT无法访问到处理器内部的寄存器；<br>一般访问步骤：<br>    读寄存器,如果不ok,说明总线挂了；<br>    读dram,如果dram不ok,说明mbus挂了；<br>    读PC,如果PC读取不ok,说明CPU挂了</p>
-<h2><span id="2cast-amp-ds-5-diff">2.CAST &amp; DS-5 diff</span></h2><p>  CAST:通过APB总线连接，CPU挂死之后还能连接上，不能访问到CPU内部的寄存器<br>  DS5：通过CPU连接，CPU挂死之后无法连接上，能够访问到CPU内部的寄存器</p>
-<h2><span id="3cast的命令">3.CAST的命令</span></h2><ol>
-<li>打开DS5的命令行；</li>
-<li>输入以下命令：</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cast</span><br><span class="line">  con USB</span><br><span class="line">  chain dev=auto clk=A</span><br><span class="line">  dvo 0</span><br></pre></td></tr></table></figure>
-<table>
-<thead>
-<tr>
-<th>command</th>
-<th style="text-align:right">short name</th>
-<th style="text-align:center">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>dpmemread</td>
-<td style="text-align:right">dmr</td>
-<td style="text-align:center">Read mememory</td>
-</tr>
-<tr>
-<td>dpmemwrite</td>
-<td style="text-align:right">dmw</td>
-<td style="text-align:center">Write memory</td>
-</tr>
-<tr>
-<td>dpfileload</td>
-<td style="text-align:right">dfl</td>
-<td style="text-align:center">Load a file into memory</td>
-</tr>
-<tr>
-<td>dpfilesave</td>
-<td style="text-align:right">dfs</td>
-<td style="text-align:center">Save a block of memory to file.</td>
-</tr>
-</tbody>
-</table>
-<p>example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dmr 0 0x00010000 0x50</span><br><span class="line">#save a block of memory to file</span><br><span class="line">dfs 0 0x047fb000 0x350 dram2.bin</span><br><span class="line">#load a file into memory</span><br><span class="line">dfl 0 bin 0x8000 myfile.bin Load binary file into 0x8000 on AP 0</span><br></pre></td></tr></table></figure></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2904,7 +2927,7 @@ k_d 为求导，一般设置为0
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2926,7 +2949,7 @@ k_d 为求导，一般设置为0
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
