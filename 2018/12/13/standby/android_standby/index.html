@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="知识总结">
 <meta property="og:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-03-21T03:19:53.281Z">
+<meta property="og:updated_time" content="2019-03-21T03:22:19.122Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓休眠流程">
 <meta name="twitter:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
@@ -609,9 +609,23 @@ while (true) {
 <h1><span id="其他">其他</span></h1><p><strong>如何设置安卓休眠超时时间？</strong></p>
 <pre><code>settings get system screen_off_timeout
 settings put system screen_off_timeout 2147483647 //设置永不休眠 
-</code></pre><p><strong> 安卓系统不休眠debug </strong><br>    查看上层有没有释放锁<br>        dumpsys power | grep -Hrsn ‘LOCK’<br>    PARTIAL_WAKE_LOCK              ‘messaging_service_start_wakelock’<br>    查看active_since这一项，看哪个锁不为0<br>          cat /sys/kernel/debug/wakeup_sources<br>    上层传向底层的锁<br>    cat /sys/power/wake_lock</p>
-<p><strong>进入深度休眠后被唤醒问题debug</strong><br>    一般而言，平台会提供深度休眠后如何查看系统唤醒源，如全志平台的查看方式为<br>        一：休眠的时候不关闭终端<br>        echo N &gt; /sys/module/printk/parameters/console_suspend<br>        二：唤醒后查看对应的唤醒源<br>        查看唤醒时候打印:<br>            platform wakeup, standby wakesource is:0x10000<br>        在allwinner对应的pm.h里面就可以看到对应的唤醒源编号，如linux4.9的在driver/soc/sunxi.pm.h</p>
-<pre><code>        #define CPUS_WAKEUP_DESCEND     (1&lt;&lt;16)
+</code></pre><p><strong> 安卓系统不休眠debug </strong></p>
+<pre><code>查看上层有没有释放锁
+    dumpsys power | grep -Hrsn &apos;LOCK&apos;
+PARTIAL_WAKE_LOCK              &apos;messaging_service_start_wakelock&apos; 
+查看active_since这一项，看哪个锁不为0
+      cat /sys/kernel/debug/wakeup_sources
+上层传向底层的锁
+cat /sys/power/wake_lock
+</code></pre><p><strong>进入深度休眠后被唤醒问题debug</strong></p>
+<pre><code>一般而言，平台会提供深度休眠后如何查看系统唤醒源，如全志平台的查看方式为
+    一：休眠的时候不关闭终端
+    echo N &gt; /sys/module/printk/parameters/console_suspend
+    二：唤醒后查看对应的唤醒源
+    查看唤醒时候打印:
+        platform wakeup, standby wakesource is:0x10000
+    在allwinner对应的pm.h里面就可以看到对应的唤醒源编号，如linux4.9的在driver/soc/sunxi.pm.h
+        #define CPUS_WAKEUP_DESCEND     (1&lt;&lt;16)
     而CPUS的GPIO一般是WIFI中断管脚在连接，故此时可以断开wifi连接查看系统唤醒是否依然异常
 另外如果当log出现为闹钟唤醒：
     platform wakeup, standby wakesource is:0x100000

@@ -249,7 +249,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/tools/ds5-userguide/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/other/TYPE-C耳机适配工作/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dongka">
@@ -268,7 +268,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/25/tools/ds5-userguide/" itemprop="url">DS5相关介绍</a></h1>
+                <a class="post-title-link" href="/2018/06/25/other/TYPE-C耳机适配工作/" itemprop="url">全志TYPE-C使用介绍</a></h1>
         
 
         <div class="post-meta">
@@ -303,8 +303,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/工具使用/" itemprop="url" rel="index">
-                    <span itemprop="name">工具使用</span>
+                  <a href="/categories/TYPE-C/" itemprop="url" rel="index">
+                    <span itemprop="name">TYPE-C</span>
                   </a>
                 </span>
 
@@ -342,83 +342,86 @@
       
         
           
-            <!-- toc -->
-<ul>
-<li><a href="#一-ds5-与-dstream">一. DS5 与 DSTREAM</a><ul>
-<li><a href="#1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</a></li>
-<li><a href="#2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</a></li>
-</ul>
-</li>
-<li><a href="#二-安装ds5">二. 安装DS5</a></li>
-<li><a href="#三-ds5的使用">三. DS5的使用</a><ul>
-<li><a href="#1新建debug-control">1.新建debug control</a></li>
-<li><a href="#2建立连接">2.建立连接</a></li>
-<li><a href="#3load-vmlinux">3.load vmlinux</a></li>
-<li><a href="#4查看logbuf">4.查看logbuf</a></li>
-<li><a href="#5load-源码单步调试">5.load 源码单步调试</a></li>
-</ul>
-</li>
-<li><a href="#四csat的使用">四：csat的使用</a><ul>
-<li><a href="#1castcoresight-access-toolcast">1.cast:CoreSight Access Tool(CAST)</a></li>
-<li><a href="#2cast-ds-5-diff">2.CAST &amp; DS-5 diff</a></li>
-<li><a href="#3cast的命令">3.CAST的命令</a></li>
-</ul>
-</li>
-</ul>
-<!-- tocstop -->
-<h1><span id="一-ds5-与-dstream">一. DS5 与 DSTREAM</span></h1><h2><span id="1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/ds5.png" alt="ds5"><br>  从以下工具发展而来：DS5&lt;RVDS&lt;ADS&lt;SDT,目前除DS5外其他都已停用；<br>  有图形化的streamline性能分析器，可基于C源码，汇编程序，地址对bare裸机程序，uboot,kernel,驱动，app进行热点，程序瓶颈，CPU使用，Cache hit/miss,功耗分析</p>
-<h2><span id="2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/dstream.png" alt="dstream"><br>    共有7个接口，其中ARM JTAG 14，TI JTAG 14，ARM JTAG 20和Coresight 10这4个接口仅有debug功能，同时MICTOR 38，MIPI34，Coresight 20这3个接口有debug+trace功能</p>
-<h1><span id="二-安装ds5">二. 安装DS5</span></h1><ol>
-<li>安装虚拟网卡；</li>
-<li>安装DS5-19和完成licence注册</li>
-<li>拷贝模型到安装目录下</li>
-<li>打开DS5</li>
-</ol>
-<h1><span id="三-ds5的使用">三. DS5的使用</span></h1><h2><span id="1新建debug-control">1.新建debug control</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use1.png" alt="use1"></p>
-<h2><span id="2建立连接">2.建立连接</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use2.jpg" alt="use2"></p>
-<h2><span id="3load-vmlinux">3.load vmlinux</span></h2><p>   当建立连接后一般都是一些汇编语言，这时候需要将vmlinux load进DS5方便debug<br><img src="/2018/06/25/tools/ds5-userguide/ds5/load.png" alt="load"></p>
-<h2><span id="4查看logbuf">4.查看logbuf</span></h2><p>   logbuf的大小由.config中的CONIFG_LOG_BUF_SHIFT决定，在init/Kconfig中有对应的说明<br>   如何确定log_buf的地址：<br>   目前在arm64中log_buf的地址对应的是system.map中__log_buf对应的地址；<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf.jpg" alt="load"><br>   arm32对应的地址为system.map的log_buf对应地址的地址，需要ds5找到映射位置后在通过此地址去查看log_buf中的内容：<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf_arm32.jpg" alt="load"></p>
-<h2><span id="5load-源码单步调试">5.load 源码单步调试</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/load_code.jpg" alt="load"></p>
-<h1><span id="四csat的使用">四：csat的使用</span></h1><h2><span id="1castcoresight-access-toolcast">1.cast:CoreSight Access Tool(CAST)</span></h2><p>  DS-5的命令行工具，处理器挂住了，通过DS-5无法连接上，只能用CAST连接上，但是CSAT无法访问到处理器内部的寄存器；<br>一般访问步骤：<br>    读寄存器,如果不ok,说明总线挂了；<br>    读dram,如果dram不ok,说明mbus挂了；<br>    读PC,如果PC读取不ok,说明CPU挂了</p>
-<h2><span id="2cast-amp-ds-5-diff">2.CAST &amp; DS-5 diff</span></h2><p>  CAST:通过APB总线连接，CPU挂死之后还能连接上，不能访问到CPU内部的寄存器<br>  DS5：通过CPU连接，CPU挂死之后无法连接上，能够访问到CPU内部的寄存器</p>
-<h2><span id="3cast的命令">3.CAST的命令</span></h2><ol>
-<li>打开DS5的命令行；</li>
-<li>输入以下命令：</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cast</span><br><span class="line">  con USB</span><br><span class="line">  chain dev=auto clk=A</span><br><span class="line">  dvo 0</span><br></pre></td></tr></table></figure>
-<table>
-<thead>
-<tr>
-<th>command</th>
-<th style="text-align:right">short name</th>
-<th style="text-align:center">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>dpmemread</td>
-<td style="text-align:right">dmr</td>
-<td style="text-align:center">Read mememory</td>
-</tr>
-<tr>
-<td>dpmemwrite</td>
-<td style="text-align:right">dmw</td>
-<td style="text-align:center">Write memory</td>
-</tr>
-<tr>
-<td>dpfileload</td>
-<td style="text-align:right">dfl</td>
-<td style="text-align:center">Load a file into memory</td>
-</tr>
-<tr>
-<td>dpfilesave</td>
-<td style="text-align:right">dfs</td>
-<td style="text-align:center">Save a block of memory to file.</td>
-</tr>
-</tbody>
-</table>
-<p>example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dmr 0 0x00010000 0x50</span><br><span class="line">#save a block of memory to file</span><br><span class="line">dfs 0 0x047fb000 0x350 dram2.bin</span><br><span class="line">#load a file into memory</span><br><span class="line">dfl 0 bin 0x8000 myfile.bin Load binary file into 0x8000 on AP 0</span><br></pre></td></tr></table></figure></p>
+            <p>有无TYPE-C方案，主从识别和耳机的插拔检测不同;有TYPE-C情况下，主要为TYPE-C逻辑进行侦测;而没有TYPE-C的方案;主从区分需要USB-ID detect管脚进行判断,耳机则靠HP-DET进行区分;</p>
+<h1><span id="传统侦测方式">传统侦测方式</span></h1><h2><span id="主从侦测">主从侦测</span></h2><p><img src="/2018/06/25/other/TYPE-C耳机适配工作/usb_id_detect.jpg" alt="usb_id_detect"></p>
+<p>在没有TYPE-C的硬件上，主要靠USB-ID管脚的上下拉来区分主从;</p>
+<h1><span id="耳机侦测">耳机侦测</span></h1><h2><span id="耳机结构">耳机结构</span></h2><p>3.5mm耳机插头有三段（TRS,Tip-Ring-Sleeve）和四段（TRRS,Tip-Ring-Sleeve）之分，其中三段的不带麦克风，尾段（Sleeve)是公共地；中间环（Ring）是右声道，尖部（Tip）是左声道，四节的分两种，一种是CTIA,一种是OMTP;</p>
+<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/耳机结构.png" alt="耳机结构"></p>
+<p>HP-L耳机左声道，HP-R耳机右声道，GND接地，V-Mic语音麦克风</p>
+<h2><span id="耳机座以及传统耳机侦测介绍">耳机座以及传统耳机侦测介绍</span></h2><p>耳机座分为支持欧标设计的耳机座和支持美标的耳机座。另外从耳机座左声道的检测方式来又可以分为”Normal-closed type”(常闭型)和“Normal  -type”(常开型)两种。设计图如下：</p>
+<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/耳机座子.png" alt="耳机座子"></p>
+<p>. 在常闭型中，不接耳机时，耳机座左声道和检测端HS-DET接触，接入耳机时，HS-DET与HPH-L不导通</p>
+<p>. 在常开型中，不接耳机时，耳机座左声道和检测端HS-DET不接触，插入耳机时，HS-DET与HPH-L导通</p>
+<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/headphone.jpg" alt="耳机侦测电路"></p>
+<p>如图为常开型结构，HP-DET上拉，当插入耳机后HP-DET和HP-OUTL导通，DET下拉引起软件中断。软件上通过debounce后，检测到持续的低电平，于是认为耳机插入；这时候需要判断，插入的还是三段还是四段，平台上打开mic_bias,当插入的是三段耳机，MIC被拉低，于是判断为三段耳机；若为四段耳机，MIC接近于MIC_BIAS，软件判断该处的直流电压为四段耳机；当按键按下时，MIC的电压发生变化，触发了系统中断，之后软件通过采样该处的电压值确定按下了哪一个按键；</p>
+<h1><span id="type-c方案侦测方式讲解">TYPE-C方案侦测方式讲解</span></h1><h2><span id="type-c主要电路如下">TYPE-C主要电路如下</span></h2><p><img src="/2018/06/25/other/TYPE-C耳机适配工作/TYPE-C关键电路.png" alt="TYPE-C关键电路"></p>
+<p>Type-C连接并没有在物理结构上区分DFP(Host)和UFP(Device),无连接时DFP未给VBUS供电，连接后通过CC信号线配置，确认连接有效，VBUS供电打开并确认使用哪一个端口传输数据;<br><strong>状态说明</strong></p>
+<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/cc_logic.jpg" alt="cc_logic"></p>
+<p><strong>如图所示</strong></p>
+<p>DFP的CC1/CC2会接上拉电阻Rp或电流源，UFP的CC1/CC2会接下拉电阻Rd,AUDIO设备则会接两个下拉电阻</p>
+<p>如何确认当前TYPE_C接入设备类型:</p>
+<pre><code>echo 1 &gt; /sys/class/axp/axp_num
+echo 0x37 &gt; /sys/class/axp_reg &amp;&amp; cat /sys/class/axp/axp_reg
+</code></pre><p>若读出状态为ATTACH_SNK 说明接入的是适配器或pc<br>若读出的状态为ATTACH_SOURCE 说明此时作为host<br>如读出为AUDIO_ACSY,说明此时为音频设备</p>
+<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/type_c_detect.jpg" alt="type_c_detect"></p>
+<p><strong>TS5USBA224RSWR</strong>：</p>
+<p> 用于将D-,D+在(USB0-DM,USB0-DP),(HPOUTL,HPOUTR)两种模式之间切换；由于VBUS默认低后，无法满足通过SEL切换状态，故VBUS一般设置为高；通过ASEL来设置高低实现切换</p>
+<p><strong>TS3A226AE</strong>:</p>
+<p>可以用于区分三四节耳机，并且可以将MIC和GROUND区分出来，降低软件设计复杂度；</p>
+<p>使用TYPE-C方案时，TYPE-C 中断服务程序负责将D-,D+选择为USB模式的Dp,Dm或者为耳机模式HP-OUTL,HP-OUTR;并通知音频驱动耳机接入;</p>
+<h2><span id="软件流程为">软件流程为：</span></h2><p>一：bmu驱动产生中断：</p>
+<pre><code>irqreturn_t axp_tc_in_isr(int irq, void *data)
+{
+    struct axp_charger_dev *chg_dev = data;
+    #ifdef CONFIG_TYPE_C_AUDIO
+    struct axp_usb_info *usb = chg_dev-&gt;spy_info-&gt;usb;
+    u8 cc_mode = 0; 
+    /*axp_usbac_in(chg_dev);*/
+    cc_mode = usb-&gt;get_cc_mode(chg_dev); //获取cc 侦测结果
+    if (cc_mode == AUDIO_ACSY) {    //如果为音频设备
+            usb-&gt;set_sel_mode(chg_dev, 1);  //D+ D- 连接到耳机的左右声道
+            call_notifier_call_chain(1);    //通知耳机驱动耳机接入
+    } else {
+            usb-&gt;set_sel_mode(chg_dev, 0); //D+ D- 连接到 USB的 Dp,Dm口
+            call_notifier_call_chain(0);   //通知耳机驱动拔出
+    }    
+    #endif
+    axp_change(chg_dev);
+    return IRQ_HANDLED;
+}
+</code></pre><p>二：耳机接受到通知：</p>
+<pre><code>static int type_c_chain_notify(struct notifier_block *nb, unsigned long mode, void *_unused)
+{
+    struct mc_private *ctx = container_of(nb, struct mc_private, type_c_chain_nb);
 
+    if (mode) {
+            ctx-&gt;detect_state = PLUG_IN; //切换接入状态
+            printk(&quot;%s PLUG_IN&quot;, __func__);
+    } else {
+            ctx-&gt;detect_state = PLUG_OUT;
+            printk(&quot;%s PLUG_OUT&quot;, __func__);
+    }
+
+    schedule_delayed_work(&amp;ctx-&gt;hs_detect_work,
+                            msecs_to_jiffies(10)); //执行音频相关的处理函数
+    return 0;
+}
+</code></pre><h1><span id="软件配置demo">软件配置demo</span></h1><p><strong>使能TYPE-C SINK与SOURCE 检测功能：</strong></p>
+<p>一：sys_config.fex中：</p>
+<pre><code>usb_id_gpio = &quot;axp_ctrl&quot;
+</code></pre><p>二：deconfig中</p>
+<pre><code>CONFIG_TYPE_C=y
+</code></pre><p><strong>使能TYPE-C耳机功能</strong></p>
+<p>一：如原理图所示，使用的是PH10作为选通管脚，故对pmu_typc_c_sel进行配置</p>
+<pre><code>[charger0]
+ compatible                 = &quot;bmu1760-charger&quot;
+pmu_type_c_sel             = port:PH10&lt;1&gt;&lt;default&gt;&lt;default&gt;&lt;0&gt;
+ pmu_chg_ic_temp            = 0
+pmu_battery_rdc            = 100
+ pmu_battery_cap            = 4200
+</code></pre><p>二：deconfig中</p>
+<pre><code>CONFIG_TYPE_C_AUDIO=y
+</code></pre>
           
         
       
@@ -614,163 +617,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-hardware-md/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/17/memory/memory-hardware-md/" itemprop="url">内存管理（一）硬件篇</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-17T00:07:09+00:00">
-                2018-06-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/内存管理/" itemprop="url" rel="index">
-                    <span itemprop="name">内存管理</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2><span id="一经典存储结构图">一.经典存储结构图</span></h2><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaghCuOMjibmmJgymLicFZBkXdwOReYVV1WfJHPhsU23ibEzhSsbdK87aGg/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="avatar"> </p>
-<pre><code>L0(寄存器)-&gt;CPU 寄存器保存来自高速缓存的字
-L1(SRAM）-&gt;高速缓存取自L2高速缓存行
-L2(SRAM)-&gt;高速缓存取自L3高速缓存的高速缓存行
-L3(SRAM)-&gt;高速缓存保存自内存的高速缓存行
-L4(内存)-&gt;内存保存自磁盘缓存的磁盘块
-L5(磁盘缓存)-&gt;磁盘缓存保存取自磁盘的磁盘块
-L6磁盘
-</code></pre><p>cpu从磁盘中加载数据,放到内存，之后再放到告诉缓存</p>
-<h2><span id="二虚拟地址和物理地址">二.虚拟地址和物理地址</span></h2><p>在旧的手机中，内存可能只有1G,但是每个进程在执行的时候都仿佛手机有4g内存；<br><strong>物理地址(Physical Address)</strong>：CPU地址总线传来的地址，由硬件电路控制其含义。物理地址中有很大一部分是留给内存条中的内存的但也常被映射到其他存储器上如显存，BIOS等),在没有使用虚拟存储器的机器上，虚拟地址被直接送到内存总线上，使具有相同物理存储器被读写;而在使用了虚拟存储器的情况下，虚拟具体地址不是被直接送到内存地址总线上，而是送到存储器管理单元MMU，把虚拟地址映射为物理地址；我们把上面实际的1G内存叫做：物理地址<br><strong>虚拟地址(Virtual Address)</strong>:是逻辑地址到物理地址变换之间的中间层；进程访问到的叫做虚拟地址；<br>虚拟内存有以下几个作用：<br>1.内存访问保护<br>  有虚拟内存，我们可以通过设置段界限或页表想来设定软件运行时的访问空间，确保软件运行使不越界；<br>2.按需分页（lazy load技术）<br>  可以让软件在没有访问某虚拟内存地址时，不分配虚拟地址，在实际访问的时候，在动态分配物理内存<br>建立虚拟内存到物理内存的页映射关系；<br>3.页换入换出（page swap in/out)<br>  把不经常访问的数据所占的内存空间临时写到硬盘上，这样可以腾出更多的空闲空间出来给到经常访问的数据；当cpu访问到不经常访问的数据时，再把数据从硬件读入到内存中；<br>4.写时复制（copy on write）<br>  两个虚拟页的数据相同时，可只分配一个物理页框，这样如果对两个虚拟页的访问是只读方式，这两个虚拟页可以共享页框，节省空间；如果当CPU对其中一个虚拟页进行了写操作，那么这两个虚拟页的数据内容不同，需要分配一个新的物理页框，并将物理页框标记为可写，这样两个虚拟页面将映射到不同的物理页帧，确保整个内存空间的正确访问。</p>
-<h2><span id="二页页表mmu">二.页，页表，MMU</span></h2><p>在讲虚拟地址到物理地址之中再补充几个概念：<br>页(page)<br>  <em>把APP的虚拟地址切分程若干个大小相等（4K）的片，每一片就是我们说的页</em><br>页框（frame）<br>  *把物理内存页按“页”的大小切分为若干大小相等的片，每一片，就是我们所说的页框 </p>
-<h2><span id="三cpu寻找页面过程">三.cpu寻找页面过程</span></h2><pre><code>CPU获取数据主要有两步：
-a.通过虚拟地址获取物理地址
-b.根据物理地址获取数据
-</code></pre><h3><span id="获取物理地址">获取物理地址</span></h3><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaBdia2Vt94nvPcnj4aYqWRrLibeKQONayr9azNLWEeiabiay7ibIF3ooxibBw/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="获取物理地址"><br>    [a].CPU向MMU发送虚拟地址<br>    [b].MMU查询快表TLB<br>        块表命中：从块表中获取物理地址，由MMU继续根据物理地址匹配数据页步骤[a]<br>        块表不命中：查询页表步骤[c]<br>    [c]:从高速缓存查询页表<br>     “高速缓存”缓存页框，而页表存储于页框中，因此读取页表实际上也是读页（页表的物理地址有单独的寄存器保存）<br>     高速缓存命中：从高速缓存获取物理地址，并更新快表，进入[步骤a]<br>     高速缓存不命中：查询内存中的页表[步骤d]<br>     [d]从内存中查询页表<br>     页表保存了所有虚拟地址的映射关系，而不管页是否有映射物理页框。因此从内存页表中肯定能“命中”页。从页表获取虚拟地址的映射关系后，进入步骤e<br>     [e]把查询的页表想记录到高速缓存<br>     [f]MMU从高速缓存中获取页表项<br>        虚拟地址有分配物理页框；转换物理地址并更新块表，由MMU继续根据物理地址匹配数据页<br>        虚拟地址没分配物理页框：触发缺页中断<br>    [g]进入缺页中断处理程序<br>    [h]为虚拟页分配物理页框<br>        如果无空闲物理页框，则根据LRU算法选择需要淘汰的页，要淘汰的页如果是脏数据就回刷，否则直接丢弃或置换到磁盘的交换分区中<br>        然后，从磁盘中获取页信息更新到物理页框，更新内存页表<br>    [i]缺页中断处理的最后<br>        修改CPU寄存器，使得重新启动导致缺页的指令，返回[步骤a]重新执行</p>
-<h3><span id="根据物理地址获取实际数据">根据物理地址获取实际数据</span></h3><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaMfh510NLONxyc2CSvYr3Vrwqyf9tiajI1jPAuD16Kzm9mOvqQdZTiaJg/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="获取数据"><br>    [A]MMU获取到物理地址后，根据物理地址查询高速缓存<br>        高速缓存命中：CPU直接从高速缓存获取数据<br>        高速缓存不命中：查询物理内存[步骤B]<br>    [B]根据物理地址，获取物理内存中的数据<br>    [C]硬件实现把数据页记录到高速缓存中<br>    [D]cpu直接从高速缓存中获取数据</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-mtp/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -880,6 +726,163 @@ b.根据物理地址获取数据
 <li>所有MTP命令均以Package(数据包)的方式在设备两端进行传递</li>
 <li>Initiator必须接收到前一条消息处理结果，无论是成功或者超时后，才能发送下一条消息</li>
 </ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-hardware-md/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/17/memory/memory-hardware-md/" itemprop="url">内存管理（一）硬件篇</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-17T00:07:09+00:00">
+                2018-06-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/内存管理/" itemprop="url" rel="index">
+                    <span itemprop="name">内存管理</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2><span id="一经典存储结构图">一.经典存储结构图</span></h2><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaghCuOMjibmmJgymLicFZBkXdwOReYVV1WfJHPhsU23ibEzhSsbdK87aGg/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="avatar"> </p>
+<pre><code>L0(寄存器)-&gt;CPU 寄存器保存来自高速缓存的字
+L1(SRAM）-&gt;高速缓存取自L2高速缓存行
+L2(SRAM)-&gt;高速缓存取自L3高速缓存的高速缓存行
+L3(SRAM)-&gt;高速缓存保存自内存的高速缓存行
+L4(内存)-&gt;内存保存自磁盘缓存的磁盘块
+L5(磁盘缓存)-&gt;磁盘缓存保存取自磁盘的磁盘块
+L6磁盘
+</code></pre><p>cpu从磁盘中加载数据,放到内存，之后再放到告诉缓存</p>
+<h2><span id="二虚拟地址和物理地址">二.虚拟地址和物理地址</span></h2><p>在旧的手机中，内存可能只有1G,但是每个进程在执行的时候都仿佛手机有4g内存；<br><strong>物理地址(Physical Address)</strong>：CPU地址总线传来的地址，由硬件电路控制其含义。物理地址中有很大一部分是留给内存条中的内存的但也常被映射到其他存储器上如显存，BIOS等),在没有使用虚拟存储器的机器上，虚拟地址被直接送到内存总线上，使具有相同物理存储器被读写;而在使用了虚拟存储器的情况下，虚拟具体地址不是被直接送到内存地址总线上，而是送到存储器管理单元MMU，把虚拟地址映射为物理地址；我们把上面实际的1G内存叫做：物理地址<br><strong>虚拟地址(Virtual Address)</strong>:是逻辑地址到物理地址变换之间的中间层；进程访问到的叫做虚拟地址；<br>虚拟内存有以下几个作用：<br>1.内存访问保护<br>  有虚拟内存，我们可以通过设置段界限或页表想来设定软件运行时的访问空间，确保软件运行使不越界；<br>2.按需分页（lazy load技术）<br>  可以让软件在没有访问某虚拟内存地址时，不分配虚拟地址，在实际访问的时候，在动态分配物理内存<br>建立虚拟内存到物理内存的页映射关系；<br>3.页换入换出（page swap in/out)<br>  把不经常访问的数据所占的内存空间临时写到硬盘上，这样可以腾出更多的空闲空间出来给到经常访问的数据；当cpu访问到不经常访问的数据时，再把数据从硬件读入到内存中；<br>4.写时复制（copy on write）<br>  两个虚拟页的数据相同时，可只分配一个物理页框，这样如果对两个虚拟页的访问是只读方式，这两个虚拟页可以共享页框，节省空间；如果当CPU对其中一个虚拟页进行了写操作，那么这两个虚拟页的数据内容不同，需要分配一个新的物理页框，并将物理页框标记为可写，这样两个虚拟页面将映射到不同的物理页帧，确保整个内存空间的正确访问。</p>
+<h2><span id="二页页表mmu">二.页，页表，MMU</span></h2><p>在讲虚拟地址到物理地址之中再补充几个概念：<br>页(page)<br>  <em>把APP的虚拟地址切分程若干个大小相等（4K）的片，每一片就是我们说的页</em><br>页框（frame）<br>  *把物理内存页按“页”的大小切分为若干大小相等的片，每一片，就是我们所说的页框 </p>
+<h2><span id="三cpu寻找页面过程">三.cpu寻找页面过程</span></h2><pre><code>CPU获取数据主要有两步：
+a.通过虚拟地址获取物理地址
+b.根据物理地址获取数据
+</code></pre><h3><span id="获取物理地址">获取物理地址</span></h3><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaBdia2Vt94nvPcnj4aYqWRrLibeKQONayr9azNLWEeiabiay7ibIF3ooxibBw/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="获取物理地址"><br>    [a].CPU向MMU发送虚拟地址<br>    [b].MMU查询快表TLB<br>        块表命中：从块表中获取物理地址，由MMU继续根据物理地址匹配数据页步骤[a]<br>        块表不命中：查询页表步骤[c]<br>    [c]:从高速缓存查询页表<br>     “高速缓存”缓存页框，而页表存储于页框中，因此读取页表实际上也是读页（页表的物理地址有单独的寄存器保存）<br>     高速缓存命中：从高速缓存获取物理地址，并更新快表，进入[步骤a]<br>     高速缓存不命中：查询内存中的页表[步骤d]<br>     [d]从内存中查询页表<br>     页表保存了所有虚拟地址的映射关系，而不管页是否有映射物理页框。因此从内存页表中肯定能“命中”页。从页表获取虚拟地址的映射关系后，进入步骤e<br>     [e]把查询的页表想记录到高速缓存<br>     [f]MMU从高速缓存中获取页表项<br>        虚拟地址有分配物理页框；转换物理地址并更新块表，由MMU继续根据物理地址匹配数据页<br>        虚拟地址没分配物理页框：触发缺页中断<br>    [g]进入缺页中断处理程序<br>    [h]为虚拟页分配物理页框<br>        如果无空闲物理页框，则根据LRU算法选择需要淘汰的页，要淘汰的页如果是脏数据就回刷，否则直接丢弃或置换到磁盘的交换分区中<br>        然后，从磁盘中获取页信息更新到物理页框，更新内存页表<br>    [i]缺页中断处理的最后<br>        修改CPU寄存器，使得重新启动导致缺页的指令，返回[步骤a]重新执行</p>
+<h3><span id="根据物理地址获取实际数据">根据物理地址获取实际数据</span></h3><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaMfh510NLONxyc2CSvYr3Vrwqyf9tiajI1jPAuD16Kzm9mOvqQdZTiaJg/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="获取数据"><br>    [A]MMU获取到物理地址后，根据物理地址查询高速缓存<br>        高速缓存命中：CPU直接从高速缓存获取数据<br>        高速缓存不命中：查询物理内存[步骤B]<br>    [B]根据物理地址，获取物理内存中的数据<br>    [C]硬件实现把数据页记录到高速缓存中<br>    [D]cpu直接从高速缓存中获取数据</p>
 
           
         
