@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="知识总结">
 <meta property="og:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-03-01T07:54:49.008Z">
+<meta property="og:updated_time" content="2019-03-21T03:19:53.281Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓休眠流程">
 <meta name="twitter:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
@@ -609,6 +609,24 @@ while (true) {
 <h1><span id="其他">其他</span></h1><p><strong>如何设置安卓休眠超时时间？</strong></p>
 <pre><code>settings get system screen_off_timeout
 settings put system screen_off_timeout 2147483647 //设置永不休眠 
+</code></pre><p><strong> 安卓系统不休眠debug </strong><br>    查看上层有没有释放锁<br>        dumpsys power | grep -Hrsn ‘LOCK’<br>    PARTIAL_WAKE_LOCK              ‘messaging_service_start_wakelock’<br>    查看active_since这一项，看哪个锁不为0<br>          cat /sys/kernel/debug/wakeup_sources<br>    上层传向底层的锁<br>    cat /sys/power/wake_lock</p>
+<p><strong>进入深度休眠后被唤醒问题debug</strong><br>    一般而言，平台会提供深度休眠后如何查看系统唤醒源，如全志平台的查看方式为<br>        一：休眠的时候不关闭终端<br>        echo N &gt; /sys/module/printk/parameters/console_suspend<br>        二：唤醒后查看对应的唤醒源<br>        查看唤醒时候打印:<br>            platform wakeup, standby wakesource is:0x10000<br>        在allwinner对应的pm.h里面就可以看到对应的唤醒源编号，如linux4.9的在driver/soc/sunxi.pm.h</p>
+<pre><code>        #define CPUS_WAKEUP_DESCEND     (1&lt;&lt;16)
+    而CPUS的GPIO一般是WIFI中断管脚在连接，故此时可以断开wifi连接查看系统唤醒是否依然异常
+另外如果当log出现为闹钟唤醒：
+    platform wakeup, standby wakesource is:0x100000
+    #define CPUS_WAKEUP_ALM0        (1&lt;&lt;20)
+这种情况下我们一般需要通过去查看到底是哪个应用去唤醒系统的：这个时候我们可以借助这个应用 BetterBatteryStats2.0
+    1.下载地址：
+    http://cn.apkhere.com/app/com.asksven.betterbatterystats
+    安装该软件：
+    2.adb install com.asksven.betterbatterystats_2.2.2.0_paid-www.apkhere.com.apk
+    3.获取权限：
+    adb -d shell pm grant com.asksven.betterbatterystats android.permission.BATTERY_STATS
+    4.若依然不可以：
+    setenforce 0：取消selinux
+    getenforce 查看是否为安全模式 Permissive 则是非安全；
+    观察各项参数：
 </code></pre><h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cnblogs.com/dyufei/p/8018016.html" target="_blank" rel="noopener">Android7.0 PowerManagerService 之亮灭屏（二） PMS 电源状态管理updatePowerStateLocked（）</a></p>
 <p><a href="https://www.jianshu.com/p/b40e1b61e6d2" target="_blank" rel="noopener">Android 保持屏幕常亮的几种方法</a></p>
 <p><a href="https://blog.csdn.net/Gaugamela/article/details/52838654" target="_blank" rel="noopener">Android7.0 PowerManagerService(3)核心函数updatePowerStateLocked的主要流程</a></p>
