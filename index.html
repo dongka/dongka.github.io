@@ -1239,11 +1239,13 @@ cat /sys/power/wake_lock
     二：唤醒后查看对应的唤醒源
     查看唤醒时候打印:
         platform wakeup, standby wakesource is:0x10000
-    在allwinner对应的pm.h里面就可以看到对应的唤醒源编号，如linux4.9的在driver/soc/sunxi.pm.h
+    在allwinner对应的pm.h里面就可以看到对应的唤醒源编号，如linux4.9的在driver/soc/sunxi/pm.h 
+    其他版本可以直接搜索关键字找到对应的唤醒源编号；
         #define CPUS_WAKEUP_DESCEND     (1&lt;&lt;16)
     而CPUS的GPIO一般是WIFI中断管脚在连接，故此时可以断开wifi连接查看系统唤醒是否依然异常
 另外如果当log出现为闹钟唤醒：
     platform wakeup, standby wakesource is:0x100000
+    查看对应唤醒源编号
     #define CPUS_WAKEUP_ALM0        (1&lt;&lt;20)
 这种情况下我们一般需要通过去查看到底是哪个应用去唤醒系统的：这个时候我们可以借助这个应用 BetterBatteryStats2.0
     1.下载地址：
