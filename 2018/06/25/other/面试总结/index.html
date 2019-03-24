@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="ds5介绍," />
+  <meta name="keywords" content="职场," />
 
 
 
@@ -79,27 +79,20 @@
 
 
 
-<meta name="description" content="一. DS5 与 DSTREAM 1. DS5 是一个软件开发工具 2. DSTREAM 是一个硬件仿真工具   二. 安装DS5 三. DS5的使用 1.新建debug control 2.建立连接 3.load vmlinux 4.查看logbuf 5.load 源码单步调试   四：csat的使用 1.cast:CoreSight Access Tool(CAST) 2.CAST &amp;am">
-<meta name="keywords" content="ds5介绍">
+<meta name="description" content="面试总结 先讲下18年面试的两家面试公司的心路历程；写给需要的人，还有是对自己做下总结；以告慰自己方向迷茫和对自己能力不确定的一年；、 面试旅程一加面试（电源管理工程师）一面： 1.进程调度 2.内存映射，虚拟地址到物理地址的映射关系 3.中断流程 4.针对项目解过的问题讲解debug流程 5.用户态怎么切换到内核态 二面： 1.项目经历，针对项目解过的问题讲解debug流程 2.休眠唤醒流程 3">
+<meta name="keywords" content="职场">
 <meta property="og:type" content="article">
-<meta property="og:title" content="DS5相关介绍">
-<meta property="og:url" content="http://yoursite.com/2018/06/25/tools/ds5-userguide/index.html">
+<meta property="og:title" content="面试总结">
+<meta property="og:url" content="http://yoursite.com/2018/06/25/other/面试总结/index.html">
 <meta property="og:site_name" content="知识总结">
-<meta property="og:description" content="一. DS5 与 DSTREAM 1. DS5 是一个软件开发工具 2. DSTREAM 是一个硬件仿真工具   二. 安装DS5 三. DS5的使用 1.新建debug control 2.建立连接 3.load vmlinux 4.查看logbuf 5.load 源码单步调试   四：csat的使用 1.cast:CoreSight Access Tool(CAST) 2.CAST &amp;am">
+<meta property="og:description" content="面试总结 先讲下18年面试的两家面试公司的心路历程；写给需要的人，还有是对自己做下总结；以告慰自己方向迷茫和对自己能力不确定的一年；、 面试旅程一加面试（电源管理工程师）一面： 1.进程调度 2.内存映射，虚拟地址到物理地址的映射关系 3.中断流程 4.针对项目解过的问题讲解debug流程 5.用户态怎么切换到内核态 二面： 1.项目经历，针对项目解过的问题讲解debug流程 2.休眠唤醒流程 3">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://yoursite.com/2018/06/25/tools/ds5-userguide/ds5/ds5.png">
-<meta property="og:image" content="http://yoursite.com/2018/06/25/tools/ds5-userguide/ds5/dstream.png">
-<meta property="og:image" content="http://yoursite.com/2018/06/25/tools/ds5-userguide/ds5/use1.png">
-<meta property="og:image" content="http://yoursite.com/2018/06/25/tools/ds5-userguide/ds5/use2.jpg">
-<meta property="og:image" content="http://yoursite.com/2018/06/25/tools/ds5-userguide/ds5/load.png">
-<meta property="og:image" content="http://yoursite.com/2018/06/25/tools/ds5-userguide/ds5/logbuf.jpg">
-<meta property="og:image" content="http://yoursite.com/2018/06/25/tools/ds5-userguide/ds5/logbuf_arm32.jpg">
-<meta property="og:image" content="http://yoursite.com/2018/06/25/tools/ds5-userguide/ds5/load_code.jpg">
-<meta property="og:updated_time" content="2018-12-17T04:09:17.035Z">
+<meta property="og:image" content="http://yoursite.com/2018/06/25/other/面试总结/power_framework.png">
+<meta property="og:updated_time" content="2019-03-24T06:03:58.012Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="DS5相关介绍">
-<meta name="twitter:description" content="一. DS5 与 DSTREAM 1. DS5 是一个软件开发工具 2. DSTREAM 是一个硬件仿真工具   二. 安装DS5 三. DS5的使用 1.新建debug control 2.建立连接 3.load vmlinux 4.查看logbuf 5.load 源码单步调试   四：csat的使用 1.cast:CoreSight Access Tool(CAST) 2.CAST &amp;am">
-<meta name="twitter:image" content="http://yoursite.com/2018/06/25/tools/ds5-userguide/ds5/ds5.png">
+<meta name="twitter:title" content="面试总结">
+<meta name="twitter:description" content="面试总结 先讲下18年面试的两家面试公司的心路历程；写给需要的人，还有是对自己做下总结；以告慰自己方向迷茫和对自己能力不确定的一年；、 面试旅程一加面试（电源管理工程师）一面： 1.进程调度 2.内存映射，虚拟地址到物理地址的映射关系 3.中断流程 4.针对项目解过的问题讲解debug流程 5.用户态怎么切换到内核态 二面： 1.项目经历，针对项目解过的问题讲解debug流程 2.休眠唤醒流程 3">
+<meta name="twitter:image" content="http://yoursite.com/2018/06/25/other/面试总结/power_framework.png">
 
 
 
@@ -129,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/06/25/tools/ds5-userguide/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/06/25/other/面试总结/"/>
 
 
 
 
 
-  <title>DS5相关介绍 | 知识总结</title>
+  <title>面试总结 | 知识总结</title>
   
 
 
@@ -262,7 +255,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/tools/ds5-userguide/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/other/面试总结/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dongka">
@@ -279,7 +272,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">DS5相关介绍</h1>
+          <h1 class="post-title" itemprop="name headline">面试总结</h1>
         
 
         <div class="post-meta">
@@ -314,8 +307,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/工具使用/" itemprop="url" rel="index">
-                    <span itemprop="name">工具使用</span>
+                  <a href="/categories/职场日志/" itemprop="url" rel="index">
+                    <span itemprop="name">职场日志</span>
                   </a>
                 </span>
 
@@ -351,82 +344,47 @@
       
 
       
-        <!-- toc -->
-<ul>
-<li><a href="#一-ds5-与-dstream">一. DS5 与 DSTREAM</a><ul>
-<li><a href="#1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</a></li>
-<li><a href="#2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</a></li>
-</ul>
-</li>
-<li><a href="#二-安装ds5">二. 安装DS5</a></li>
-<li><a href="#三-ds5的使用">三. DS5的使用</a><ul>
-<li><a href="#1新建debug-control">1.新建debug control</a></li>
-<li><a href="#2建立连接">2.建立连接</a></li>
-<li><a href="#3load-vmlinux">3.load vmlinux</a></li>
-<li><a href="#4查看logbuf">4.查看logbuf</a></li>
-<li><a href="#5load-源码单步调试">5.load 源码单步调试</a></li>
-</ul>
-</li>
-<li><a href="#四csat的使用">四：csat的使用</a><ul>
-<li><a href="#1castcoresight-access-toolcast">1.cast:CoreSight Access Tool(CAST)</a></li>
-<li><a href="#2cast-ds-5-diff">2.CAST &amp; DS-5 diff</a></li>
-<li><a href="#3cast的命令">3.CAST的命令</a></li>
-</ul>
-</li>
-</ul>
-<!-- tocstop -->
-<h1><span id="一-ds5-与-dstream">一. DS5 与 DSTREAM</span></h1><h2><span id="1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/ds5.png" alt="ds5"><br>  从以下工具发展而来：DS5&lt;RVDS&lt;ADS&lt;SDT,目前除DS5外其他都已停用；<br>  有图形化的streamline性能分析器，可基于C源码，汇编程序，地址对bare裸机程序，uboot,kernel,驱动，app进行热点，程序瓶颈，CPU使用，Cache hit/miss,功耗分析</p>
-<h2><span id="2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/dstream.png" alt="dstream"><br>    共有7个接口，其中ARM JTAG 14，TI JTAG 14，ARM JTAG 20和Coresight 10这4个接口仅有debug功能，同时MICTOR 38，MIPI34，Coresight 20这3个接口有debug+trace功能</p>
-<h1><span id="二-安装ds5">二. 安装DS5</span></h1><ol>
-<li>安装虚拟网卡；</li>
-<li>安装DS5-19和完成licence注册</li>
-<li>拷贝模型到安装目录下</li>
-<li>打开DS5</li>
-</ol>
-<h1><span id="三-ds5的使用">三. DS5的使用</span></h1><h2><span id="1新建debug-control">1.新建debug control</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use1.png" alt="use1"></p>
-<h2><span id="2建立连接">2.建立连接</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use2.jpg" alt="use2"></p>
-<h2><span id="3load-vmlinux">3.load vmlinux</span></h2><p>   当建立连接后一般都是一些汇编语言，这时候需要将vmlinux load进DS5方便debug<br><img src="/2018/06/25/tools/ds5-userguide/ds5/load.png" alt="load"></p>
-<h2><span id="4查看logbuf">4.查看logbuf</span></h2><p>   logbuf的大小由.config中的CONIFG_LOG_BUF_SHIFT决定，在init/Kconfig中有对应的说明<br>   如何确定log_buf的地址：<br>   目前在arm64中log_buf的地址对应的是system.map中__log_buf对应的地址；<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf.jpg" alt="load"><br>   arm32对应的地址为system.map的log_buf对应地址的地址，需要ds5找到映射位置后在通过此地址去查看log_buf中的内容：<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf_arm32.jpg" alt="load"></p>
-<h2><span id="5load-源码单步调试">5.load 源码单步调试</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/load_code.jpg" alt="load"></p>
-<h1><span id="四csat的使用">四：csat的使用</span></h1><h2><span id="1castcoresight-access-toolcast">1.cast:CoreSight Access Tool(CAST)</span></h2><p>  DS-5的命令行工具，处理器挂住了，通过DS-5无法连接上，只能用CAST连接上，但是CSAT无法访问到处理器内部的寄存器；<br>一般访问步骤：<br>    读寄存器,如果不ok,说明总线挂了；<br>    读dram,如果dram不ok,说明mbus挂了；<br>    读PC,如果PC读取不ok,说明CPU挂了</p>
-<h2><span id="2cast-amp-ds-5-diff">2.CAST &amp; DS-5 diff</span></h2><p>  CAST:通过APB总线连接，CPU挂死之后还能连接上，不能访问到CPU内部的寄存器<br>  DS5：通过CPU连接，CPU挂死之后无法连接上，能够访问到CPU内部的寄存器</p>
-<h2><span id="3cast的命令">3.CAST的命令</span></h2><ol>
-<li>打开DS5的命令行；</li>
-<li>输入以下命令：</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cast</span><br><span class="line">  con USB</span><br><span class="line">  chain dev=auto clk=A</span><br><span class="line">  dvo 0</span><br></pre></td></tr></table></figure>
-<table>
-<thead>
-<tr>
-<th>command</th>
-<th style="text-align:right">short name</th>
-<th style="text-align:center">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>dpmemread</td>
-<td style="text-align:right">dmr</td>
-<td style="text-align:center">Read mememory</td>
-</tr>
-<tr>
-<td>dpmemwrite</td>
-<td style="text-align:right">dmw</td>
-<td style="text-align:center">Write memory</td>
-</tr>
-<tr>
-<td>dpfileload</td>
-<td style="text-align:right">dfl</td>
-<td style="text-align:center">Load a file into memory</td>
-</tr>
-<tr>
-<td>dpfilesave</td>
-<td style="text-align:right">dfs</td>
-<td style="text-align:center">Save a block of memory to file.</td>
-</tr>
-</tbody>
-</table>
-<p>example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dmr 0 0x00010000 0x50</span><br><span class="line">#save a block of memory to file</span><br><span class="line">dfs 0 0x047fb000 0x350 dram2.bin</span><br><span class="line">#load a file into memory</span><br><span class="line">dfl 0 bin 0x8000 myfile.bin Load binary file into 0x8000 on AP 0</span><br></pre></td></tr></table></figure></p>
+        <p>面试总结</p>
+<p>先讲下18年面试的两家面试公司的心路历程；写给需要的人，还有是对自己做下总结；以告慰自己方向迷茫和对自己能力不确定的一年；、</p>
+<h1><span id="面试旅程">面试旅程</span></h1><h2><span id="一加面试电源管理工程师">一加面试（电源管理工程师）</span></h2><p>一面：</p>
+<pre><code>1.进程调度
+2.内存映射，虚拟地址到物理地址的映射关系
+3.中断流程
+4.针对项目解过的问题讲解debug流程
+5.用户态怎么切换到内核态
+</code></pre><p>二面：</p>
+<pre><code>1.项目经历，针对项目解过的问题讲解debug流程
+2.休眠唤醒流程
+3.离职原因
+</code></pre><p><strong>经验总结：</strong>对流程的细节要清楚，对于解过的问题要了然于胸，这两点更为重要，在解问题的切记由于浮躁对问题一知半解，要深挖刨底，不能一来就想着怎样去规避；当面试的时候，离职原因经常会被询问，所以也应该想好自己的离职的初心是什么？</p>
+<p>在面试一加的时候，由于只是熟悉下面试的流程，准备甚少；但确实也面的很没面子，原因在于之前在问题解决的时候没有深究，对于业务流程缺乏一个深度理解；虽然熟悉到具体的细节上并不会影响到你解决问题，但是如果能有更深的理解时，在面试的时候才会有个制高点，你和面试官才会是更为平等的技术交流关系；</p>
+<h2><span id="vivo面试电源管理工程师">vivo面试（电源管理工程师）</span></h2><p>一面：</p>
+<pre><code>1.休眠唤醒流程
+2.常见的锁及锁的作用，设备驱动模型
+3.系统功耗优化方向
+4.针对项目解过的问题讲解debug流程
+</code></pre><p>二面：</p>
+<pre><code>1.自我介绍
+2.技术规划
+    技术框架
+    怎么把自己的模块做好？    
+    如果给你个20人的团队，你会怎样把模块做好？            
+3.职业规划
+</code></pre><p>三面：</p>
+<pre><code>1.主要为薪资协调；还有个人情况了解；
+</code></pre><p><strong>经验总结：</strong></p>
+<p>在vivo的面试的时候，由于有了半年的准备，在技术上细节上有了比较充足的准备，所以在面试技术上并没有遇到特别难缠的问题；感触比较多的还是技术二面，一个是自身知识体系的把握；另外在工作期间是否有注重更好提高思考模块交付的质量；其实这一点无论在哪里工作都会是闪光点；职业规划也是我觉得一个工程师在自己的工作旅程中经常要去思考的问题;</p>
+<h1><span id="抉择">抉择</span></h1><p><strong>离职的原因：</strong></p>
+<p>一：没有必要的客户端沟通成本，问题解决反复；主要体现为不愿原理性技术开放到客户端，客户需要定制的模块与平台绑定过深甚至于不开源，不是一个作为好的芯片平台架构；给客户支持带来不必要的沟通成本；二：缺乏技术前瞻性，主要为低端市场，与主流市场技术已相差甚远，突破性的技术改进甚少；作为定位在低端市场的芯片厂商，迫于市场压力得想着怎样去cost down自身的芯片成本；三：知识积累存在局限性，对于软件工程师而言，学习的知识更多是依赖自己芯片平台，切换到其他平台的时候积累的优势则不复存在；</p>
+<p><strong>职场初心</strong></p>
+<pre><code>work for fun and make some difference for the world!!!
+</code></pre><p>对于自己而言，vivo无疑会是更高的技术平台，能遇见的视野也能更加广阔，薪资给的也可能是在目前公司干2~3年后才有可能拿到的薪酬;只是在职业规划的时候，将职业旅程放大到10年后，想到如果还是搞电源，给自身带来的成就感和满足感并不大，所以在一通挣扎后还是选择放弃这个选择；决定从显示这个技术方向入手，逐渐向XR方向靠近；</p>
+<h1><span id="对自己的职场寄语">对自己的职场寄语</span></h1><p>一：熟悉相关岗位知识框架，以下是我就电源管理框架流程图脉络的简单梳理；局限于自身的平台，读者可参考借鉴</p>
+<p><img src="/2018/06/25/other/面试总结/power_framework.png" alt="电源框架"></p>
+<p>二：关注知识细节,熟悉业务流程；</p>
+<p>三：思考如何提高产品竞争力</p>
+<p>四：按照初心进行自己的职业规划</p>
+<p>五：努力，不要为当初的决定打脸</p>
 
       
     </div>
@@ -444,7 +402,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/ds5介绍/" rel="tag"># ds5介绍</a>
+            <a href="/tags/职场/" rel="tag"># 职场</a>
           
         </div>
       
@@ -457,8 +415,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/06/25/cpu/cpu_freq/" rel="next" title="CPUFreq">
-                <i class="fa fa-chevron-left"></i> CPUFreq
+              <a href="/2018/06/25/tools/ds5-userguide/" rel="next" title="DS5相关介绍">
+                <i class="fa fa-chevron-left"></i> DS5相关介绍
               </a>
             
           </div>
@@ -467,8 +425,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/06/25/other/面试总结/" rel="prev" title="面试总结">
-                面试总结 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/06/25/process/process_day1/" rel="prev" title="进程初识">
+                进程初识 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -601,7 +559,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">一. DS5 与 DSTREAM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.</span> <span class="nav-text">1. DS5 是一个软件开发工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.2.</span> <span class="nav-text">2. DSTREAM 是一个硬件仿真工具</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">二. 安装DS5</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">三. DS5的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.</span> <span class="nav-text">1.新建debug control</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.2.</span> <span class="nav-text">2.建立连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.3.</span> <span class="nav-text">3.load vmlinux</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.4.</span> <span class="nav-text">4.查看logbuf</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.5.</span> <span class="nav-text">5.load 源码单步调试</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">四：csat的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.1.</span> <span class="nav-text">1.cast:CoreSight Access Tool(CAST)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.2.</span> <span class="nav-text">2.CAST &amp; DS-5 diff</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.3.</span> <span class="nav-text">3.CAST的命令</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">面试旅程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.</span> <span class="nav-text">一加面试（电源管理工程师）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.2.</span> <span class="nav-text">vivo面试（电源管理工程师）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">抉择</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">对自己的职场寄语</span></a></li></ol></div>
             
 
           </div>
