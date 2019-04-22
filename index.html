@@ -1401,6 +1401,15 @@ while (true) {
 </code></pre><p>为了呼应上次内核篇上讲的安卓等待的时机，我们在这里把读写wakeup count内核的的相关操作也po出来；</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">ReadFdToString(wakeup_count_fd, &amp;wakeup_count)</span><br><span class="line">	bool pm_get_wakeup_count(unsigned int *count, bool block)    </span><br><span class="line">	&#123;                                                            </span><br><span class="line">	    unsigned int cnt, inpr;                                  </span><br><span class="line">	                                                             </span><br><span class="line">	    if (block) &#123;                                             </span><br><span class="line">	        DEFINE_WAIT(wait);                                   </span><br><span class="line">	                                                             </span><br><span class="line">	        for (;;) &#123;                                           </span><br><span class="line">	            prepare_to_wait(&amp;wakeup_count_wait_queue, &amp;wait, </span><br><span class="line">	                    TASK_INTERRUPTIBLE);                     </span><br><span class="line">	            split_counters(&amp;cnt, &amp;inpr);                     </span><br><span class="line">	            if (inpr == 0 || signal_pending(current))        </span><br><span class="line">	                break;                                       </span><br><span class="line">	                                                             </span><br><span class="line">	            schedule();                                      </span><br><span class="line">	        &#125;                                                    </span><br><span class="line">	        finish_wait(&amp;wakeup_count_wait_queue, &amp;wait);        </span><br><span class="line">	    &#125;                                                        </span><br><span class="line">	                                                             </span><br><span class="line">	    split_counters(&amp;cnt, &amp;inpr);                             </span><br><span class="line">	    *count = cnt;                                            </span><br><span class="line">	    return !inpr;                                            </span><br><span class="line">	&#125;</span><br><span class="line">可以看到在读函数里面也会去判断是否有唤醒事件在处理，如果没有唤醒事件那么就会不断的阻塞在获取进程当中；</span><br><span class="line"></span><br><span class="line">WriteStringToFd(wakeup_count, wakeup_count_fd)</span><br><span class="line">	bool pm_save_wakeup_count(unsigned int count)     </span><br><span class="line">	&#123;                                                 </span><br><span class="line">	    unsigned int cnt, inpr;                       </span><br><span class="line">	    unsigned long flags;                          </span><br><span class="line">	                                                  </span><br><span class="line">	    events_check_enabled = false;                 </span><br><span class="line">	    spin_lock_irqsave(&amp;events_lock, flags);       </span><br><span class="line">	    split_counters(&amp;cnt, &amp;inpr);                  </span><br><span class="line">	    if (cnt == count &amp;&amp; inpr == 0) &#123;              </span><br><span class="line">	        saved_count = count;                      </span><br><span class="line">	        events_check_enabled = true;              </span><br><span class="line">	    &#125;                                             </span><br><span class="line">	    spin_unlock_irqrestore(&amp;events_lock, flags);  </span><br><span class="line">	    return events_check_enabled;                  </span><br><span class="line">	&#125;</span><br><span class="line">可以看到在写函数中，呼应到了我们内核篇中，当判断是否save_count == wakeup_count &amp;&amp; inpr==0这两个判断为没有唤醒事件，之后就开始写相关的节点，</span><br><span class="line"></span><br><span class="line">success = WriteStringToFd(sleep_state, state_fd);//echo mem &gt; /sys/power/state 发起内核进入休眠流程；</span><br></pre></td></tr></table></figure>
 <p>总之，当安卓灭屏后，才会使能autosuspend不断轮询是否有锁也即唤醒事件，没有才会下发mem到写到内核节点state中；</p>
+<h1><span id="android-q上的变更">android Q上的变更</span></h1><p>androidQ上，谷歌弃用/sys/power/wake_lock节点；将这个流程在system/hardware/interfaces/suspend中进行实现；</p>
+<p>谷歌列举这样的好处是：</p>
+<ol>
+<li>减少对内核的依赖</li>
+<li>在没有debugfs的时候用户层仍有能力去debug和log suspend blocks</li>
+<li>当进程消亡的时候可以进行锁通过binder的管理进行释放 dangling wake locks</li>
+</ol>
+<p>在这里只能说谷歌终于想通了要把这套放在用户层，毕竟曾经为了wake_lock,一直在争吵，最后还是被谷歌给干进内核，现在的话又抽出来放在用户层里面；<br>具体细节可以参照这篇文章<a href="http://www.wowotech.net/pm_subsystem/wakelocks.html" target="_blank" rel="noopener">Linux电源管理</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">void SystemSuspend::initAutosuspend() &#123;                                                             </span><br><span class="line">    std::thread autosuspendThread([this] &#123;                                                          </span><br><span class="line">        while (true) &#123;                                                                              </span><br><span class="line">            std::this_thread::sleep_for(mSleepTime);                                                </span><br><span class="line">            lseek(mWakeupCountFd, 0, SEEK_SET);                                                     </span><br><span class="line">            const string wakeupCount = readFd(mWakeupCountFd);                                      </span><br><span class="line">            if (wakeupCount.empty()) &#123;                                                              </span><br><span class="line">                PLOG(ERROR) &lt;&lt; &quot;error reading from /sys/power/wakeup_count&quot;;                        </span><br><span class="line">                continue;                                                                           </span><br><span class="line">            &#125;                                                                                       </span><br><span class="line">                                                                                                    </span><br><span class="line">            auto counterLock = std::unique_lock(mCounterLock);                                      </span><br><span class="line">            mCounterCondVar.wait(counterLock, [this] &#123; return mSuspendCounter == 0; &#125;);//申请锁的时候mSuspendCounter会增加；释放的时候mSuspendCounter会减少            </span><br><span class="line">            // The mutex is locked and *MUST* remain locked until we write to /sys/power/state.     </span><br><span class="line">            // Otherwise, a WakeLock might be acquired after we check mSuspendCounter and before we </span><br><span class="line">            // write to /sys/power/state.                                                           </span><br><span class="line">                                                                                                    </span><br><span class="line">            if (!WriteStringToFd(wakeupCount, mWakeupCountFd)) &#123;                                    </span><br><span class="line">                PLOG(VERBOSE) &lt;&lt; &quot;error writing from /sys/power/wakeup_count&quot;;                      </span><br><span class="line">                continue;                                                                           </span><br><span class="line">            &#125;                                                                                       </span><br><span class="line">            bool success = WriteStringToFd(kSleepState, mStateFd);                                  </span><br><span class="line">            counterLock.unlock();                                                                   </span><br><span class="line">                                                                                                    </span><br><span class="line">            if (!success) &#123;                                                                         </span><br><span class="line">                PLOG(VERBOSE) &lt;&lt; &quot;error writing to /sys/power/state&quot;;                               </span><br><span class="line">            &#125;                                                                                       </span><br><span class="line">                                                                                                    </span><br><span class="line">            mControlService-&gt;notifyWakeup(success);                                                 </span><br><span class="line">                                                                                                    </span><br><span class="line">            updateSleepTime(success);                                                               </span><br><span class="line">        &#125;                                                                                           </span><br><span class="line">    &#125;);                                                                                             </span><br><span class="line">    autosuspendThread.detach();                                                                     </span><br><span class="line">    LOG(INFO) &lt;&lt; &quot;automatic system suspend enabled&quot;;                                                </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h1><span id="其他">其他</span></h1><p><strong>如何设置安卓休眠超时时间？</strong></p>
 <pre><code>settings get system screen_off_timeout
 settings put system screen_off_timeout 2147483647 //设置永不休眠 
@@ -2115,7 +2124,7 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/other/TYPE-C耳机适配工作/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/tools/ds5-userguide/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dongka">
@@ -2134,7 +2143,7 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/25/other/TYPE-C耳机适配工作/" itemprop="url">全志TYPE-C使用介绍</a></h1>
+                <a class="post-title-link" href="/2018/06/25/tools/ds5-userguide/" itemprop="url">DS5相关介绍</a></h1>
         
 
         <div class="post-meta">
@@ -2169,8 +2178,8 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/TYPE-C/" itemprop="url" rel="index">
-                    <span itemprop="name">TYPE-C</span>
+                  <a href="/categories/工具使用/" itemprop="url" rel="index">
+                    <span itemprop="name">工具使用</span>
                   </a>
                 </span>
 
@@ -2208,86 +2217,83 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
       
         
           
-            <p>有无TYPE-C方案，主从识别和耳机的插拔检测不同;有TYPE-C情况下，主要为TYPE-C逻辑进行侦测;而没有TYPE-C的方案;主从区分需要USB-ID detect管脚进行判断,耳机则靠HP-DET进行区分;</p>
-<h1><span id="传统侦测方式">传统侦测方式</span></h1><h2><span id="主从侦测">主从侦测</span></h2><p><img src="/2018/06/25/other/TYPE-C耳机适配工作/usb_id_detect.jpg" alt="usb_id_detect"></p>
-<p>在没有TYPE-C的硬件上，主要靠USB-ID管脚的上下拉来区分主从;</p>
-<h1><span id="耳机侦测">耳机侦测</span></h1><h2><span id="耳机结构">耳机结构</span></h2><p>3.5mm耳机插头有三段（TRS,Tip-Ring-Sleeve）和四段（TRRS,Tip-Ring-Sleeve）之分，其中三段的不带麦克风，尾段（Sleeve)是公共地；中间环（Ring）是右声道，尖部（Tip）是左声道，四节的分两种，一种是CTIA,一种是OMTP;</p>
-<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/耳机结构.png" alt="耳机结构"></p>
-<p>HP-L耳机左声道，HP-R耳机右声道，GND接地，V-Mic语音麦克风</p>
-<h2><span id="耳机座以及传统耳机侦测介绍">耳机座以及传统耳机侦测介绍</span></h2><p>耳机座分为支持欧标设计的耳机座和支持美标的耳机座。另外从耳机座左声道的检测方式来又可以分为”Normal-closed type”(常闭型)和“Normal  -type”(常开型)两种。设计图如下：</p>
-<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/耳机座子.png" alt="耳机座子"></p>
-<p>. 在常闭型中，不接耳机时，耳机座左声道和检测端HS-DET接触，接入耳机时，HS-DET与HPH-L不导通</p>
-<p>. 在常开型中，不接耳机时，耳机座左声道和检测端HS-DET不接触，插入耳机时，HS-DET与HPH-L导通</p>
-<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/headphone.jpg" alt="耳机侦测电路"></p>
-<p>如图为常开型结构，HP-DET上拉，当插入耳机后HP-DET和HP-OUTL导通，DET下拉引起软件中断。软件上通过debounce后，检测到持续的低电平，于是认为耳机插入；这时候需要判断，插入的还是三段还是四段，平台上打开mic_bias,当插入的是三段耳机，MIC被拉低，于是判断为三段耳机；若为四段耳机，MIC接近于MIC_BIAS，软件判断该处的直流电压为四段耳机；当按键按下时，MIC的电压发生变化，触发了系统中断，之后软件通过采样该处的电压值确定按下了哪一个按键；</p>
-<h1><span id="type-c方案侦测方式讲解">TYPE-C方案侦测方式讲解</span></h1><h2><span id="type-c主要电路如下">TYPE-C主要电路如下</span></h2><p><img src="/2018/06/25/other/TYPE-C耳机适配工作/TYPE-C关键电路.png" alt="TYPE-C关键电路"></p>
-<p>Type-C连接并没有在物理结构上区分DFP(Host)和UFP(Device),无连接时DFP未给VBUS供电，连接后通过CC信号线配置，确认连接有效，VBUS供电打开并确认使用哪一个端口传输数据;<br><strong>状态说明</strong></p>
-<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/cc_logic.jpg" alt="cc_logic"></p>
-<p><strong>如图所示</strong></p>
-<p>DFP的CC1/CC2会接上拉电阻Rp或电流源，UFP的CC1/CC2会接下拉电阻Rd,AUDIO设备则会接两个下拉电阻</p>
-<p>如何确认当前TYPE_C接入设备类型:</p>
-<pre><code>echo 1 &gt; /sys/class/axp/axp_num
-echo 0x37 &gt; /sys/class/axp_reg &amp;&amp; cat /sys/class/axp/axp_reg
-</code></pre><p>若读出状态为ATTACH_SNK 说明接入的是适配器或pc<br>若读出的状态为ATTACH_SOURCE 说明此时作为host<br>如读出为AUDIO_ACSY,说明此时为音频设备</p>
-<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/type_c_detect.jpg" alt="type_c_detect"></p>
-<p><strong>TS5USBA224RSWR</strong>：</p>
-<p> 用于将D-,D+在(USB0-DM,USB0-DP),(HPOUTL,HPOUTR)两种模式之间切换；由于VBUS默认低后，无法满足通过SEL切换状态，故VBUS一般设置为高；通过ASEL来设置高低实现切换</p>
-<p><strong>TS3A226AE</strong>:</p>
-<p>可以用于区分三四节耳机，并且可以将MIC和GROUND区分出来，降低软件设计复杂度；</p>
-<p>使用TYPE-C方案时，TYPE-C 中断服务程序负责将D-,D+选择为USB模式的Dp,Dm或者为耳机模式HP-OUTL,HP-OUTR;并通知音频驱动耳机接入;</p>
-<h2><span id="软件流程为">软件流程为：</span></h2><p>一：bmu驱动产生中断：</p>
-<pre><code>irqreturn_t axp_tc_in_isr(int irq, void *data)
-{
-    struct axp_charger_dev *chg_dev = data;
-    #ifdef CONFIG_TYPE_C_AUDIO
-    struct axp_usb_info *usb = chg_dev-&gt;spy_info-&gt;usb;
-    u8 cc_mode = 0; 
-    /*axp_usbac_in(chg_dev);*/
-    cc_mode = usb-&gt;get_cc_mode(chg_dev); //获取cc 侦测结果
-    if (cc_mode == AUDIO_ACSY) {    //如果为音频设备
-            usb-&gt;set_sel_mode(chg_dev, 1);  //D+ D- 连接到耳机的左右声道
-            call_notifier_call_chain(1);    //通知耳机驱动耳机接入
-    } else {
-            usb-&gt;set_sel_mode(chg_dev, 0); //D+ D- 连接到 USB的 Dp,Dm口
-            call_notifier_call_chain(0);   //通知耳机驱动拔出
-    }    
-    #endif
-    axp_change(chg_dev);
-    return IRQ_HANDLED;
-}
-</code></pre><p>二：耳机接受到通知：</p>
-<pre><code>static int type_c_chain_notify(struct notifier_block *nb, unsigned long mode, void *_unused)
-{
-    struct mc_private *ctx = container_of(nb, struct mc_private, type_c_chain_nb);
+            <!-- toc -->
+<ul>
+<li><a href="#一-ds5-与-dstream">一. DS5 与 DSTREAM</a><ul>
+<li><a href="#1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</a></li>
+<li><a href="#2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</a></li>
+</ul>
+</li>
+<li><a href="#二-安装ds5">二. 安装DS5</a></li>
+<li><a href="#三-ds5的使用">三. DS5的使用</a><ul>
+<li><a href="#1新建debug-control">1.新建debug control</a></li>
+<li><a href="#2建立连接">2.建立连接</a></li>
+<li><a href="#3load-vmlinux">3.load vmlinux</a></li>
+<li><a href="#4查看logbuf">4.查看logbuf</a></li>
+<li><a href="#5load-源码单步调试">5.load 源码单步调试</a></li>
+</ul>
+</li>
+<li><a href="#四csat的使用">四：csat的使用</a><ul>
+<li><a href="#1castcoresight-access-toolcast">1.cast:CoreSight Access Tool(CAST)</a></li>
+<li><a href="#2cast-ds-5-diff">2.CAST &amp; DS-5 diff</a></li>
+<li><a href="#3cast的命令">3.CAST的命令</a></li>
+</ul>
+</li>
+</ul>
+<!-- tocstop -->
+<h1><span id="一-ds5-与-dstream">一. DS5 与 DSTREAM</span></h1><h2><span id="1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/ds5.png" alt="ds5"><br>  从以下工具发展而来：DS5&lt;RVDS&lt;ADS&lt;SDT,目前除DS5外其他都已停用；<br>  有图形化的streamline性能分析器，可基于C源码，汇编程序，地址对bare裸机程序，uboot,kernel,驱动，app进行热点，程序瓶颈，CPU使用，Cache hit/miss,功耗分析</p>
+<h2><span id="2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/dstream.png" alt="dstream"><br>    共有7个接口，其中ARM JTAG 14，TI JTAG 14，ARM JTAG 20和Coresight 10这4个接口仅有debug功能，同时MICTOR 38，MIPI34，Coresight 20这3个接口有debug+trace功能</p>
+<h1><span id="二-安装ds5">二. 安装DS5</span></h1><ol>
+<li>安装虚拟网卡；</li>
+<li>安装DS5-19和完成licence注册</li>
+<li>拷贝模型到安装目录下</li>
+<li>打开DS5</li>
+</ol>
+<h1><span id="三-ds5的使用">三. DS5的使用</span></h1><h2><span id="1新建debug-control">1.新建debug control</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use1.png" alt="use1"></p>
+<h2><span id="2建立连接">2.建立连接</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use2.jpg" alt="use2"></p>
+<h2><span id="3load-vmlinux">3.load vmlinux</span></h2><p>   当建立连接后一般都是一些汇编语言，这时候需要将vmlinux load进DS5方便debug<br><img src="/2018/06/25/tools/ds5-userguide/ds5/load.png" alt="load"></p>
+<h2><span id="4查看logbuf">4.查看logbuf</span></h2><p>   logbuf的大小由.config中的CONIFG_LOG_BUF_SHIFT决定，在init/Kconfig中有对应的说明<br>   如何确定log_buf的地址：<br>   目前在arm64中log_buf的地址对应的是system.map中__log_buf对应的地址；<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf.jpg" alt="load"><br>   arm32对应的地址为system.map的log_buf对应地址的地址，需要ds5找到映射位置后在通过此地址去查看log_buf中的内容：<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf_arm32.jpg" alt="load"></p>
+<h2><span id="5load-源码单步调试">5.load 源码单步调试</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/load_code.jpg" alt="load"></p>
+<h1><span id="四csat的使用">四：csat的使用</span></h1><h2><span id="1castcoresight-access-toolcast">1.cast:CoreSight Access Tool(CAST)</span></h2><p>  DS-5的命令行工具，处理器挂住了，通过DS-5无法连接上，只能用CAST连接上，但是CSAT无法访问到处理器内部的寄存器；<br>一般访问步骤：<br>    读寄存器,如果不ok,说明总线挂了；<br>    读dram,如果dram不ok,说明mbus挂了；<br>    读PC,如果PC读取不ok,说明CPU挂了</p>
+<h2><span id="2cast-amp-ds-5-diff">2.CAST &amp; DS-5 diff</span></h2><p>  CAST:通过APB总线连接，CPU挂死之后还能连接上，不能访问到CPU内部的寄存器<br>  DS5：通过CPU连接，CPU挂死之后无法连接上，能够访问到CPU内部的寄存器</p>
+<h2><span id="3cast的命令">3.CAST的命令</span></h2><ol>
+<li>打开DS5的命令行；</li>
+<li>输入以下命令：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cast</span><br><span class="line">  con USB</span><br><span class="line">  chain dev=auto clk=A</span><br><span class="line">  dvo 0</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th style="text-align:right">short name</th>
+<th style="text-align:center">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dpmemread</td>
+<td style="text-align:right">dmr</td>
+<td style="text-align:center">Read mememory</td>
+</tr>
+<tr>
+<td>dpmemwrite</td>
+<td style="text-align:right">dmw</td>
+<td style="text-align:center">Write memory</td>
+</tr>
+<tr>
+<td>dpfileload</td>
+<td style="text-align:right">dfl</td>
+<td style="text-align:center">Load a file into memory</td>
+</tr>
+<tr>
+<td>dpfilesave</td>
+<td style="text-align:right">dfs</td>
+<td style="text-align:center">Save a block of memory to file.</td>
+</tr>
+</tbody>
+</table>
+<p>example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dmr 0 0x00010000 0x50</span><br><span class="line">#save a block of memory to file</span><br><span class="line">dfs 0 0x047fb000 0x350 dram2.bin</span><br><span class="line">#load a file into memory</span><br><span class="line">dfl 0 bin 0x8000 myfile.bin Load binary file into 0x8000 on AP 0</span><br></pre></td></tr></table></figure></p>
 
-    if (mode) {
-            ctx-&gt;detect_state = PLUG_IN; //切换接入状态
-            printk(&quot;%s PLUG_IN&quot;, __func__);
-    } else {
-            ctx-&gt;detect_state = PLUG_OUT;
-            printk(&quot;%s PLUG_OUT&quot;, __func__);
-    }
-
-    schedule_delayed_work(&amp;ctx-&gt;hs_detect_work,
-                            msecs_to_jiffies(10)); //执行音频相关的处理函数
-    return 0;
-}
-</code></pre><h1><span id="软件配置demo">软件配置demo</span></h1><p><strong>使能TYPE-C SINK与SOURCE 检测功能：</strong></p>
-<p>一：sys_config.fex中：</p>
-<pre><code>usb_id_gpio = &quot;axp_ctrl&quot;
-</code></pre><p>二：deconfig中</p>
-<pre><code>CONFIG_TYPE_C=y
-</code></pre><p><strong>使能TYPE-C耳机功能</strong></p>
-<p>一：如原理图所示，使用的是PH10作为选通管脚，故对pmu_typc_c_sel进行配置</p>
-<pre><code>[charger0]
- compatible                 = &quot;bmu1760-charger&quot;
-pmu_type_c_sel             = port:PH10&lt;1&gt;&lt;default&gt;&lt;default&gt;&lt;0&gt;
- pmu_chg_ic_temp            = 0
-pmu_battery_rdc            = 100
- pmu_battery_cap            = 4200
-</code></pre><p>二：deconfig中</p>
-<pre><code>CONFIG_TYPE_C_AUDIO=y
-</code></pre>
           
         
       
@@ -2478,7 +2484,7 @@ pmu_battery_rdc            = 100
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/tools/ds5-userguide/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/thermal/thermal_framework/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dongka">
@@ -2497,7 +2503,7 @@ pmu_battery_rdc            = 100
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/25/tools/ds5-userguide/" itemprop="url">DS5相关介绍</a></h1>
+                <a class="post-title-link" href="/2018/06/25/thermal/thermal_framework/" itemprop="url">Thermal 框架梳理</a></h1>
         
 
         <div class="post-meta">
@@ -2532,8 +2538,8 @@ pmu_battery_rdc            = 100
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/工具使用/" itemprop="url" rel="index">
-                    <span itemprop="name">工具使用</span>
+                  <a href="/categories/thermal/" itemprop="url" rel="index">
+                    <span itemprop="name">thermal</span>
                   </a>
                 </span>
 
@@ -2571,82 +2577,299 @@ pmu_battery_rdc            = 100
       
         
           
-            <!-- toc -->
-<ul>
-<li><a href="#一-ds5-与-dstream">一. DS5 与 DSTREAM</a><ul>
-<li><a href="#1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</a></li>
-<li><a href="#2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</a></li>
-</ul>
-</li>
-<li><a href="#二-安装ds5">二. 安装DS5</a></li>
-<li><a href="#三-ds5的使用">三. DS5的使用</a><ul>
-<li><a href="#1新建debug-control">1.新建debug control</a></li>
-<li><a href="#2建立连接">2.建立连接</a></li>
-<li><a href="#3load-vmlinux">3.load vmlinux</a></li>
-<li><a href="#4查看logbuf">4.查看logbuf</a></li>
-<li><a href="#5load-源码单步调试">5.load 源码单步调试</a></li>
-</ul>
-</li>
-<li><a href="#四csat的使用">四：csat的使用</a><ul>
-<li><a href="#1castcoresight-access-toolcast">1.cast:CoreSight Access Tool(CAST)</a></li>
-<li><a href="#2cast-ds-5-diff">2.CAST &amp; DS-5 diff</a></li>
-<li><a href="#3cast的命令">3.CAST的命令</a></li>
-</ul>
-</li>
-</ul>
-<!-- tocstop -->
-<h1><span id="一-ds5-与-dstream">一. DS5 与 DSTREAM</span></h1><h2><span id="1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/ds5.png" alt="ds5"><br>  从以下工具发展而来：DS5&lt;RVDS&lt;ADS&lt;SDT,目前除DS5外其他都已停用；<br>  有图形化的streamline性能分析器，可基于C源码，汇编程序，地址对bare裸机程序，uboot,kernel,驱动，app进行热点，程序瓶颈，CPU使用，Cache hit/miss,功耗分析</p>
-<h2><span id="2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/dstream.png" alt="dstream"><br>    共有7个接口，其中ARM JTAG 14，TI JTAG 14，ARM JTAG 20和Coresight 10这4个接口仅有debug功能，同时MICTOR 38，MIPI34，Coresight 20这3个接口有debug+trace功能</p>
-<h1><span id="二-安装ds5">二. 安装DS5</span></h1><ol>
-<li>安装虚拟网卡；</li>
-<li>安装DS5-19和完成licence注册</li>
-<li>拷贝模型到安装目录下</li>
-<li>打开DS5</li>
+            <h1><span id="theraml框架框图">theraml框架框图</span></h1><ol>
+<li>thermal_zone_device：获取温度设备的抽象</li>
+<li>thermal_cooling_device: 降低温度措施的抽象</li>
+<li>thermal_governor:温控策略，step wise, bangbang,user space,power_allocator，fair_share</li>
+<li>thermal_core : 作为user space和kernel的接口，同时也是Thermal框架的中枢</li>
 </ol>
-<h1><span id="三-ds5的使用">三. DS5的使用</span></h1><h2><span id="1新建debug-control">1.新建debug control</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use1.png" alt="use1"></p>
-<h2><span id="2建立连接">2.建立连接</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use2.jpg" alt="use2"></p>
-<h2><span id="3load-vmlinux">3.load vmlinux</span></h2><p>   当建立连接后一般都是一些汇编语言，这时候需要将vmlinux load进DS5方便debug<br><img src="/2018/06/25/tools/ds5-userguide/ds5/load.png" alt="load"></p>
-<h2><span id="4查看logbuf">4.查看logbuf</span></h2><p>   logbuf的大小由.config中的CONIFG_LOG_BUF_SHIFT决定，在init/Kconfig中有对应的说明<br>   如何确定log_buf的地址：<br>   目前在arm64中log_buf的地址对应的是system.map中__log_buf对应的地址；<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf.jpg" alt="load"><br>   arm32对应的地址为system.map的log_buf对应地址的地址，需要ds5找到映射位置后在通过此地址去查看log_buf中的内容：<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf_arm32.jpg" alt="load"></p>
-<h2><span id="5load-源码单步调试">5.load 源码单步调试</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/load_code.jpg" alt="load"></p>
-<h1><span id="四csat的使用">四：csat的使用</span></h1><h2><span id="1castcoresight-access-toolcast">1.cast:CoreSight Access Tool(CAST)</span></h2><p>  DS-5的命令行工具，处理器挂住了，通过DS-5无法连接上，只能用CAST连接上，但是CSAT无法访问到处理器内部的寄存器；<br>一般访问步骤：<br>    读寄存器,如果不ok,说明总线挂了；<br>    读dram,如果dram不ok,说明mbus挂了；<br>    读PC,如果PC读取不ok,说明CPU挂了</p>
-<h2><span id="2cast-amp-ds-5-diff">2.CAST &amp; DS-5 diff</span></h2><p>  CAST:通过APB总线连接，CPU挂死之后还能连接上，不能访问到CPU内部的寄存器<br>  DS5：通过CPU连接，CPU挂死之后无法连接上，能够访问到CPU内部的寄存器</p>
-<h2><span id="3cast的命令">3.CAST的命令</span></h2><ol>
-<li>打开DS5的命令行；</li>
-<li>输入以下命令：</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cast</span><br><span class="line">  con USB</span><br><span class="line">  chain dev=auto clk=A</span><br><span class="line">  dvo 0</span><br></pre></td></tr></table></figure>
-<table>
-<thead>
-<tr>
-<th>command</th>
-<th style="text-align:right">short name</th>
-<th style="text-align:center">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>dpmemread</td>
-<td style="text-align:right">dmr</td>
-<td style="text-align:center">Read mememory</td>
-</tr>
-<tr>
-<td>dpmemwrite</td>
-<td style="text-align:right">dmw</td>
-<td style="text-align:center">Write memory</td>
-</tr>
-<tr>
-<td>dpfileload</td>
-<td style="text-align:right">dfl</td>
-<td style="text-align:center">Load a file into memory</td>
-</tr>
-<tr>
-<td>dpfilesave</td>
-<td style="text-align:right">dfs</td>
-<td style="text-align:center">Save a block of memory to file.</td>
-</tr>
-</tbody>
-</table>
-<p>example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dmr 0 0x00010000 0x50</span><br><span class="line">#save a block of memory to file</span><br><span class="line">dfs 0 0x047fb000 0x350 dram2.bin</span><br><span class="line">#load a file into memory</span><br><span class="line">dfl 0 bin 0x8000 myfile.bin Load binary file into 0x8000 on AP 0</span><br></pre></td></tr></table></figure></p>
+<p>相关的节点：/sys/class/thermal<br><img src="/2018/06/25/thermal/thermal_framework/thermal.jpg" alt="thermal"></p>
+<h1><span id="thermal_zone_device">thermal_zone_device</span></h1><pre><code>dts
+    cpu_thermal_zone{
+
+                            polling-delay-passive = &lt;1000&gt;;
+                            polling-delay = &lt;2000&gt;;
+                            thermal-sensors = &lt;&amp;ths_combine0 0&gt;;
+
+                            trips{
+                                    cpu_trip0:t0{
+                                            temperature = &lt;65&gt;;
+                                            type = &quot;passive&quot;;
+                                            hysteresis = &lt;0&gt;; 
+                                    };   
+                                    cpu_trip1:t1{
+                                            temperature = &lt;75&gt;;
+                                            type = &quot;passive&quot;;
+                                            hysteresis = &lt;0&gt;; 
+                                    };   
+    ....
+
+struct thermal_zone_of_device_ops {
+    int (*get_temp)(void *, int *);  
+    int (*get_trend)(void *, int, enum thermal_trend *); 
+    int (*set_trips)(void *, int, int); // 设置温度窗口，当温度超过设置点需要通过thermal_zone_device_update
+    int (*set_emul_temp)(void *, int);
+    int (*set_trip_temp)(void *, int, int);
+};
+
+struct thermal_zone_of_device_ops combine_ops = { 
+    .get_temp          = sunxi_combine_get_temp,
+    .set_emul_temp     = sunxi_combine_set_emul_temp,
+
+};
+
+在probe中完成注册：
+sensor-&gt;tz = thermal_zone_of_sensor_register(&amp;pdev-&gt;dev,
+        id, sensor, &amp;combine_ops);
+
+温度获取流程
+
+sunxi_combine_get_temp //sunxi_ths_combine.c
+    --&gt;ret = controller-&gt;ops-&gt;get_temp(controller,sensor_id, &amp;temp);
+sunxi_ths_get_temp  // sunxi_ths_core.c
+    --&gt;t = ths_driver_get_temp(ths_data, id);
+ths_driver_reg_to_temp(reg_data, id, ths_data-&gt;ths_driver_version, ths_data-&gt;ths_coefficent-&gt;calcular_para); //sunxi_ths_driver.c
+</code></pre><h1><span id="thermal_core">thermal_core</span></h1><p> 在thermar core作为中枢注册governor,注册Thermal类，并且基于Device Tree注册Thermal Zone；提供Thermal zone注册函数，Cooling Device注册函数，提供将Cooling设备绑定到Zone的函数，一个Thermal Zone可以有多个Cooling设备；同时还提供一个核心函数Thermal_\zone_device\update作为Thermal中断处理函数和轮询函数，轮询时间会根据不同Trip Delay调节</p>
+<h2><span id="1thermal_init">1.thermal_init</span></h2><p><img src="/2018/06/25/thermal/thermal_framework/thermal_init.png" alt="thermal_init"></p>
+<h2><span id="2netlink">2.netlink</span></h2><p>  <strong>netlink是linux提供的用于内核和用户态进程之间通信的方式。</strong>一般来说用户空间和内核空间的通信方式有三种：/proc,ioctl,netlink,而前两种是单向的，但是netlink可以实现双工通信；虽然netlink主要用于用户空间和内核空间的通信，但是也能用于用户空间的两个进程通信。只是进程间通信有其他很多方式，除非需要用到netlink的广播特性；</p>
+<p>  <strong>netlink有以下特点：</strong></p>
+<p>  1.支持全双工，异步通信（当然也同步也支持）</p>
+<p>  2.用户空间可使用标准的BSD socket接口</p>
+<p>  3.在内核空间使用专门的内核API接口</p>
+<p>  4.支持多播（因此支持”总线”式通信，可实现消息订阅）</p>
+<p>  5.在内核端可用于进程上下文和中断上下文；</p>
+<p> <strong>用户态使用netlink：</strong></p>
+<p> 用户态应使用标准的socket APIs,socket(),bind(),sendmsg(),recvmsg()和close()就可以使用netlink socket</p>
+<p> <strong>netlink内核API</strong> </p>
+<p> 一：定义协议类型 （可省略）</p>
+<p> 二：netlink_kernel_create</p>
+<p> 三：设置目标地址与源地址</p>
+<p> 四：通过netlink_unicast和netlink_broadcast发送消息；</p>
+<h2><span id="3thermal轮询流程">3.thermal轮询流程</span></h2><p>在thermal core中通过不断的轮询来检测温度变化，如果温度没有达到crital则调用governor的throttle，通过governor的throttle决定下一次轮询的时间；如果温度为crital则走关机流程；</p>
+<p><img src="/2018/06/25/thermal/thermal_framework/thermal_core.jpg" alt="thermal_core调用流程"></p>
+<h1><span id="cooling_device">cooling_device</span></h1><p>嵌入式设备通过改变频率电压，来达到改变功耗的目的，cooling_device提供了获取当前设备的温控状态以及设置等接口；<br><img src="/2018/06/25/thermal/thermal_framework/cooling_device.png" alt="cooling_device"></p>
+<h2><span id="thermal_cooling_device">thermal_cooling_device</span></h2><pre><code>dts:
+cooling-maps{
+                                    bind0{
+                                            contribution = &lt;0&gt;;
+                                            trip = &lt;&amp;cpu_trip0&gt;;
+                                            cooling-device
+                                            = &lt;&amp;cpu_budget_cooling 1 1&gt;;
+                                    };
+                                    bind1{
+                                            contribution = &lt;0&gt;;
+                                            trip = &lt;&amp;cpu_trip1&gt;;
+                                            cooling-device
+                                            = &lt;&amp;cpu_budget_cooling 2 2&gt;;
+                                    };
+...
+               cpu_budget_cooling:cpu_budget_cool{
+                    compatible = &quot;allwinner,budget_cooling&quot;;
+                    device_type = &quot;cpu_budget_cooling&quot;;
+                    #cooling-cells = &lt;2&gt;;
+                    status = &quot;okay&quot;;
+                    state_cnt = &lt;7&gt;;
+                    cluster_num = &lt;1&gt;;
+                    state0 = &lt;1800000 4&gt;;
+                    state1 = &lt;1512000 4&gt;;
+                    state2 = &lt;1416000 4&gt;;
+                    state3 = &lt;1200000 4&gt;;
+                    state4 = &lt;1008000 3&gt;;
+                    state5 = &lt;1008000 2&gt;;
+                    state6 = &lt;1008000 1&gt;;
+            };
+...
+
+
+struct thermal_cooling_device_ops {
+    int (*get_max_state) (struct thermal_cooling_device *, unsigned long *);   //获取最高的cooling状态的回调函数，指最低功耗的OPP                       
+    int (*get_cur_state) (struct thermal_cooling_device *, unsigned long *); //获取当前cooling状态的回调函数                          
+    int (*set_cur_state) (struct thermal_cooling_device *, unsigned long);   //根据cooling_state执行cpufreq的回调函数，是执行的实体                         
+    int (*get_requested_power)(struct thermal_cooling_device *,
+                               struct thermal_zone_device *, u32 *);//获取当前当前CPU的功耗值，包括dynamic功耗和static功耗。中间需要用到dyn_power_table进行转换                                  
+    int (*state2power)(struct thermal_cooling_device *,
+                       struct thermal_zone_device *, unsigned long, u32 *); //将CPU cooling状态转换成需要消耗的功耗值；                          
+    int (*power2state)(struct thermal_cooling_device *,
+                       struct thermal_zone_device *, u32, unsigned long *);//将CPU所能获取的最大功耗值转换成cooling状态                           
+};
+
+static struct thermal_cooling_device_ops const sunxi_cpu_cooling_ops = {
+    .get_max_state = cpu_budget_get_max_state,
+    .get_cur_state = cpu_budget_get_cur_state,
+    .set_cur_state = cpu_budget_set_cur_state,
+};
+cool_dev = thermal_of_cooling_device_register(
+                        pdev-&gt;dev.of_node,
+                        SUNXI_BUDGET_COOLING_NAME,
+                        budget_cdev,
+                        &amp;sunxi_cpu_cooling_ops);
+
+set_cur_state
+    -&gt;cpu_budget_apply_cooling(cooling_device, state); 
+        -&gt;sunxi_hotplug_update_state(cooling_device, cluster);
+            -&gt;autohotplug_roomage_limit(cluster, min, max); //限制最大的核数
+        -&gt;sunxi_cpufreq_update_state(cooling_device, cluster);  ??怎么传递这个参数的
+            -&gt;cpufreq_update_policy(cpuid); //限制最大频率
+</code></pre><h1><span id="thermal-governor">thermal governor</span></h1><h2><span id="内核中的governor策略">内核中的governor策略</span></h2><p><strong>step wise</strong>: Open loop control. Temperature threshold and trend based. Walk through each cooling device cooling state, step by step.</p>
+<p><strong>fair share</strong>: Weight based. Determine the cooling device state based on assigned weight partitioning.</p>
+<p><strong>bang bang</strong>: uses a hysteresis to switch abruptly on or off a cooling device. It is intended to control fans, which can not be throttled but just switched on or off.</p>
+<p><strong>power allocator</strong>: Closed loop control. Based on power budget, temperature, and current power consumption of each involved device.</p>
+<p><strong>user space</strong>: hand off the control of a thermal zone to user space. Example: thermald and iTux.</p>
+<h2><span id="手机端的thermal配置情况">手机端的thermal配置情况</span></h2><h3><span id="mtk">mtk</span></h3><p>以魅族 15plus为例</p>
+<pre><code>15Plus:/sys/class/thermal $ ls
+cooling_device0 cooling_device2 cooling_device4 cooling_device6 thermal_zone1 thermal_zone3 thermal_zone5\
+cooling_device1 cooling_device3 cooling_device5 thermal_zone0   thermal_zone2 thermal_zone4
+</code></pre><p>cooling device</p>
+<pre><code>15Plus:/sys/class/thermal/cooling_device1 $ ls
+cur_state max_state power subsystem type uevent
+for i in $(seq 0 6)
+do
+    printf &quot;cooling_device$i\t&quot;
+    type=$(cat cooling_device$i/type)
+    printf &quot;$type\t&quot;
+    cur_state=$(cat cooling_device$i/cur_state)
+    printf &quot;$cur_state\t&quot;
+    max_state=$(cat cooling_device$i/max_state)
+    printf &quot;$max_state\n&quot;
+done
+cooling_device0         battery_control02       0       1
+cooling_device1         battery_control01       0       1
+cooling_device2         battery_control00       0       1
+cooling_device3         thermal-cpufreq-0       0       13
+cooling_device4         thermal-cpufreq-1       0       8
+cooling_device5         thermal-gpufreq-0       0       4
+cooling_device6         thermal-isp-0           0       2
+</code></pre><p>thermal_zone</p>
+<pre><code>for i in $(seq 0 5)
+do
+    printf &quot;thermal_zone$i\t&quot;
+    type=$(cat thermal_zone$i/type)
+    printf &quot;$type\t&quot;
+    policy=$(cat thermal_zone$i/policy)
+    printf &quot;$policy\n&quot;
+done
+
+thermal_zone0   mngs-thermal    power_allocator        cdev【0-1】 -&gt; ../cooling_device3        thermal-cpufreq-0
+thermal_zone1   APOLLO          step_wise            cdev【0-4】 -&gt; ../cooling_device4        thermal-cpufreq-1
+thermal_zone2   GPU             power_allocator     cdev【0-1】 -&gt; ../cooling_device5        thermal-gpufreq-0
+thermal_zone3   ISP             step_wise             cdev【0-4】 -&gt; ../cooling_device6        thermal-isp-0
+thermal_zone4   battery         step_wise
+thermal_zone5   meizu_ntc       step_wise             cdev【0-2】 -&gt; ../cooling_device【0-2】    battery_control0【0-2】
+</code></pre><h3><span id="海思">海思</span></h3><p>以荣耀9为例</p>
+<p>cooling_device</p>
+<pre><code>cooling_device0 thermal-devfreq-0       05
+cooling_device1 thermal-cpufreq-0       04
+cooling_device2 thermal-cpufreq-1       04
+</code></pre><p>thermal_zone</p>
+<pre><code>thermal_zone0   soc_thermal     power_allocator  cdev【0-2】 -&gt; ../cooling_device[0-2]
+thermal_zone1   Battery         user_space
+thermal_zone2   cluster0        user_space    
+thermal_zone3   cluster1        user_space
+thermal_zone4   gpu                user_space
+thermal_zone5   modem           user_space
+thermal_zone6   ddr                user_space
+thermal_zone7   system_h        user_space
+thermal_zone8   flash_led       user_space
+thermal_zone9   charger         user_space
+thermal_zone10  pa_0            user_space
+thermal_zone11  dcxo0           user_space
+thermal_zone12  hisi_shell      user_space
+thermal_zone13  hisi_ambient    user_space
+</code></pre><h3><span id="高通">高通</span></h3><p>以pixel为例</p>
+<p>cooling_device</p>
+<pre><code>                    type                cur_state    max_state
+cooling_device0 thermal-cpufreq-0       1900800         21
+cooling_device1 thermal-cpufreq-1       2457600            30
+</code></pre><p>thermal_zone </p>
+<pre><code>thermal_zone0   mnh_ipu1                step_wise
+thermal_zone1   mnh_ipu2                   step_wise
+thermal_zone2   mnh_cpu                 step_wise
+thermal_zone3   mnh_lpddr                   step_wise
+thermal_zone4   usb                     step_wise
+thermal_zone5   battery                 step_wise
+thermal_zone6   usb_port_temp           step_wise
+thermal_zone7   pm8998_tz               step_wise
+thermal_zone8   pmi8998_tz              step_wise
+thermal_zone9   pm8005_tz               step_wise
+thermal_zone10  msm_therm                   step_wise
+thermal_zone11  quiet_therm             step_wise
+thermal_zone12  xo_therm                step_wise
+thermal_zone13  fpc_therm               step_wise
+thermal_zone14  back_therm              step_wise
+thermal_zone15  pa_therm                step_wise
+thermal_zone16  tsens_tz_sensor0        step_wise
+thermal_zone17  tsens_tz_sensor1        step_wise
+thermal_zone18  tsens_tz_sensor2        step_wise
+thermal_zone19  tsens_tz_sensor3        step_wise
+thermal_zone20  tsens_tz_sensor4        step_wise
+thermal_zone21  tsens_tz_sensor7        step_wise
+thermal_zone22  tsens_tz_sensor8        step_wise
+thermal_zone23  tsens_tz_sensor9        step_wise
+thermal_zone24  tsens_tz_sensor10       step_wise
+thermal_zone25  tsens_tz_sensor11       step_wise
+thermal_zone26  tsens_tz_sensor12       step_wise
+thermal_zone27  tsens_tz_sensor13       step_wise
+thermal_zone28  tsens_tz_sensor14       step_wise
+thermal_zone29  tsens_tz_sensor15       step_wise
+thermal_zone30  tsens_tz_sensor16       step_wise
+thermal_zone31  tsens_tz_sensor17       step_wise
+thermal_zone32  tsens_tz_sensor18       step_wise
+thermal_zone33  tsens_tz_sensor19       step_wise
+thermal_zone34  tsens_tz_sensor20       step_wise
+thermal_zone35  tsens_tz_sensor21       step_wise
+thermal_zone36  limits_sensor-00        step_wise
+thermal_zone37  limits_sensor-01        step_wise
+thermal_zone38  bcm15602_tz             step_wise
+thermal_zone39  bms                     step_wise
+thermal_zone40  GLM_soc                 step_wise
+</code></pre><p>通过观察发现，power allocator，step wise,user space为常用的governor，故以下简单介绍此三种thermal;</p>
+<h2><span id="power-allocator">Power allocator</span></h2><h3><span id="ipa的发展历史">IPA的发展历史</span></h3><pre><code>在2013，ARM 开始在Linux OS中布局IPA，只是介绍了相关的概念和在实际场景中的好处；
+在2015年3月3号，第一个完整的IPA提交被纳入Linux,并被merge到linux4.2.所以linux4.2之后不用再打相关的pactch
+</code></pre><p>在讲power allocator 前，需要先讲个概念PID（Proportional Integral Derivative）的概念;</p>
+<h3><span id="pid控制器">PID控制器</span></h3><p><img src="/2018/06/25/thermal/thermal_framework/pid.png" alt="pid"></p>
+<p>PID控制器是一个闭环的系统，通过将输出反馈到输入，这使系统可以得到更精细和自适应的控制</p>
+<p>.u(t) is the control signal.</p>
+<p>.y(t)is the actual output value.</p>
+<p>.r(t) is the reference value, also called the setpoint. It is the desired output value.</p>
+<p>.e(t) is the control error (e(t) = r(t) − y(t)). It shows the difference between the reference value and the actual output value.</p>
+<p>.The term Plant refers to the object that is being controlled<br>The control signal 𝑢(𝑡) is a sum of the following terms:</p>
+<pre><code>The P-term: This term is proportional to the error. It acts on the present value of the error.
+The I-term: This term is proportional to the integral of the error. It represents the accumulation of past errors.
+The D-term: This term is proportional to the derivative of the error. It can be interpreted as a prediction of future errors, based on linear extrapolation according to the current rate of change.
+</code></pre><p>PID控制器适用于多个控制领域，除了多路输入输出；</p>
+<p>对于thermal 而言，对应的PID如以下模样：</p>
+<p><img src="/2018/06/25/thermal/thermal_framework/thermal_pid.png" alt="thermal_pid"></p>
+<p><em>Pmax</em> 是根据当前的温度和预想的温度计算出来的系统可以运行的最大功耗：</p>
+<p><strong>计算公式如下：</strong></p>
+<pre><code>P_max = k_p * e + k_i * err_integral + k_d * diff_err + sustainable_power
+e = desired_temperature - current_temperature
+err_integral is the sum of previous errors
+diff_err = e - previous_error
+</code></pre><p>. 所谓的Sustainable Power是在不同OPP情境下，某一个最大的OPP的温度保持基本稳定，比其大者，温度上升明显；比其小者温度保持不变或者下降；这可以通过监测不同OPP对应的温度值，得到一个Sustainable Power</p>
+<pre><code>以荣耀9为例: 
+Sustainable Power = 4500
+trip_point_1_temp = 80000;
+trip_point0_temp = 55000;
+if (!tz-&gt;tzp-&gt;k_po || force)
+    tz-&gt;tzp-&gt;k_po = int_to_frac(sustainable_power) / temperature_threshold;
+k_po = sustainable_power / (desired_temperature - switch_on_temp) = （4500 * 1024）/(80000-55000) = 184.32
+if (!tz-&gt;tzp-&gt;k_pu || force)
+     tz-&gt;tzp-&gt;k_pu = int_to_frac(2 * sustainable_power) / temperature_threshold 
+k_pu = 2 * sustainable_power / (desired_temperature - switch_on_temp) = = (2 * 4500 * 1024)/(80000 - 55000) =  368.64;
+tz-&gt;tzp-&gt;k_i = int_to_frac(10) / 1000 = 10.24;
+k_i = 10 * 1024 /1000 = 为积分常数，用来补偿偏移；当温度误差低于 integral_cutoff（一般为0）误差就会被累计
+k_d 为求导，一般设置为0
+</code></pre><p><img src="/2018/06/25/thermal/thermal_framework/power_allocate_throttle.jpg" alt="power_allocate_throttle"></p>
+<h2><span id="step-wise">step wise</span></h2><p>根据当前温度的趋势（上升，下降）和与当前的trip温度对比，来决定CPU下一次的cooling状态</p>
+<p><img src="/2018/06/25/thermal/thermal_framework/step_wise.jpg" alt="step_wise"></p>
+<h2><span id="user-space">user space</span></h2><p>通过将温度，事件，暴露到上层，上层应用再去驱动throttle进行控温，目前没有相关的资料可以分析，暂时不做分析；</p>
+<h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cnblogs.com/arnoldlu/p/6388151.html" target="_blank" rel="noopener">Android/Linux Thermal框架分析及其Governor对比</a></p>
+<p><a href="https://www.cnblogs.com/arnoldlu/p/6388112.html" target="_blank" rel="noopener">Android/Linux Thermal Governor之IPA分析与使用</a></p>
+<p><a href="http://blog.jobbole.com/104334/" target="_blank" rel="noopener">LinuxNetlink基本使用</a></p>
+<p><a href="https://www.ibm.com/developerworks/cn/linux/l-kerns-usrs/index.html" target="_blank" rel="noopener">内核启动参数，模块参数与sysfs,sysctl,系统调用和netlink</a></p>
+<p><a href="https://www.techbang.com/posts/17396-power-states-know-how-many-g-p-t-s-c-read" target="_blank" rel="noopener">电脑待机，睡眠，休眠分不清楚？P,T,S,G,C电源状态一次看懂</a></p>
+<p><a href="file:///C:/Users/key/Downloads/thermal-framework-status-no-transitioning.pdf" target="_blank" rel="noopener">The thermal framework</a></p>
+<p><a href="http://infocenter.arm.com/help/topic/com.arm.doc.dto0052a/DTO0052A_intelligent_power_allocation_white_paper.pdf" target="_blank" rel="noopener">intelligent_power_allocation_white_paper</a></p>
 
           
         
