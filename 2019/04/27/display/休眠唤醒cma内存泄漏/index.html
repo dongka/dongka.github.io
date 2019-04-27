@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="display memory ion," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="现象分析现场排查起因keeptesting休眠唤醒出现vmap allocation申请内存失败，log打印如下 1234567[ 7499.814118] [ion_debug]In ion_buffer_destroy: release buf size 249856, phys_addr 70bc0000, process[1947:composer@2.1-se][ 7499.899841">
+<meta name="keywords" content="display memory ion">
+<meta property="og:type" content="article">
+<meta property="og:title" content="休眠唤醒cma内存泄漏">
+<meta property="og:url" content="http://yoursite.com/2019/04/27/display/休眠唤醒cma内存泄漏/index.html">
+<meta property="og:site_name" content="知识总结">
+<meta property="og:description" content="现象分析现场排查起因keeptesting休眠唤醒出现vmap allocation申请内存失败，log打印如下 1234567[ 7499.814118] [ion_debug]In ion_buffer_destroy: release buf size 249856, phys_addr 70bc0000, process[1947:composer@2.1-se][ 7499.899841">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/display/休眠唤醒cma内存泄漏/window.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/27/display/休眠唤醒cma内存泄漏/mmap.png">
+<meta property="og:updated_time" content="2019-04-27T13:11:53.002Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="休眠唤醒cma内存泄漏">
+<meta name="twitter:description" content="现象分析现场排查起因keeptesting休眠唤醒出现vmap allocation申请内存失败，log打印如下 1234567[ 7499.814118] [ion_debug]In ion_buffer_destroy: release buf size 249856, phys_addr 70bc0000, process[1947:composer@2.1-se][ 7499.899841">
+<meta name="twitter:image" content="http://yoursite.com/2019/04/27/display/休眠唤醒cma内存泄漏/window.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/27/display/休眠唤醒cma内存泄漏/"/>
+
+
+
+
+
+  <title>休眠唤醒cma内存泄漏 | 知识总结</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">知识总结</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/27/display/休眠唤醒cma内存泄漏/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">休眠唤醒cma内存泄漏</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-04-27T21:00:00+00:00">
+                2019-04-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/display/" itemprop="url" rel="index">
+                    <span itemprop="name">display</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1><span id="现象分析">现象分析</span></h1><h2><span id="现场排查">现场排查</span></h2><p>起因keeptesting休眠唤醒出现vmap allocation申请内存失败，log打印如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">[ 7499.814118] [ion_debug]In ion_buffer_destroy: release buf size 249856, phys_addr 70bc0000, process[1947:composer@2.1-se]</span><br><span class="line">[ 7499.899841] vmap allocation for size 5537792 failed: use vmalloc=&lt;size&gt; to increase size</span><br><span class="line">[ 7499.910499] platform cma: Fail to allocate buffer</span><br><span class="line">[ 7499.941821] vmap allocation for size 5537792 failed: use vmalloc=&lt;size&gt; to increase size</span><br><span class="line">[ 7499.952483] platform cma: Fail to allocate buffer</span><br><span class="line">[ 7499.983029] vmap allocation for size 5537792 failed: use vmalloc=&lt;size&gt; to increase size</span><br></pre></td></tr></table></figure>
+<p>通过查看显示相关的进程<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">t7-p3:/ # procrank</span><br><span class="line">  PID       Vss      Rss      Pss      Uss     Swap    PSwap    USwap    ZSwap  cmdline</span><br><span class="line"></span><br><span class="line"> 2387  1050156K  141496K   43392K   32760K       0K       0K       0K       0K  com.android.systemui</span><br><span class="line"> </span><br><span class="line">                           ------   ------   ------   ------   ------   ------  ------</span><br><span class="line">                          479314K  354572K     708K     708K     708K     534K  TOTAL</span><br><span class="line"></span><br><span class="line">ZRAM: 676K physical used for 896K in swap (754616K total swap)</span><br><span class="line"> RAM: 1006160K total, 50708K free, 2984K buffers, 513540K cached, 1016K shmem, 46584K slab</span><br><span class="line"></span><br><span class="line">查看对应的dma_buf分配情况,发现个数不断的增大</span><br><span class="line"></span><br><span class="line">procmem -p 2387 | grep dmabuf | grep 1948 | wc -l</span><br></pre></td></tr></table></figure></p>
+<p>通过在ion_map的时候将进程信息添加到对应的ion debug节点中，unmap再删除，看到异常的dmabuf对应的进程；对应的是2880 systemui和launcher</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">t7-p3:/ # cat /sys/kernel/debug/ion/heaps/cma | grep dmabuf | grep 1994</span><br><span class="line"> allocator@2.0-s             1966          1994752 0 1 |  2217/android.display  dmabuf:172      | 3426/Binder:3413_2    dmabuf:172      |</span><br><span class="line"> allocator@2.0-s             1966          1994752 0 1 |  3168/Binder:2880_6    dmabuf:d3       | 9217/Binder:3413_4    dmabuf:d3       |</span><br><span class="line"> allocator@2.0-s             1966          1994752 0 1 |  9347/Binder:2880_9    dmabuf:13e      | 3426/Binder:3413_2    dmabuf:13e      |</span><br><span class="line"> allocator@2.0-s             1966          1994752 0 1 |  2217/android.display  dmabuf:17a      | 9217/Binder:3413_4    dmabuf:17a      | 2894/Binder:2880_1    dmabuf:17a      |</span><br><span class="line"> allocator@2.0-s             1966          1994752 0 1 |  2217/android.display  dmabuf:16a      | 2894/Binder:2880_1    dmabuf:16a      | 3426/Binder:3413_2    dmabuf:16a      |</span><br><span class="line"> allocator@2.0-s             1966          1994752 0 1 |  3426/Binder:3413_2    dmabuf:105      | 9168/Binder:2880_7    dmabuf:105      |</span><br><span class="line"> allocator@2.0-s             1966          1994752 0 1 |  2895/Binder:2880_2    dmabuf:a5       | 9217/Binder:3413_4    dmabuf:a5       |</span><br><span class="line"> allocator@2.0-s             1966          1994752 0 1 |  9347/Binder:2880_9    dmabuf:da       | 9217/Binder:3413_4    dmabuf:da       |</span><br></pre></td></tr></table></figure>
+<p>跟踪logcat中gralloc alloc的时候的打印，发现异常截图size与截图的大小一致；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">03-26 19:34:17.096  1980  2160 D SurfaceFlinger: captureLayers here sourcecrop = 0 0 - 1920 720</span><br><span class="line">03-26 19:34:17.108  2186  2212 E KernelCpuSpeedReader: Failed to read cpu-freq: /sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state (No such file or directory)</span><br><span class="line">03-26 19:34:17.109  1965  2107 I [Gralloc]: ion_alloc from ion_client:5 via heap type DMA(mask:16) for 1990720 Bytes cached buffer successfully, usage = 0x00000333</span><br></pre></td></tr></table></figure>
+<h2><span id="内存回收">内存回收</span></h2><p>首先怀疑是否为安卓内存没有回收导致</p>
+<p>强制触发内存回收</p>
+<pre><code>方式一：kill -10 pid
+方式二：am dumpheap com.test.test /sdcard/test.hprof
+方式三：在进程onReceive中添加System.gc() ;然后在adb shell中输入 am  broadcast -a INTENT_ACTION_NAME_HERE
+</code></pre><p>安卓系统内存回收可以分为三种情况：</p>
+<pre><code>第一，用户程序调用StartAcitity(),使当前的活动的Activity被覆盖；
+第二，用户按BACK键，退出当前应用程序；
+第三：启动一个新的应用程序。这些能够触发内存回收的时间最终调用的函数接口就是activityIdleInternal
+</code></pre><p>通过kill -10 pid 的方式，触发安卓内存进行回收，发现内存没有释放；</p>
+<p>从内核debug节点也看到此问题是上层systemui和launcher映射的fd没有释放导致；</p>
+<h1><span id="休眠截屏流程">休眠截屏流程</span></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">services/core/java/com/android/server/wm/TaskSnapshotController.java</span><br><span class="line">/**</span><br><span class="line"> * Called when screen is being turned off.</span><br><span class="line"> */</span><br><span class="line">void screenTurningOff(ScreenOffListener listener) &#123;</span><br><span class="line">    if (shouldDisableSnapshots()) &#123;</span><br><span class="line">        listener.onScreenOff();</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // We can&apos;t take a snapshot when screen is off, so take a snapshot now!</span><br><span class="line">    mHandler.post(() -&gt; &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            synchronized (mService.mWindowMap) &#123;</span><br><span class="line">                mTmpTasks.clear();</span><br><span class="line">                mService.mRoot.forAllTasks(task -&gt; &#123;</span><br><span class="line">                    if (task.isVisible()) &#123;</span><br><span class="line">                        mTmpTasks.add(task);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line">                snapshotTasks(mTmpTasks);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            listener.onScreenOff();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在休眠老化过程中，将shouldDisableSnapshots默认配置为true，没有出现内存泄漏，更加确定与截屏流程有关；</p>
+<h1><span id="测试场景脚本化">测试场景脚本化</span></h1><p>在出现异常的现场时，如果能简化到某些行为，可以使debug的范围很大程度的缩小；在验证问题是否解决的时，也更容易判断</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">while true;</span><br><span class="line">do</span><br><span class="line">	am start -n com.android.calculator2/com.android.calculator2.Calculator</span><br><span class="line">	sleep 0.5 </span><br><span class="line">	am start -n com.android.settings/com.android.settings.Settings</span><br><span class="line">	sleep 0.5</span><br><span class="line">done</span><br><span class="line">或</span><br><span class="line">while true;</span><br><span class="line">do</span><br><span class="line">	input keyevent POWER</span><br><span class="line">	sleep 1</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+<h1><span id="怀疑方向">怀疑方向</span></h1><p>从泄漏问题来看，有两点有疑问，一： 主界面为什么不泄露，设置界面泄漏？二：为什么与截屏流程有关,且影响到systemUI和launcher?</p>
+<h2><span id="主界面没有泄漏原因">主界面没有泄漏原因</span></h2><p>从log上看主界面之所以没有泄漏，是因为主界面不走截屏的流程；那么下一步的动作就是看为什么主界面没有截屏</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">/** Activity type is currently not defined. */</span><br><span class="line">public static final int ACTIVITY_TYPE_UNDEFINED = 0;</span><br><span class="line">/** Standard activity type. Nothing special about the activity... */</span><br><span class="line">public static final int ACTIVITY_TYPE_STANDARD = 1;</span><br><span class="line">/** Home/Launcher activity type. */</span><br><span class="line">public static final int ACTIVITY_TYPE_HOME = 2;</span><br><span class="line">/** Recents/Overview activity type. There is only one activity with this type in the system. */</span><br><span class="line">public static final int ACTIVITY_TYPE_RECENTS = 3;</span><br><span class="line">/** Assistant activity type. */</span><br><span class="line">public static final int ACTIVITY_TYPE_ASSISTANT = 4;</span><br><span class="line"></span><br><span class="line">   int getSnapshotMode(Task task) &#123;</span><br><span class="line">       final AppWindowToken topChild = task.getTopChild();</span><br><span class="line">       if (!task.isActivityTypeStandardOrUndefined() &amp;&amp; !task.isActivityTypeAssistant()) &#123;</span><br><span class="line">           return SNAPSHOT_MODE_NONE;//主界面 </span><br><span class="line">       &#125; else if (topChild != null &amp;&amp; topChild.shouldUseAppThemeSnapshot()) &#123;</span><br><span class="line">           return SNAPSHOT_MODE_APP_THEME;</span><br><span class="line">       &#125; else &#123;</span><br><span class="line">           return SNAPSHOT_MODE_REAL;//设置界面</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>结合打印和代码可以发现，由于主界面activity属性为ACTIVITY_TYPE_HOME，故不截屏；而设置界面中，activity属性为ACTIVITY_TYPE_STANDARD；故进行截屏；</p>
+<p>dumpsys window</p>
+<p><img src="/2019/04/27/display/休眠唤醒cma内存泄漏/window.png" alt="window"></p>
+<p>并无出现截图数量递增的情况；</p>
+<p>安卓P上默认无论是否为低内存设备不再提供禁止截屏的接口，把截屏的第一针动画当做第一针进行显示；低内存只能更改第一针的采样率</p>
+<pre><code>services/core/java/com/android/server/wm/TaskSnapshotController.java
+    final float scaleFraction = isLowRamDevice ? 1f : 1f;
+</code></pre><h2><span id="截屏作用">截屏作用</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">./services/core/java/com/android/server/am/ActivityRecord.java showStartingWindow</span><br><span class="line">	showStartingWindow</span><br><span class="line">		addStartingWindow //添加启动窗口</span><br><span class="line">			final TaskSnapshot snapshot = mService.mTaskSnapshotController.getSnapshot(</span><br><span class="line">        	mContainer.getTask().mTaskId, mContainer.getTask().mUserId,</span><br><span class="line">       		false /* restoreFromDisk */, false /* reducedResolution */);//休眠的时候系统会通过TaskController进行截图</span><br><span class="line">			</span><br><span class="line">			final int type = getStartingWindowType(newTask, taskSwitch, processRunning,</span><br><span class="line">        	allowTaskSnapshot, 、activityCreated, fromRecents, snapshot);</span><br><span class="line">			获取启动窗口的类型，如果启动串口的类型是STARTING_WINDOW_TYPE_SNAPSHOT时，使用snapshot内容作为启动窗口内容</span><br><span class="line">			一般我们从recents界面进入应用时，或者应用被压入后台再次点击桌面图标进入应用时走该流程；</span><br><span class="line">			窗口类型：</span><br><span class="line">				STARTING_WINDOW_TYPE_NONE：不添加starting window</span><br><span class="line">				STARTING_WINDOW_TYPE_SNAPSHOT：使用任务快照作为starting window的显示内容</span><br><span class="line">				STARTING_WINDOW_TYPE_SPLASH_SCREEN：默认行为，该界面显示的内容搜应用主题相关属性设置的影响</span><br><span class="line"></span><br><span class="line">			一般情况下我们可以通过设置theme的windowDisablePreview的属性为true禁止显示starting window,如果我们设置了应用窗口背景透明或者使用了float属性为true类型的窗口时，这个时候启动应用时不会添加starting window的。</span><br><span class="line">			对于启动窗口的内容何时使用snapshot内容合适受应用的theme影响。我们可以以应用启动方式不同来做一判断，一般应用冷启动和温启动的时候staring window的显示容易受theme影响，应用通过Recent启动或者热启动时，starting window会显示snapshot的内容</span><br><span class="line">			 if (type == STARTING_WINDOW_TYPE_SNAPSHOT) &#123;</span><br><span class="line">    					 return createSnapshot(snapshot);</span><br><span class="line"> 				&#125;</span><br></pre></td></tr></table></figure>
+<p>即截图的图片在启动动画的时候会用来做第一帧动画；如果有keyguard的时候，唤醒启动的时候则会去那休眠前截好的图作为第一针动画显示；没有则不用走到这里来；T7没有keyguard，故休眠唤醒的流程也不会经过这里；</p>
+<h1><span id="systemui截屏相关流程">SystemUi截屏相关流程</span></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">启动流程：</span><br><span class="line">	startOtherServices()</span><br><span class="line">		startSystemUi(context, windowManagerF);</span><br><span class="line">			intent.setComponent(new ComponentName(&quot;com.android.systemui&quot;,&quot;com.android.systemui.SystemUIService&quot;));</span><br><span class="line">			context.startServiceAsUser(intent, UserHandle.SYSTEM);</span><br><span class="line"></span><br><span class="line">		src/com/android/systemui/SystemUIService.java	</span><br><span class="line">		onCreate()</span><br><span class="line">				((SystemUIApplication) getApplication()).startServicesIfNeeded();</span><br><span class="line">					mServices[i].start();</span><br><span class="line">	这时候就会去起recent的服务</span><br><span class="line"></span><br><span class="line">截图相关流程</span><br><span class="line">	getThumbnail	只是提供缩略图的作用</span><br><span class="line">		snapshot = ActivityManager.getService().getTaskSnapshot(taskId, reducedResolution);</span><br><span class="line">			return task.getSnapshot(reducedResolution);</span><br><span class="line">				task = mStackSupervisor.anyTaskForIdLocked(taskId,</span><br><span class="line">        				MATCH_TASK_IN_STACKS_OR_RECENT_TASKS);</span><br><span class="line">			return task.getSnapshot(reducedResolution);</span><br></pre></td></tr></table></figure>
+<p>在休眠唤醒的流程里面，添加打印，并未发现有systemui进入到getSnapshot的相关操作。至此在应用排查阶段一直没有进展；另外烧录gsi同样能发现内存泄漏的问题；怀疑还是自己平台修改导致的可能性比较大；故在目光转移至gralloc分配流程；</p>
+<h1><span id="进程的地址空间">进程的地址空间</span></h1><p>进程的地址空间（address space）由允许进程使用的全部线性地址（memery region，其含义通常所指的虚拟内存的一个区间，可以称为虚存区 VMA Virtual Memory Area ）组成。每个进程所看到的线性地址集成是不同的，一个进程所使用的地址和另外一个进程所使用的地址之间没有什么关系。后面我们还会看到，内核可以通过增加或删除某些线性地址区间来动态地修改进程的地址空间；</p>
+<p>内存描述符：与进程地址空间有关的全部信息都包含在一个叫做内存描述符（memory descriptor）的数据结构中，这个类型为mm_struct,进程描述符的mm字段就指向这个内存结构；</p>
+<h1><span id="ion基本概念">ION基本概念</span></h1><p>ION作用：用于用户空间的进程之间或者内核空间的模块之间进行内存共享；而且这种共享是0拷贝的；</p>
+<p>对于ION的基本概念可以看下篇文章；</p>
+<p><a href="http://kernel.meizu.com/memory%20management%20-%20ion.html" target="_blank" rel="noopener">内存管理–ION</a></p>
+<h2><span id="free时机">free时机</span></h2><p>一般我们认为当ref_count = 0的时候就会去release这块内存</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">drivers/staging/android/ion/ion.c</span><br><span class="line">ion_buffer_put(struct ion_buffer *buffer)</span><br><span class="line">	 return kref_put(&amp;handle-&gt;ref, _ion_handle_destroy);</span><br><span class="line">		return kref_sub(kref, 1, release); </span><br><span class="line">			 if (atomic_sub_and_test((int) count, &amp;kref-&gt;refcount)) &#123; </span><br><span class="line">    			release(kref);</span><br><span class="line">                    ion_buffer_destroy</span><br><span class="line">			            buffer-&gt;heap-&gt;ops-&gt;free(buffer);</span><br><span class="line">						vfree(buffer-&gt;pages);           </span><br><span class="line">						kfree(buffer);</span><br></pre></td></tr></table></figure>
+<p>可以看到ion buffer的free动作是在在引用计数为0的时候去清理的；实际此时当不同进程都map到同一个buffer的时候，这时候还有一个引用计数会决定是否真正的close;</p>
+<p>通过ioct free的时候</p>
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th>Operations</th>
+<th>Ion buffer ref count</th>
+<th>Ion buf status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="mailto:allocator@2.0-s" target="_blank" rel="noopener">allocator@2.0-s</a>(alloc_device_alloc)</td>
+<td>1.ion_alloc</td>
+<td>1</td>
+<td>allocated</td>
+</tr>
+<tr>
+<td></td>
+<td>2.ion share:dmabuf fd1</td>
+<td>2</td>
+<td>—</td>
+</tr>
+<tr>
+<td>surfaceflinger</td>
+<td>gralloc_register_buffer(map)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>surfaceflinger</td>
+<td>gralloc_lock</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>surfaceflinger</td>
+<td>gralloc_unlock</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>surfaceflinger</td>
+<td>gralloc_unregister_buffer(unmap)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="mailto:allocator@2.0-s" target="_blank" rel="noopener">allocator@2.0-s</a>(alloc_device_free)</td>
+<td>3.close(不会真正执行)</td>
+<td>2</td>
+<td>—</td>
+</tr>
+<tr>
+<td></td>
+<td>4.ion_free</td>
+<td>1(2 -&gt; 1)</td>
+<td>using</td>
+</tr>
+<tr>
+<td>systemUI</td>
+<td>gralloc_register_buffer(map)</td>
+<td>—</td>
+<td>using</td>
+</tr>
+<tr>
+<td>systemUI</td>
+<td>FinalizerDaemon-&gt;gralloc_register_buffer(unmap)-&gt;close</td>
+<td>0(1 -&gt; 0)</td>
+<td>freed</td>
+</tr>
+</tbody>
+</table>
+<h2><span id="内存映射">内存映射</span></h2><p>mmap是一种内存映射文件的方法，即将一个文件或者其他对象映射到进程的地址空间，实现文件磁盘地址和虚拟内存</p>
+<p><img src="/2019/04/27/display/休眠唤醒cma内存泄漏/mmap.png" alt="mmap流程"></p>
+<p><strong>mmap三个阶段：</strong></p>
+<p>一：进程启动映射过程，并在虚拟地址空间中为映射创建虚拟映射区域；</p>
+<p>二：调用内核空间的系统调用函数mmap(不同于用户空间函数)，实现文件物理地址和进程虚拟地址的一一映射关系</p>
+<p>三：进程发起对这片映射空间的访问，引发缺页异常；实现文件内容到物理内存（主存）的拷贝</p>
+<p><strong>内存映射类型：</strong></p>
+<p>私有内存映射：多个进程会创建一个新的映射，各个进程不共享，也不会反应到物理文件中，比如linux.so动态库就是采用这种形式映射到各个进程虚拟地址空间中；</p>
+<p>私有匿名映射：mmap会创建一个新的映射，各个进程不共享，这种使用主要用于分配内存</p>
+<p>共享文件映射：多个进程通过虚拟内存技术共享同样的物理内存空间，对内存文件会反映到实际物理文件中，他也是进程通信的机制</p>
+<p>共享匿名映射：这种机制在fork的时候不会采用写时复制，父子进程完全共享同样的物理内存，这也就实现了父子间通信（IPC）</p>
+<p>匿名的意思是需不需要一个fd,正常来讲，当需要进行内存映射的时候，我们都需要依赖一个文件才能实现；通常需要open一个temp文件，穿件后unlink，close掉，比较麻烦；可以直接使用匿名映射来代替，linux也提供了这么一套机制给我们；无需依赖文件即可创建。：</p>
+<font color="green">如：int *p = mmap(NULL, 4, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);</font> 
+
+
+
+<p><strong>映射流程：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">DPATH=&quot;/sys/kernel/debug/tracing&quot;</span><br><span class="line">echo &gt; $DPATH/trace</span><br><span class="line">echo nop &gt; $DPATH/current_tracer</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">echo &gt; $DPATH/set_ftrace_filter</span><br><span class="line">echo &quot;SyS_mmap_pgoff SyS_old_mmap SyS_munmap SyS_open filp_open &quot; &gt;&gt; $DPATH/set_ftrace_filter</span><br><span class="line">echo &quot;do_brk elf_map load_elf_binary&quot; &gt;&gt; $DPATH/set_ftrace_filter</span><br><span class="line">echo &quot;do_mmap do_munmap get_unmapped_area mmap_region vm_mmap vm_munmap vm_mmap_pgoff&quot; &gt;&gt; $DPATH/set_ftrace_filter</span><br><span class="line">echo &quot;__split_vma unmap_region split_vma&quot; &gt;&gt; $DPATH/set_ftrace_filter</span><br><span class="line"></span><br><span class="line">echo function_graph &gt; $DPATH/current_tracer</span><br><span class="line">echo 2542 &gt; $DPATH/set_ftrace_pid</span><br><span class="line"></span><br><span class="line">echo 1 &gt; $DPATH/tracing_on</span><br><span class="line">cat $DPATH/trace &gt; /data/trace.txt</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"> mappedAddress = (unsigned char *)mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, hnd-&gt;share_fd, 0);</span><br><span class="line"></span><br><span class="line"> 1)               |  SyS_mmap_pgoff() &#123;</span><br><span class="line"> 1)               |    vm_mmap_pgoff() &#123;</span><br><span class="line"> --&gt;              |     do_mmap_pgoff</span><br><span class="line"> 1)               |      do_mmap() &#123;</span><br><span class="line"> 1) + 27.334 us   |        get_unmapped_area();</span><br><span class="line"> 1) + 15.792 us   |        mmap_region();</span><br><span class="line"> 1) + 53.583 us   |      &#125;</span><br><span class="line"> 1) + 60.958 us   |    &#125;</span><br><span class="line"> 1) + 66.250 us   |  &#125;</span><br><span class="line"> </span><br><span class="line">munmap(base, size) </span><br><span class="line"> </span><br><span class="line"> 1)               |  SyS_munmap() &#123;</span><br><span class="line"> 1)               |    do_munmap() &#123;</span><br><span class="line"> 1) + 85.084 us   |      unmap_region();</span><br><span class="line"> 1) ! 105.667 us  |    &#125;</span><br><span class="line"> 1) ! 111.458 us  |  &#125;</span><br></pre></td></tr></table></figure>
+<p><strong>do_map</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">do_mmap</span><br><span class="line">	//获取未映射的vma</span><br><span class="line">	 addr = get_unmapped_area(file, addr, len, pgoff, flags); </span><br><span class="line">	 //先检查vma分配后是否超过进程限制，之后再rb_tree中找到满足本次申请条件vma的前区vma区（内核有很多红黑树存储的数据结构，尤其在内存中）</span><br><span class="line">	 //如果两个vma能合并就合并成一个，否则就新申请的vma插入rb_tree中。</span><br><span class="line">	 //在整个过程中，我们能看到的只有vma的申请和磁盘文件的关联</span><br><span class="line">	 addr = mmap_region(file, addr, len, vm_flags, pgoff);</span><br><span class="line">	 	vma = vma_merge(mm, prev, addr, addr + len, vm_flags,</span><br><span class="line">        NULL, file, pgoff, NULL, NULL_VM_UFFD_CTX, NULL);</span><br><span class="line">	 	vma-&gt;vm_file = get_file(file);  </span><br><span class="line">			atomic_long_inc(&amp;f-&gt;f_count);</span><br><span class="line">		error = file-&gt;f_op-&gt;mmap(file, vma);通过fd进行内存映射</span><br></pre></td></tr></table></figure>
+<p><strong>unmap流程</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">do_munmap</span><br><span class="line">	vma = find_vma(mm, start); //找到起始地址落在哪个vma内</span><br><span class="line">	unmap_region(mm, vma, prev, start, end);</span><br><span class="line">	error = __split_vma(mm, vma, start, 0); //上面有讲到如果两个vma能合并就合并，解映射的时候分离出来</span><br><span class="line">	remove_vma_list(mm, vma); </span><br><span class="line">		vma = remove_vma(vma);</span><br><span class="line">			fput(vma-&gt;vm_file); </span><br><span class="line">				atomic_long_dec_and_test(&amp;file-&gt;f_count)</span><br><span class="line">					schedule_delayed_work</span><br><span class="line">						delayed_fput</span><br><span class="line">							__fput</span><br><span class="line">								file-&gt;f_op-&gt;release(inode, file);</span><br></pre></td></tr></table></figure>
+<p>释放时的log</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[ 1689.870445] ion_buffer_put count:0 phys_adr 72100000 </span><br><span class="line">[ 1689.877035] CPU: 2 PID: 3353 Comm: FinalizerDaemon Tainted: G           O    4.9.118 #2</span><br><span class="line">[ 1689.885982] Hardware name: sun8iw17</span><br><span class="line">[ 1689.889931] [&lt;c0111184&gt;] (unwind_backtrace) from [&lt;c010cd1c&gt;] (show_stack+0x20/0x24)</span><br><span class="line">[ 1689.898604] [&lt;c010cd1c&gt;] (show_stack) from [&lt;c0478c5c&gt;] (dump_stack+0x78/0x94)</span><br><span class="line">[ 1689.906703] [&lt;c0478c5c&gt;] (dump_stack) from [&lt;c06fb5f4&gt;] (ion_buffer_put+0xc0/0xd4)</span><br><span class="line">[ 1689.915177] [&lt;c06fb5f4&gt;] (ion_buffer_put) from [&lt;c06fb7fc&gt;] (ion_dma_buf_release+0x1c/0x20)</span><br><span class="line">[ 1689.924520] [&lt;c06fb7fc&gt;] (ion_dma_buf_release) from [&lt;c0585b60&gt;] (dma_buf_release+0x64/0x17c)</span><br><span class="line">[ 1689.934049] [&lt;c0585b60&gt;] (dma_buf_release) from [&lt;c02843cc&gt;] (__fput+0xf4/0x1d0)</span><br><span class="line">[ 1689.942319] [&lt;c02843cc&gt;] (__fput) from [&lt;c0284518&gt;] (____fput+0x18/0x1c)</span><br><span class="line">[ 1689.949806] [&lt;c0284518&gt;] (____fput) from [&lt;c013f574&gt;] (task_work_run+0xc8/0xd8)</span><br><span class="line">[ 1689.957976] [&lt;c013f574&gt;] (task_work_run) from [&lt;c010c458&gt;] (do_work_pending+0xac/0xcc)</span><br><span class="line">[ 1689.966819] [&lt;c010c458&gt;] (do_work_pending) from [&lt;c0107f60&gt;] (slow_work_pending+0xc/0x20)</span><br></pre></td></tr></table></figure>
+<p>只有当映射同一块进程都解除映射后，file-&gt;f_count,为0；才会调到ion_buffer_put，此时ion_buffer计数为0，释放该buffer</p>
+<h2><span id="userspace-使用">userspace 使用</span></h2><p>mali-utgard/gralloc/src/gralloc_module.cpp</p>
+<p>进程创建buffer的流程<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">static struct hw_module_methods_t gralloc_module_methods =</span><br><span class="line">&#123;</span><br><span class="line">    .open = gralloc_device_open</span><br><span class="line">&#125;;   </span><br><span class="line">                                                      </span><br><span class="line">	gralloc_device_open</span><br><span class="line">		alloc_device_open</span><br><span class="line">			 m-&gt;ion_client = ion_open();</span><br><span class="line">	alloc_device_alloc</span><br><span class="line">		gralloc_alloc_buffer</span><br><span class="line">			ret = aw_ion_alloc(&amp;(m-&gt;ion_client), size, 0, heap_mask, flags, &amp;(ion_hnd), usage);</span><br><span class="line">			ret = ion_share(m-&gt;ion_client, ion_hnd, &amp;shared_fd);</span><br><span class="line">			cpu_ptr = mmap(NULL, size, map_mask, MAP_SHARED, shared_fd, 0);</span><br></pre></td></tr></table></figure></p>
+<p> 结构体gralloc_module_t定义在文件hardware/libhardware/include/hardware/gralloc.h中，它主要是定义了四个用来操作图形缓冲区的成员函数，如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">private_module_t::private_module_t()</span><br><span class="line">&#123;</span><br><span class="line">```	                                                  </span><br><span class="line">	base.registerBuffer = gralloc_register_buffer;</span><br><span class="line">	base.unregisterBuffer = gralloc_unregister_buffer;</span><br><span class="line">	base.lock = gralloc_lock;                         </span><br><span class="line">	base.unlock = gralloc_unlock;</span><br><span class="line">```</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>registerBuffer和unregisterBuffer分别用来注册和注销一个指定的图形缓冲区，这个指定的图形缓冲区使用一个buffer_handle_t句柄来描述。所谓注册图形缓冲区，实际上就是将一块图形缓冲区映射到一个进程的地址空间，注销图形缓冲区则是相反的过程；成员函数lock和unlock分别用来锁定和解锁一个缓冲区，例如向一块图形缓冲写入内容的时候，需要将图形缓冲区锁定。用来避免访问冲突；</p>
+<h1><span id="gralloc-流程debug">gralloc 流程debug</span></h1><p>对于systemui来讲，在此过程并不会去申请buffer,而是通过内存映射，所以我们主要关注register和unregiser的流程</p>
+<p>添加引用计数：</p>
+<pre><code>gralloc_register_buffer
+     if (size == 1990720) {
+                   getNameByPid(hnd-&gt;pid,task_name);       
+                   count = count + 1;
+                   AERR(&quot; 0x%p process %d  task_name:%s size:%d share_fd:0x%x count:%d &quot;, hnd, hnd-&gt;pid, task_name, size, hnd-&gt;share_fd, count);
+     }
+
+gralloc_unregister_buffer        
+if (size == 1990720) {
+                   getNameByPid(hnd-&gt;pid,task_name);       
+                   count= count -1;
+                   AERR(&quot; 0x%p process %d  task_name:%s size:%d share_fd:0x%x count:%d &quot;, hnd, hnd-&gt;pid, task_name, size, hnd-&gt;share_fd, count);
+}
+</code></pre><p>应用计数log:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gralloc_unregister_buffer:345  0x0xa96c52c0 process 2327  task_name:ndroid.systemui size:1990720 share_fd:0x5b count:2</span><br><span class="line">   gralloc_unregister_buffer:345  0x0xaeca7400 process 2327  task_name:ndroid.systemui size:1990720 share_fd:0x59 count:1</span><br><span class="line">gralloc_unregister_buffer:345  0x0xaeccd7f0 process 2327  task_name:ndroid.systemui size:1990720 share_fd:0x4c count:0</span><br></pre></td></tr></table></figure></p>
+<p>通过打印发现，systemUI的register动作和unregister的动作是匹配的，count也能清零；但依然进程中的dmabuf异常存在泄漏</p>
+<p>对应的dmabuf如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">t7-p3:/ # procmem  -p 2327 | grep dmabuf</span><br><span class="line"> 	1948K       0K       0K       0K       0K       0K       0K       0K  anon_inode:dmabuf-c3</span><br></pre></td></tr></table></figure></p>
+<p>且kill -10 后系统也没有完成回收，说明此时已经存在内存泄漏</p>
+<p>查看unregister相关代码发现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">gralloc_unregister_buffer</span><br><span class="line">....</span><br><span class="line">    /* if handle is still locked, the unmapping would not happen until unlocked*/</span><br><span class="line">    if (!(hnd-&gt;lockState &amp; private_handle_t::LOCK_STATE_WRITE))</span><br><span class="line">    &#123;</span><br><span class="line">        unmap_buffer(hnd);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    hnd-&gt;lockState |= private_handle_t::LOCK_STATE_UNREGISTERED;</span><br><span class="line">....</span><br></pre></td></tr></table></figure>
+<p>当存在LOCK_WRITE标识的时候，此时不会被unmap,那么什么时候这个标志是什么时候被赋值的呢？surfaceFlinger在创建这块内存时，对于surfaceFlinger而言；由于截图的动作比较频繁，会调用lock为buffer添加锁保护，当写完之后unlock;这时候systemUI恰好映射到这块内存恰好会将其标志拷贝；对于systemUI而言，本身不会有写的操作，故更不会有unlock的动作；所以就发生了泄漏；解决这个问题的方法。就是在进程映射内存的时候；将这个标志清除掉；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gralloc_register_buffer</span><br><span class="line">	hnd-&gt;lockState &amp;= ~(private_handle_t::LOCK_STATE_WRITE);</span><br></pre></td></tr></table></figure>
+<p>安卓O同样存在同样的问题，但由于项目一开始为了减少设备的内存使用，所以禁止了相关截图的功能，在androidP上，谷歌没有提供相关的全局禁止功能，故问题就暴露出来；</p>
+<p>补丁如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">在方案下面的:venus_a1.mk</span><br><span class="line">Disable the task snapshots feature</span><br><span class="line">PRODUCT_PROPERTY_OVERRIDES += \</span><br><span class="line"></span><br><span class="line">persist.enable_task_snapshots = false</span><br></pre></td></tr></table></figure>
+<h1><span id="补充代办">补充（代办）</span></h1><h2><span id="上层的gralloc流程">上层的gralloc流程</span></h2><h2><span id="systemui如何map到surfaceflinger">systemUI如何map到surfaceFlinger</span></h2><h1><span id="参考资料">参考资料</span></h1><p><a href="http://zhoujinjian.cc/2019/06/23/Android%20P%20Graphics%20System%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9AGraphicBuffer%E5%92%8CGralloc%E5%88%86%E6%9E%90/index.html" target="_blank" rel="noopener">gralloc流程</a></p>
+<p><a href="https://www.jianshu.com/p/97fb764f2669" target="_blank" rel="noopener">安卓性能优化：关于内存泄漏的知识都在这里了</a></p>
+<p><a href="https://blog.csdn.net/abm1993/article/details/88641725" target="_blank" rel="noopener">Activity启动窗口和TaskSnapshot</a></p>
+<p><a href="https://www.ibm.com/developerworks/cn/opensource/os-cn-android-mmry-rcycl/index.html" target="_blank" rel="noopener">Android操作系统的内存回收机制</a></p>
+<p><a href="http://gityuan.com/2016/04/16/kill-signal/" target="_blank" rel="noopener">信号处理</a></p>
+<p><a href="http://windrunnerlihuan.com/2018/01/09/Android-SurfaceFlinger-%E5%AD%A6%E4%B9%A0%E4%B9%8B%E8%B7%AF-%E5%8D%81%E4%BA%8C-%E5%90%88%E6%88%90Layer/" target="_blank" rel="noopener">Android SurfaceFlinger学习之路</a></p>
+<p><a href="http://www.cnblogs.com/huxiao-tee/p/4660352.html" target="_blank" rel="noopener">认真分析mmap:是什么 为什么 怎么用</a></p>
+<p><a href="https://www.cnblogs.com/arnoldlu/p/9367253.html" target="_blank" rel="noopener">Linux内存管理（9）mmap补充</a></p>
+<p><a href="https://blog.csdn.net/SweeNeil/article/details/83661933" target="_blank" rel="noopener">匿名映射</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/display-memory-ion/" rel="tag"># display memory ion</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/24/other/面试总结/" rel="next" title="面试总结">
+                <i class="fa fa-chevron-left"></i> 面试总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">dongka</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">现象分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.</span> <span class="nav-text">现场排查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.2.</span> <span class="nav-text">内存回收</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">休眠截屏流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">测试场景脚本化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">怀疑方向</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.1.</span> <span class="nav-text">主界面没有泄漏原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.2.</span> <span class="nav-text">截屏作用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">SystemUi截屏相关流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">6.</span> <span class="nav-text">进程的地址空间</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">7.</span> <span class="nav-text">ION基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">7.1.</span> <span class="nav-text">free时机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">7.2.</span> <span class="nav-text">内存映射</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">7.3.</span> <span class="nav-text">userspace 使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">8.</span> <span class="nav-text">gralloc 流程debug</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">9.</span> <span class="nav-text">补充（代办）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">9.1.</span> <span class="nav-text">上层的gralloc流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">9.2.</span> <span class="nav-text">systemUI如何map到surfaceFlinger</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">10.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dongka</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
