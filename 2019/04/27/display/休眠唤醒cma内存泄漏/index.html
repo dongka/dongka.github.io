@@ -89,7 +89,7 @@
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2019/04/27/display/休眠唤醒cma内存泄漏/window.png">
 <meta property="og:image" content="http://yoursite.com/2019/04/27/display/休眠唤醒cma内存泄漏/mmap.png">
-<meta property="og:updated_time" content="2019-04-28T03:05:24.628Z">
+<meta property="og:updated_time" content="2019-04-28T03:08:18.405Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="休眠唤醒cma内存泄漏">
 <meta name="twitter:description" content="现象分析现场排查起因keeptesting休眠唤醒出现vmap allocation申请内存失败，log打印如下 1234567[ 7499.814118] [ion_debug]In ion_buffer_destroy: release buf size 249856, phys_addr 70bc0000, process[1947:composer@2.1-se][ 7499.899841">
@@ -458,7 +458,7 @@
 </tr>
 <tr>
 <td>systemUI</td>
-<td>FinalizerDaemon<br>-&gt;gralloc_unregister_buffer<br>(unmap)</td>
+<td>FinalizerDaemon<br>gralloc_unregister_buffer<br>(unmap)</td>
 <td>0(1 -&gt; 0)</td>
 <td>freed</td>
 </tr>
