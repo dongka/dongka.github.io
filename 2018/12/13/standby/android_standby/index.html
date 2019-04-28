@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="知识总结">
 <meta property="og:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-04-27T10:41:27.062Z">
+<meta property="og:updated_time" content="2019-04-28T05:13:51.058Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓休眠流程">
 <meta name="twitter:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
@@ -632,12 +632,75 @@ while (true) {
 });                                                                                             
 autosuspendThread.detach();                                                                     
 LOG(INFO) &lt;&lt; &quot;automatic system suspend enabled&quot;;                                                
-</code></pre><p>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 其他</span><br><span class="line"></span><br><span class="line">**如何设置安卓休眠超时时间？**</span><br><span class="line"></span><br><span class="line">	settings get system screen_off_timeout</span><br><span class="line">	settings put system screen_off_timeout 2147483647 //设置永不休眠 </span><br><span class="line"></span><br><span class="line">** 安卓系统不休眠debug **</span><br><span class="line"></span><br><span class="line">	查看上层有没有释放锁</span><br><span class="line">		dumpsys power | grep -Hrsn &apos;LOCK&apos;</span><br><span class="line">	PARTIAL_WAKE_LOCK              &apos;messaging_service_start_wakelock&apos; </span><br><span class="line">	查看active_since这一项，看哪个锁不为0</span><br><span class="line">	      cat /sys/kernel/debug/wakeup_sources</span><br><span class="line">	上层传向底层的锁</span><br><span class="line">	cat /sys/power/wake_lock</span><br><span class="line"></span><br><span class="line">**进入深度休眠后被唤醒问题debug**</span><br><span class="line">	</span><br><span class="line">	一般而言，平台会提供深度休眠后如何查看系统唤醒源，如全志平台的查看方式为</span><br><span class="line">		一：休眠的时候不关闭终端</span><br><span class="line">		echo N &gt; /sys/module/printk/parameters/console_suspend</span><br><span class="line">		二：唤醒后查看对应的唤醒源</span><br><span class="line">		查看唤醒时候打印:</span><br><span class="line">			platform wakeup, standby wakesource is:0x10000</span><br><span class="line">		在allwinner对应的pm.h里面就可以看到对应的唤醒源编号，如linux4.9的在driver/soc/sunxi/pm.h </span><br><span class="line">		其他版本可以直接搜索关键字找到对应的唤醒源编号；</span><br><span class="line">			#define CPUS_WAKEUP_DESCEND     (1&lt;&lt;16)</span><br><span class="line">		而CPUS的GPIO一般是WIFI中断管脚在连接，故此时可以断开wifi连接查看系统唤醒是否依然异常</span><br><span class="line">	另外如果当log出现为闹钟唤醒：</span><br><span class="line">		platform wakeup, standby wakesource is:0x100000</span><br><span class="line">		查看对应唤醒源编号</span><br><span class="line">		#define CPUS_WAKEUP_ALM0        (1&lt;&lt;20)</span><br><span class="line">	这种情况下我们一般需要通过去查看到底是哪个应用去唤醒系统的：这个时候我们可以借助这个应用 BetterBatteryStats2.0</span><br><span class="line">		1.下载地址：</span><br><span class="line">		http://cn.apkhere.com/app/com.asksven.betterbatterystats</span><br><span class="line">		安装该软件：</span><br><span class="line">		2.adb install com.asksven.betterbatterystats_2.2.2.0_paid-www.apkhere.com.apk</span><br><span class="line">		3.获取权限：</span><br><span class="line">		adb -d shell pm grant com.asksven.betterbatterystats android.permission.BATTERY_STATS</span><br><span class="line">		4.若依然不可以：</span><br><span class="line">		setenforce 0：取消selinux</span><br><span class="line">		getenforce 查看是否为安全模式 Permissive 则是非安全；</span><br><span class="line">		观察各项参数：</span><br><span class="line"></span><br><span class="line">** rtc闹钟设置与查看 **</span><br></pre></td></tr></table></figure></p>
-<p>venus-a3:/ # cat /proc/driver/rtc<br>rtc_time        : 05:44:49<br>rtc_date        : 2019-04-26<br>alrm_time       : 00:00:00<br>alrm_date       : 1970-01-01<br>alarm_IRQ       : no<br>alrm_pending    : no<br>update IRQ enabled      : no<br>periodic IRQ enabled    : no<br>periodic IRQ frequency  : 1<br>max user IRQ frequency  : 64<br>24hr            : yes</p>
-<p>设置当前时间+100000后唤醒<br>venus-a3:/ # echo +100000 &gt; /sys/devices/platform/soc/rtc/rtc/rtc0/wakealarm<br>venus-a3:/ # cat /proc/driver/rtc<br>rtc_time        : 05:47:15<br>rtc_date        : 2019-04-26<br>alrm_time       : 09:33:52<br>alrm_date       : 2019-04-27<br>alarm_IRQ       : yes<br>alrm_pending    : no<br>update IRQ enabled      : no<br>periodic IRQ enabled    : no<br>periodic IRQ frequency  : 1<br>max user IRQ frequency  : 64<br>24hr            : yes</p>
-<p>echo 0取消</p>
-<p>~~~</p>
-<h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cnblogs.com/dyufei/p/8018016.html" target="_blank" rel="noopener">Android7.0 PowerManagerService 之亮灭屏（二） PMS 电源状态管理updatePowerStateLocked（）</a></p>
+</code></pre><p>}<br>~~~</p>
+<h1><span id="其他">其他</span></h1><p><strong>如何设置安卓休眠超时时间？</strong></p>
+<pre><code>settings get system screen_off_timeout
+settings put system screen_off_timeout 2147483647 //设置永不休眠 
+</code></pre><p><strong> 安卓系统不休眠debug </strong></p>
+<pre><code>查看上层有没有释放锁
+    dumpsys power | grep -Hrsn &apos;LOCK&apos;
+PARTIAL_WAKE_LOCK              &apos;messaging_service_start_wakelock&apos; 
+查看active_since这一项，看哪个锁不为0
+      cat /sys/kernel/debug/wakeup_sources
+上层传向底层的锁
+cat /sys/power/wake_lock
+</code></pre><p><strong>进入深度休眠后被唤醒问题debug</strong></p>
+<pre><code>一般而言，平台会提供深度休眠后如何查看系统唤醒源，如全志平台的查看方式为
+    一：休眠的时候不关闭终端
+    echo N &gt; /sys/module/printk/parameters/console_suspend
+    二：唤醒后查看对应的唤醒源
+    查看唤醒时候打印:
+        platform wakeup, standby wakesource is:0x10000
+    在allwinner对应的pm.h里面就可以看到对应的唤醒源编号，如linux4.9的在driver/soc/sunxi/pm.h 
+    其他版本可以直接搜索关键字找到对应的唤醒源编号；
+        #define CPUS_WAKEUP_DESCEND     (1&lt;&lt;16)
+    而CPUS的GPIO一般是WIFI中断管脚在连接，故此时可以断开wifi连接查看系统唤醒是否依然异常
+另外如果当log出现为闹钟唤醒：
+    platform wakeup, standby wakesource is:0x100000
+    查看对应唤醒源编号
+    #define CPUS_WAKEUP_ALM0        (1&lt;&lt;20)
+这种情况下我们一般需要通过去查看到底是哪个应用去唤醒系统的：这个时候我们可以借助这个应用 BetterBatteryStats2.0
+    1.下载地址：
+    http://cn.apkhere.com/app/com.asksven.betterbatterystats
+    安装该软件：
+    2.adb install com.asksven.betterbatterystats_2.2.2.0_paid-www.apkhere.com.apk
+    3.获取权限：
+    adb -d shell pm grant com.asksven.betterbatterystats android.permission.BATTERY_STATS
+    4.若依然不可以：
+    setenforce 0：取消selinux
+    getenforce 查看是否为安全模式 Permissive 则是非安全；
+    观察各项参数：
+</code></pre><p><strong> rtc闹钟设置与查看 </strong></p>
+<pre><code>venus-a3:/ # cat /proc/driver/rtc
+rtc_time        : 05:44:49
+rtc_date        : 2019-04-26
+alrm_time       : 00:00:00
+alrm_date       : 1970-01-01
+alarm_IRQ       : no
+alrm_pending    : no
+update IRQ enabled      : no
+periodic IRQ enabled    : no
+periodic IRQ frequency  : 1
+max user IRQ frequency  : 64
+24hr            : yes
+
+设置当前时间+100000后唤醒
+venus-a3:/ # echo +100000 &gt; /sys/devices/platform/soc/rtc/rtc/rtc0/wakealarm
+venus-a3:/ # cat /proc/driver/rtc
+rtc_time        : 05:47:15
+rtc_date        : 2019-04-26
+alrm_time       : 09:33:52
+alrm_date       : 2019-04-27
+alarm_IRQ       : yes
+alrm_pending    : no
+update IRQ enabled      : no
+periodic IRQ enabled    : no
+periodic IRQ frequency  : 1
+max user IRQ frequency  : 64
+24hr            : yes
+
+echo 0取消
+</code></pre><h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cnblogs.com/dyufei/p/8018016.html" target="_blank" rel="noopener">Android7.0 PowerManagerService 之亮灭屏（二） PMS 电源状态管理updatePowerStateLocked（）</a></p>
 <p><a href="https://www.jianshu.com/p/b40e1b61e6d2" target="_blank" rel="noopener">Android 保持屏幕常亮的几种方法</a></p>
 <p><a href="https://blog.csdn.net/Gaugamela/article/details/52838654" target="_blank" rel="noopener">Android7.0 PowerManagerService(3)核心函数updatePowerStateLocked的主要流程</a></p>
 <p><a href="https://blog.csdn.net/fu_kevin0606/article/details/54408094" target="_blank" rel="noopener">Android7.0 PowerManagerService亮灭屏分析(一)</a></p>
@@ -816,7 +879,7 @@ LOG(INFO) &lt;&lt; &quot;automatic system suspend enabled&quot;;
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">安卓电源状态</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">老化休眠唤醒代码demo</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">sleep流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">设置的闹钟处理流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">安卓电源状态</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">老化休眠唤醒代码demo</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">sleep流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">设置的闹钟处理流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
 
           </div>
