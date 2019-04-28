@@ -413,7 +413,7 @@
 </tr>
 <tr>
 <td>surfaceflinger</td>
-<td>gralloc_register_buffer(map)</td>
+<td>gralloc_register_buffer<br>(map)</td>
 <td>2</td>
 <td></td>
 </tr>
@@ -437,7 +437,7 @@
 </tr>
 <tr>
 <td><a href="mailto:allocator@2.0-s" target="_blank" rel="noopener">allocator@2.0-s</a>(alloc_device_free)</td>
-<td>3.close(不会真正执行)</td>
+<td>3.close(ion buffer个数不减少)</td>
 <td>2</td>
 <td>—</td>
 </tr>
@@ -449,13 +449,13 @@
 </tr>
 <tr>
 <td>systemUI</td>
-<td>gralloc_register_buffer(map)</td>
+<td>gralloc_register_buffer<br>(map)</td>
 <td>1</td>
 <td>using</td>
 </tr>
 <tr>
 <td>systemUI</td>
-<td>FinalizerDaemon<br>-&gt;gralloc_unregister_buffer(unmap)</td>
+<td>FinalizerDaemon<br>-&gt;gralloc_unregister_buffer<br>(unmap)</td>
 <td>0(1 -&gt; 0)</td>
 <td>freed</td>
 </tr>
