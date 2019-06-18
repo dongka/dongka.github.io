@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="知识总结">
 <meta property="og:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-04-28T05:43:32.346Z">
+<meta property="og:updated_time" content="2019-05-22T04:14:10.254Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓休眠流程">
 <meta name="twitter:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
@@ -683,6 +683,10 @@ max user IRQ frequency  : 64
 24hr            : yes
 
 echo 0取消
+
+查看闹钟应用设置闹钟：
+venus-a3:/ # settings list system | grep  next
+       next_alarm_formatted=Wed 11:50 AM
 </code></pre><h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cnblogs.com/dyufei/p/8018016.html" target="_blank" rel="noopener">Android7.0 PowerManagerService 之亮灭屏（二） PMS 电源状态管理updatePowerStateLocked（）</a></p>
 <p><a href="https://www.jianshu.com/p/b40e1b61e6d2" target="_blank" rel="noopener">Android 保持屏幕常亮的几种方法</a></p>
 <p><a href="https://blog.csdn.net/Gaugamela/article/details/52838654" target="_blank" rel="noopener">Android7.0 PowerManagerService(3)核心函数updatePowerStateLocked的主要流程</a></p>
@@ -718,8 +722,8 @@ echo 0取消
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/11/17/cpu/arm体系架构的发展/" rel="next" title="ARM体系架构概述">
-                <i class="fa fa-chevron-left"></i> ARM体系架构概述
+              <a href="/2018/12/13/standby/kernel_suspend/" rel="next" title="内核的休眠流程">
+                <i class="fa fa-chevron-left"></i> 内核的休眠流程
               </a>
             
           </div>
@@ -728,8 +732,8 @@ echo 0取消
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/12/13/standby/kernel_suspend/" rel="prev" title="内核的休眠流程">
-                内核的休眠流程 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/02/27/display/display_hardware/" rel="prev" title="显示硬件篇">
+                显示硬件篇 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -807,7 +811,7 @@ echo 0取消
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-count">18</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
