@@ -375,7 +375,7 @@
 <p>先将创建的线程给打出来，后面有涉及到的线程作用也会提及</p>
 <p><img src="/2019/06/18/display/Vsync/thread.png" alt="1558615784026"></p>
 <h2><span id="messagequeue创建">MessageQueue创建</span></h2><p><strong>类介绍</strong></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SurfaceFlinger</span> :</span> <span class="keyword">public</span> BnSurfaceComposer, 实现SurfaceComposer接口</span><br><span class="line">                       <span class="keyword">public</span> PriorityDumper,        <span class="comment">//实现SurfaceFlinger的信息dump</span></span><br><span class="line">                        IBinder::DeathRecipient,</span><br><span class="line">					   <span class="keyword">private</span> HWC2::ComposerCallback 实现以下三种事件回调</span><br><span class="line">					   		<span class="comment">//onHotplugReceived 屏幕热插拔事件</span></span><br><span class="line">					   		<span class="comment">//onRefreshReceived 当地曾的配置参数有变动的时候，SurfaceFlinger前面给的数据不能用的时候</span></span><br><span class="line">					   		<span class="comment">//onVsyncReceived 接受底层硬件上报的垂直同步信息</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SurfaceFlinger</span> :</span> <span class="keyword">public</span> BnSurfaceComposer, 实现SurfaceComposer接口</span><br><span class="line">                       <span class="keyword">public</span> PriorityDumper,        <span class="comment">//实现SurfaceFlinger的信息dump</span></span><br><span class="line">                        IBinder::DeathRecipient,</span><br><span class="line">					   <span class="keyword">private</span> HWC2::ComposerCallback 实现以下三种事件回调</span><br><span class="line">					   		<span class="comment">//onHotplugReceived 屏幕热插拔事件</span></span><br><span class="line">					   		<span class="comment">//onRefreshReceived 当图层的配置参数有变动的时候，SurfaceFlinger前面给的数据不能用的时候</span></span><br><span class="line">					   		<span class="comment">//onVsyncReceived 接受底层硬件上报的垂直同步信息</span></span><br></pre></td></tr></table></figure>
 <p><strong>onFirstRef</strong></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">flinger的数据类型为sp强指针类型，当首次被强指针引用的时候则执行onFirstRef</span><br><span class="line">onFirstRef</span><br><span class="line">	 mEventQueue-&gt;init(this);</span><br><span class="line">	 </span><br><span class="line">services/surfaceflinger/Scheduler/MessageQueue.cpp	 	</span><br><span class="line">void MessageQueue::init(const sp&lt;SurfaceFlinger&gt;&amp; flinger) &#123;  </span><br><span class="line">	mFlinger = flinger;    </span><br><span class="line">	mLooper = new Looper(true);    </span><br><span class="line">	mHandler = new Handler(*this);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p><img src="/2019/06/18/display/Vsync/messagequeue.png" alt="img"></p>
@@ -392,7 +392,7 @@
 <p>代码流程如下：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> SurfaceFlinger::onMessageReceived(<span class="keyword">int32_t</span> what) NO_THREAD_SAFETY_ANALYSIS &#123;</span><br><span class="line">    <span class="keyword">switch</span> (what) &#123;</span><br><span class="line">            <span class="keyword">case</span> MessageQueue::INVALIDATE: &#123;</span><br><span class="line">                <span class="keyword">if</span> (hwcFrameMissed &amp;&amp; !gpuFrameMissed) &#123;</span><br><span class="line">                    signalLayerUpdate();</span><br><span class="line">                    	--&gt;connection-&gt;resyncCallback();</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">      			handleMessageTransaction（）</span><br><span class="line">                handleMessageInvalidate()</span><br><span class="line">                   --&gt;handlePageFlip(); </span><br><span class="line">                   <span class="comment">//从bufferqueue中取出下一个图形缓冲区，就好像翻页一样;</span></span><br><span class="line">	           <span class="comment">//该函数主要是从各个layer对应的BufferQueue中拿图形缓冲区资料，并根据内容更新脏数据</span></span><br><span class="line">                    --&gt;invalidateLayerStack</span><br><span class="line">                    --&gt;signalRefresh     </span><br><span class="line">                &#125;</span><br><span class="line">            <span class="keyword">case</span> MessageQueue::REFRESH: &#123;</span><br><span class="line">                handleMessageRefresh();</span><br><span class="line">           </span><br><span class="line">  	         rebuildLayerStacks();</span><br><span class="line">               <span class="comment">//遍历所有layer按照Z序找到可见图层和可见区域。核心算法有region类完成。</span></span><br><span class="line">               <span class="comment">//它拥有一个私有成员变量mStorage(Vector&lt;Rect&gt;类型)，并封装了与，或，异或操作函数，管			    </span></span><br><span class="line">               <span class="comment">//理一组合法有序的矩形区域。</span></span><br><span class="line">               <span class="comment">//通过region可以方便的计算出多个图层叠加后的可见图层，可见区域及其大小位置</span></span><br><span class="line">               </span><br><span class="line">                   calculateWorkingSet();</span><br><span class="line">               <span class="comment">//遍历所有可见图层，在hal创建影子图层参数，例如hal没有该图层即调用createLayer创建，然				  </span></span><br><span class="line">              <span class="comment">//后分配合成策略,决策由GPU还是DE合成；</span></span><br><span class="line">                   prepareFrame(display);</span><br><span class="line">               <span class="comment">//通过调用hwc validate函数，会调用hwc中的AssignLayer函数，根据厂商的DE情况，决策是				  </span></span><br><span class="line">              <span class="comment">//否是DE合成还是GPU</span></span><br><span class="line">                  doComposition(display, repaintEverything);</span><br><span class="line">              <span class="comment">//合成，如果GPU合成则调用OpenGLES合成到FB,否则全部可见图层参数送到DE，即调用hal的			       </span></span><br><span class="line">              <span class="comment">//hwc_presentDisplay函数，调用presentDisplay获取fence； submitLayerToDisplay将显示</span></span><br><span class="line">              <span class="comment">//Layer加到链表中然后唤醒hwc_submit_thread,</span></span><br><span class="line">              <span class="comment">//调用setupLayer设置好送显的图层参数，再等待生成者的fence释放完成后；</span></span><br><span class="line">              <span class="comment">//调用commitToDisplay送显，最后displayToSrceen调用ioctl完成</span></span><br><span class="line">                </span><br><span class="line">                   postComposition();</span><br><span class="line">                <span class="comment">//完成合成后的一些状态处理</span></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h1><span id="总结">总结</span></h1><p>以下是一帧的大概显示流程,后续有机会在详细讲下技术细节：</p>
-<p>​    事件驱动：vsync-app驱动应用层绘图完毕后会回调onFrameAvaliable到SF的layer里面更新layer状态，然后调用requestVsync把mSFEventThread唤醒（应用若长期不送帧，会进入休眠状态），在下一个Vsync信号来时会往MessageQueue(MQ)队列添加invalidata消息。MQ是SF的主线程，它主要处理invalidate和refresh消息。当MQ收到Refresh消息后，就会真正的进入合成和送显的流程；关键流程就是以上所说的<strong>rebuildLayerStacks,calculateWorkingSet,prepareFrame,doComposition,postComposition</strong></p>
+<p>​    事件驱动：vsync-app驱动应用层绘图完毕后会回调onFrameAvaliable到SF的layer里面更新layer状态，然后调用requestVsync把mSFEventThread唤醒（应用若长期不送帧，会进入休眠状态），在下一个Vsync信号来时会往MessageQueue(MQ)队列添加invalidata消息。MQ是SF的主线程，它主要处理invalidate和refresh消息。当MQ收到Refresh消息后，就会真正的进入合成和送显的流程；关键流程就是以上所说的<strong>rebuildLayerStacks, calculateWorkingSet, prepareFrame, doComposition, postComposition</strong></p>
 <p>​    SF进行Refresh时，通过VrModeSwitch()判断是否处于虚拟桌面，调用prepareFrame(对应HWC的de2TryToAssignLayer)询问HWC各个图层的合成方式。</p>
 <p>​    接着调用drawMesh()进行重绘合成（OPENGL）和调用postFrameBuffer()提交合成的画布或这一帧。SF提交是不代表GPU已经处理完成，所以不直接送显；而是通过submitLayerToDisplay()把这一帧放入链表中，就直接返回接着处理下一帧。</p>
 <p>​    HWC::DisplayOpr有一个线程，submitThreadLoop()循环通过从链表中拿出一帧数据，通过commitToDisplay()异步向display下发，下发前等GPU完成即fence释放；</p>
@@ -1190,6 +1190,388 @@ if (size == 1990720) {
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/13/standby/kernel_suspend/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/13/standby/kernel_suspend/" itemprop="url">内核的休眠流程</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-13T00:07:09+00:00">
+                2018-12-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/standby/" itemprop="url" rel="index">
+                    <span itemprop="name">standby</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1><span id="内核休眠流程">内核休眠流程</span></h1><p>当安卓合适的时机(wakeup_count = save_count &amp;&amp; inpr == 0),与内核一致，在没有wakeup事件的时候，走进一步的流程，发echo mem &gt; /sys/power/state命令后，内核开始处理休眠流程</p>
+<pre><code>./kernel/power/main.c 
+state_store
+    -&gt;pm_suspend
+        -&gt;enter_state
+</code></pre><h1><span id="休眠流程">休眠流程：</span></h1><p>按照内核划分的休眠测试环节分为，FREEZER(进程冻结),DEVICES(设备休眠),PLATFORM(关闭不必要的中断),CPUS(关闭noboot cpu)，core(关闭cpu中断，通知cpus进入休眠处理流程)几个阶段</p>
+<p>kernel/power/suspend.c</p>
+<pre><code>enter_state
+    suspend_prepare(suspend_state_t state)
+    error = suspend_devices_and_enter(state);
+</code></pre><h2><span id="一test_freezer冻结流程">一：test_freezer（冻结流程）</span></h2><pre><code>suspend_prepare(suspend_state_t state)    
+        pm_prepare_console //如果需要的话重定向内核的kmsg  ??为什么要做切换
+        error = pm_notifier_call_chain(pm_suspend_prepare); //用途一：有些设备需要在freeze进程之前就suspend；用途二：如果有些设备的reseym动作需要较多的延时么么resume的时候会在进程恢复之前，会阻止所有进程的恢复？更有甚者需要设备等待某个进程的数据才能resume; 
+        //例子如下：drivers/video/fbdev/omap2/omapfb/dss/core.c
+        error = suspend_freeze_processes(); //进程冻结，将用户进程和内核线程置于“可控”的暂停状态
+</code></pre><p>在此对进程冻结进行展开描述</p>
+<h3><span id="为什么需要进程冻结">为什么需要进程冻结</span></h3><ol>
+<li>会破坏文件系统，在系统创建hibernate image到cpu down之间，如果有进程还在修改文件系统的内容，这将会导致系统恢复之后无法完全恢复文件系统；</li>
+<li>有可能导致创建hibernation image失败，创建hibernation image需要足够的内存空间，这期间如果还有进程在申请内存，就可能导致创建失败</li>
+<li>干扰设备的resume和suspend,在cpu down之前，device suspend期间，如果进程还在访问设备，尤其是访问竞争资源，就有可能引起设备suspend异常</li>
+<li>有可能导致进程感知休眠。系统休眠的理想状态下是所有任务对休眠过程无感知，睡眠之后会自动恢复工作，有些进程，需要所有cpu online才能正常工作，如果进程不冻结，那么休眠过程中就会异常；    </li>
+</ol>
+<h3><span id="冻结进程的主要流程">冻结进程的主要流程</span></h3><pre><code>suspend_freeze_processes
+——&gt;    freeze_processes()   -&gt; pm_freezing = true   
+                         -&gt;try_to_freeze_tasks -&gt;  freeze_task -&gt;  fake_signal_wake_up(p); 冻结用户进程
+
+
+
+-&gt;freeze_kernel_threads()  -&gt;pm_nosig_freezing = true 
+                           -&gt;try_to_freeze_tasks -&gt; freeze_task -&gt;    freeze_workqueues_begin();   冻结workqueue;
+                                                                    wake_up_state(p, task_interruptible); 冻结内核线程
+</code></pre><p>冻结的对象：可以被调度执行的实体，包括用户进程，内核线程和workqueue.</p>
+<h4><span id="1用户进程冻结流程">1.用户进程冻结流程</span></h4><p><strong>用户进程</strong>默认是可以被冻结的，<strong>借助信号处理机制</strong>,设置任务的tif_sigpending位，但不传递系统，然后唤醒任务；这样任务在返回用户态时就会进入信号处理流程，检查系统freeze状态，并做相应的处理；</p>
+<pre><code>fake_signal_wake_up -&gt; signal_wake_up(p, 0) -&gt; signal_wake_up_state(t, resume ? task_wakekill : 0); 
+                                                    -&gt; set_tsk_thread_flag(t, tif_sigpending);
+</code></pre><p><strong>信号的处理时机</strong></p>
+<p>理解信号异步机制的关键是信号的响应时机，我们对一个进程发送一个信号后，其实并没有硬中断发生，只是简单把信号挂载到目标进程的信号pending队列上去，信号真正得到执行的时机是进程执行完异常/中断返回到用户态的时刻；</p>
+<p>让信号看起来是一个异步中断的关键是,正常的用户进程是会频繁的在用户态和内核态之间切换的（这种切换包括：系统调用，缺页异常，系统中断..）,所以信号能很快得到执行。这样也带来一个问题，内核进程是不响应信号的，除非它刻意的去查询。所以通常情况下我们无法通过kill命令去杀死一个内核进程；</p>
+<p><strong>信号响应时机：</strong></p>
+<p><img src="/2018/12/13/standby/kernel_suspend/信号响应时机.jpg" alt="信号响应时机"></p>
+<pre><code>arch/arm64/kernel/signal.c    
+do_notify_resume -&gt; do_signal(regs) -&gt; get_signal
+                                            task_work_run
+                                            try_to_freeze
+
+                                    -&gt; handle_signal
+</code></pre><h4><span id="2内核线程冻结">2.内核线程冻结</span></h4><p><strong>内核线程和workqueue</strong>默认是不能被冻结的，少数内核线程和workqueue在创建的时指定了freezable标志。这些任务需要对freeze状态进行判断，当系统进入freezing时，可以通过调用freezing来判断freezing状态，<strong>并主动调用</strong>，try_to_freeze进入冻结；</p>
+<pre><code>代码范例如下：
+static int autohotplug_thread_task(void *data)
+{
+    set_freezable();
+    while (1) {
+            if (freezing(current)) {
+                    if (try_to_freeze())
+                            continue;
+            }    
+
+            if (hotplug_enable)
+                    autohotplug_governor_judge();
+
+            set_current_state(task_interruptible);
+            schedule();
+            if (kthread_should_stop())
+                    break;
+            set_current_state(task_running);
+    }    
+
+    return 0;
+}
+</code></pre><h4><span id="3workqueue冻结">3.workqueue冻结</span></h4><p>work_queue通过max_active属性，<strong>如果max_active=0则不能入队新的work</strong>,所有的work延后执行；</p>
+<pre><code>freeze_workqueues_begin -&gt;     workqueue_freezing = true; 
+                            pwq_adjust_max_active(pwq); 
+                                -&gt; pwq-&gt;max_active = 0;
+
+schedule_work -&gt; queue_work -&gt; queue_work_on -&gt;
+ __queue_work 
+    ...
+    如果还没有达到max_active,将work挂载到worklist
+          if (likely(pwq-&gt;nr_active &lt; pwq-&gt;max_active)) {
+                trace_workqueue_activate_work(work);
+                pwq-&gt;nr_active++;
+                worklist = &amp;pwq-&gt;pool-&gt;worklist;
+                if (list_empty(worklist))
+                        pwq-&gt;pool-&gt;watchdog_ts = jiffies;
+       否则将work挂载到临时队列 pwq-&gt;delayed_works
+            } else {
+                work_flags |= work_struct_delayed;
+                worklist = &amp;pwq-&gt;delayed_works;
+            }                       
+  ...
+</code></pre><h3><span id="冻结进程何时被打断">冻结进程何时被打断</span></h3><p>进程怎么阻止休眠：无论通过wake_lock接口，__pm_stay_awake等，最终调用的都是wakeup_source_activate，都是增加inpr表示有事件在处理不准休眠；</p>
+<pre><code>wakeup_source_activate
+    /* increment the counter of events in progress. */
+    cec = atomic_inc_return(&amp;combined_event_count);   也即解下来要讲的变量inpr
+
+在系统休眠过程中：上层会判断cnt == saved_count, inpr == 0；底层也是如此
+ bool pm_wakeup_pending(void)                                                                                     
+ {                                                                                                                
+     unsigned long flags;                                                                                     
+     bool ret = false;                                                                                        
+
+     spin_lock_irqsave(&amp;events_lock, flags);                                                                  
+     printk(&quot;++%s %d++\n&quot;,__func__, events_check_enabled);                                                    
+     if (events_check_enabled) {                                                                              
+             unsigned int cnt, inpr;                                                                          
+
+             split_counters(&amp;cnt, &amp;inpr);    
+             用户空间还有内核都是判断这两个变量；如果写入的值和cnt不同，说明读写的过程中出现产生了events；
+             inpr表示用唤醒事件在处理，这两种都会阻止系统休眠                                                                
+             ret = (cnt != saved_count || inpr &gt; 0);                                                          
+             events_check_enabled = !ret;                                                                     
+             printk(&quot;+++%s cnt:%d saved_count:%d inpr:%d ret:%d++\n&quot;,__func__, cnt, saved_count, inpr, ret);  
+     }                                                                                                        
+     spin_unlock_irqrestore(&amp;events_lock, flags);                                                             
+
+     if (ret) {                                                                                               
+             pr_info(&quot;pm: wakeup pending, aborting suspend\n&quot;);                                               
+             pm_print_active_wakeup_sources();                                                                
+     }                                                                                                        
+
+     return ret || pm_abort_suspend;                                                                          
+ }
+</code></pre><h1><span id="device_suspend设备休眠">device_suspend(设备休眠)</span></h1><pre><code>suspend_devices_and_enter
+--&gt; platform_suspend_begin
+    suspend_console();
+    dpm_suspend_start(pmsg_suspend);
+        --&gt;dpm_prepare(state);
+        --&gt;dpm_suspend(state);
+            device_suspend(dev);    
+                --&gt;async_schedule(async_suspend, dev); 
+                //在设备中如果通过device_enable_async_suspend设置过，async_schedule使设备走异步的休眠唤醒流程；
+                --&gt;__device_suspend(dev, pm_transition, false);
+                        dpm_watchdog_set//设置超时watchdog，若休眠时间过长，则打印打钱的设置和函数栈默认超时时间为120s
+                --&gt;    dpm_run_callback(callback, dev, state, info);    
+                        由于设备模型有bus、driver、device等多个层级，而suspend接口可能由任意一个层级实现。这里的优先顺序
+                        是指，只要优先级高的层级注册了suspend，就会优先使用它，而不会使用优先级低的prepare。优先顺序为：dev-&gt;pm_domain-&gt;ops、dev-&gt;type-&gt;pm、dev-&gt;class-&gt;pm、dev-&gt;bus-&gt;pm、dev-&gt;driver-&gt;pm（这个优先顺序同样适用于其它callbacks）。 
+</code></pre><h1><span id="platform关闭不需要唤醒的中断">platform（关闭不需要唤醒的中断）</span></h1><pre><code>suspend_enter(state, &amp;wakeup);
+    --&gt;platform_suspend_prepare(state);        
+       dpm_suspend_late(pmsg_suspend);
+       platform_suspend_prepare_late(state);
+       dpm_suspend_noirq(pmsg_suspend)
+               --&gt;cpuidle_pause();
+               device_wakeup_arm_wake_irqs();
+                    如果设备具有唤醒功能(dev-&gt;power.can_wakeup)那么设置唤醒标志(irqd_wakeup_state)
+                    --&gt;enable_irq_wake-&gt;irq_set_irq_wake-&gt;set_irq_wake_real-&gt;irq_set_wake-&gt;sunxi_irq_set_wake 
+                        这样传递后怎么处理？？
+                  suspend_device_irqs();
+                    --&gt;没有唤醒标志的 enable_irq_wake,  request_irq(irq, xxx_isr, flag | irqf_no_suspend, xxx, xxx)的时候，此时中断会被清除,此时切断的是irq device和irq controller之间的联系
+                        这两者的区别在于enable_irq_wake还会走到synchronize_irq(irq),等待中断处理完毕
+
+              device_suspend_noirq(dev) //处理关闭中断后的事情    
+       platform_suspend_prepare_noirq(state)            
+</code></pre><h1><span id="cpus关闭no-bootcpu">cpus(关闭no bootcpu)</span></h1><pre><code>disable_nonboot_cpus() //关闭no boot cpu
+    freeze_secondary_cpus(0)
+            _cpu_down(cpu, 1, cpuhp_offline);
+</code></pre><h1><span id="core关闭cpu中断通知arisc走休眠处理流程">core(关闭cpu中断，通知arisc走休眠处理流程)</span></h1><pre><code>arch_suspend_disable_irqs(); //此时关闭的是irq controller和cpu的联系，在这个时候中断便不能唤醒cpu了;
+     local_irq_disable();
+syscore_suspend(); 
+suspend_ops-&gt;enter(state);    
+        sunxi_suspend_enter//向小cpus传递电源相关参数
+            arm_cpuidle_suspend
+                 cpuidle_ops[cpu].suspend(index)
+                    psci_cpu_suspend_enter
+                        cpu_suspend(3, psci_suspend_finisher)
+                    svc：psci_fn_cpu_suspend
+</code></pre><h1><span id="arisc小cpu的休眠处理流程">arisc(小cpu的休眠处理流程)</span></h1><pre><code>extended_super_standby_entry(pmessage)
+    esstandby_process_init(request, para, config) 
+        dram进入自刷新；
+        将系统相关的clk切换到低频状态
+        将系统相关的电源关闭
+    get_wakeup_src(para)
+        轮询检测中断源
+</code></pre><h1><span id="休眠唤醒流程">休眠唤醒流程</span></h1><p><img src="/2018/12/13/standby/kernel_suspend/suspend_resume_trace.jpg" alt="suspend_resume_trace">                         </p>
+<h2><span id="思考题">思考题：</span></h2><p><strong>1：进行如下操作后</strong></p>
+<p>echo 1 &gt; /sys/power/wake_lock</p>
+<p>echo mem &gt; /sys/power/state</p>
+<p><strong>此时系统能否休眠？？</strong></p>
+<pre><code>能,events_check_enabled此时的值为false，故系统会直接进入休眠状态;只有上层程序在调用save_wakeup_count的时候，会去使能events_check_enabled，从这个层面讲，休眠的时候需不需要被唤醒事件打断，其实是看用户自身是否需要这种同步机制；
+</code></pre><p>有正在处理的事件inpr，为什么还要cnt作为判断进入休眠唤醒的标志呢？</p>
+<pre><code>一般而言inpr已经足够表示系统有事件在进行，不要进入休眠；引入这个条件笔者认为只是为了能更新该值，保证wakeup_event都能被统计到；
+当cnt != save_cnt 
+打印如下 last active wakeup source: axp22_wakeup_source；表明是上次是被谁影响到休眠
+</code></pre><p><strong>2: 为什么即有request_irq(irq, xxx_isr, flag | irqf_no_suspend, xxx, xxx)又有，enanle_irq_wake?</strong></p>
+<pre><code>http://www.wowotech.net/forum/viewtopic.php?id=20
+这里有相关的讨论，大意是
+这两个方法，做的是同一件事情，都是控制“request line和irq controller之间的联系”。
+irqf_no_suspend是旧方法；
+enable_irq_wake是新方法。
+之所以所有的driver都调用这两个接口，有两种可能：一是为兼容；而是不太理解，为保险起见，都调用。
+从代码上看request的时候带的参数irqf_no_suspend只能在内核休眠的时候起到阻止休眠的功能，而enable_irq_wake则可以在深度休眠后仍然能唤醒；
+当休眠到core阶段的时候cpu的irq和fiq都已关闭，但仍保存着wakeup信号线，通过wakeup信号线唤醒从而唤醒cpu,当cpu中断使能开启后再响应中断
+</code></pre><p><strong>3：怎么对休眠流程进行分解debug</strong></p>
+<pre><code>内核在休眠的流程中加入了trace point可以根据这个去定位是哪个流程去定位哪个流程异常：
+    echo 1 &gt; /sys/kernel/debug/tracing/events/power/suspend_resume/enable
+    echo &gt; /sys/kernel/debug/tracing/trace //清空trace
+    echo 1 &gt; /sys/kernel/debug/tracing/tracing_on
+    按power键进入休眠的流程
+    按power键唤醒
+    cat  /sys/kernel/debug/tracing/trace
+    查看在哪个流程就退出
+
+如当怀疑休眠流程在device_suspend中挂死的；
+可以echo devices &gt; /sys/power/pm_test
+然后修改dpm_suspend设备的休眠流程，让其逐一进入休眠后退出，观察是哪个设备休眠唤醒后系统异常；
+其他处于内核阶段的类似；
+
+如果没有异常，那么可以怀疑是否由于cpus中dram进入自刷新后异常导致；或者系统电上下电导致；或者时钟频率不稳导致；    
+在cpus中挂死，即走到arisc的休眠流程中,表现为串口log处于深度休眠，且无任何异常打印；
+在重启的log中：
+可以观察rtc寄存器的值：正常的值如下：
+[371]rtc[0] value = 0x00000000
+[374]rtc[1] value = 0x00000000
+[377]rtc[2] value = 0x00000000
+[380]rtc[3] value = 0x0000a101
+[383]rtc[4] value = 0x00000000
+[386]rtc[5] value = 0x00000000
+此时观察rtc[3],查看相关代码定位挂死的地方
+如怀疑dram导致的异常,可进行DRAM_CRC的校验，如下校验1G的空间
+usage:
+        echo  1 0x40000000 0x40000000 &gt; sys/devices/platform/soc/soc@03000000:arisc/dram_crc_paras
+
+        1:           enable
+        0x40024080:  dram crc start address
+        0xf0000:     dram crc length(byte)
+venus-a1:/ # cat ./sys/devices/platform/soc/soc@03000000:arisc/dram_crc_result
+dram info:
+ enable 0
+  error 0
+ total count 0
+error count 0
+src:40000000
+len:0x100000
+</code></pre><p><strong>4.项目经验总结</strong></p>
+<pre><code>1. 硬件需确保电源信号稳定性；
+2. 在项目开发过程中，休眠唤醒稳定性测试，在每次迭代的时候尽量做到一周进行一次多台机器休眠唤醒老化测试,测试老化的时候，应加大负载，如同时播放视频;
+   以便增加问题的复现概率 
+</code></pre><h1><span id="参考资料">参考资料</span></h1><p><a href="http://www.wowotech.net/pm_subsystem/237.html" target="_blank" rel="noopener">linux进程冻结技术</a></p>
+<p><a href="http://www.wowotech.net/pm_subsystem/suspend_and_resume.html" target="_blank" rel="noopener">Linux电源管理（6）_Generic PM之Suspend功能</a></p>
+<p><a href="http://www.wowotech.net/irq_subsystem/workqueue.html" target="_blank" rel="noopener">Concurrency Managed Workqueue之（一）：workqueue的基本概念</a></p>
+<p><a href="https://www.ibm.com/developerworks/cn/linux/l-cn-cncrrc-mngd-wkq/index.html" target="_blank" rel="noopener">Linux 的并发可管理工作队列机制探讨</a></p>
+<p><a href="http://kernel.meizu.com/linux-workqueue.html" target="_blank" rel="noopener">linux workqueue</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/13/standby/android_standby/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1633,388 +2015,6 @@ venus-a3:/ # settings list system | grep  next
 <p><a href="https://blog.csdn.net/Gaugamela/article/details/52838654" target="_blank" rel="noopener">Android7.0 PowerManagerService(3)核心函数updatePowerStateLocked的主要流程</a></p>
 <p><a href="https://blog.csdn.net/fu_kevin0606/article/details/54408094" target="_blank" rel="noopener">Android7.0 PowerManagerService亮灭屏分析(一)</a></p>
 <p><a href="https://jasper-1024.github.io/2017/08/19/linux%E7%AC%94%E8%AE%B0%E2%80%94rtc%E5%AD%90%E7%B3%BB%E7%BB%9F/" target="_blank" rel="noopener">linux笔记–rtc子系统</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/13/standby/kernel_suspend/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/13/standby/kernel_suspend/" itemprop="url">内核的休眠流程</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-13T00:07:09+00:00">
-                2018-12-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/standby/" itemprop="url" rel="index">
-                    <span itemprop="name">standby</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1><span id="内核休眠流程">内核休眠流程</span></h1><p>当安卓合适的时机(wakeup_count = save_count &amp;&amp; inpr == 0),与内核一致，在没有wakeup事件的时候，走进一步的流程，发echo mem &gt; /sys/power/state命令后，内核开始处理休眠流程</p>
-<pre><code>./kernel/power/main.c 
-state_store
-    -&gt;pm_suspend
-        -&gt;enter_state
-</code></pre><h1><span id="休眠流程">休眠流程：</span></h1><p>按照内核划分的休眠测试环节分为，FREEZER(进程冻结),DEVICES(设备休眠),PLATFORM(关闭不必要的中断),CPUS(关闭noboot cpu)，core(关闭cpu中断，通知cpus进入休眠处理流程)几个阶段</p>
-<p>kernel/power/suspend.c</p>
-<pre><code>enter_state
-    suspend_prepare(suspend_state_t state)
-    error = suspend_devices_and_enter(state);
-</code></pre><h2><span id="一test_freezer冻结流程">一：test_freezer（冻结流程）</span></h2><pre><code>suspend_prepare(suspend_state_t state)    
-        pm_prepare_console //如果需要的话重定向内核的kmsg  ??为什么要做切换
-        error = pm_notifier_call_chain(pm_suspend_prepare); //用途一：有些设备需要在freeze进程之前就suspend；用途二：如果有些设备的reseym动作需要较多的延时么么resume的时候会在进程恢复之前，会阻止所有进程的恢复？更有甚者需要设备等待某个进程的数据才能resume; 
-        //例子如下：drivers/video/fbdev/omap2/omapfb/dss/core.c
-        error = suspend_freeze_processes(); //进程冻结，将用户进程和内核线程置于“可控”的暂停状态
-</code></pre><p>在此对进程冻结进行展开描述</p>
-<h3><span id="为什么需要进程冻结">为什么需要进程冻结</span></h3><ol>
-<li>会破坏文件系统，在系统创建hibernate image到cpu down之间，如果有进程还在修改文件系统的内容，这将会导致系统恢复之后无法完全恢复文件系统；</li>
-<li>有可能导致创建hibernation image失败，创建hibernation image需要足够的内存空间，这期间如果还有进程在申请内存，就可能导致创建失败</li>
-<li>干扰设备的resume和suspend,在cpu down之前，device suspend期间，如果进程还在访问设备，尤其是访问竞争资源，就有可能引起设备suspend异常</li>
-<li>有可能导致进程感知休眠。系统休眠的理想状态下是所有任务对休眠过程无感知，睡眠之后会自动恢复工作，有些进程，需要所有cpu online才能正常工作，如果进程不冻结，那么休眠过程中就会异常；    </li>
-</ol>
-<h3><span id="冻结进程的主要流程">冻结进程的主要流程</span></h3><pre><code>suspend_freeze_processes
-——&gt;    freeze_processes()   -&gt; pm_freezing = true   
-                         -&gt;try_to_freeze_tasks -&gt;  freeze_task -&gt;  fake_signal_wake_up(p); 冻结用户进程
-
-
-
--&gt;freeze_kernel_threads()  -&gt;pm_nosig_freezing = true 
-                           -&gt;try_to_freeze_tasks -&gt; freeze_task -&gt;    freeze_workqueues_begin();   冻结workqueue;
-                                                                    wake_up_state(p, task_interruptible); 冻结内核线程
-</code></pre><p>冻结的对象：可以被调度执行的实体，包括用户进程，内核线程和workqueue.</p>
-<h4><span id="1用户进程冻结流程">1.用户进程冻结流程</span></h4><p><strong>用户进程</strong>默认是可以被冻结的，<strong>借助信号处理机制</strong>,设置任务的tif_sigpending位，但不传递系统，然后唤醒任务；这样任务在返回用户态时就会进入信号处理流程，检查系统freeze状态，并做相应的处理；</p>
-<pre><code>fake_signal_wake_up -&gt; signal_wake_up(p, 0) -&gt; signal_wake_up_state(t, resume ? task_wakekill : 0); 
-                                                    -&gt; set_tsk_thread_flag(t, tif_sigpending);
-</code></pre><p><strong>信号的处理时机</strong></p>
-<p>理解信号异步机制的关键是信号的响应时机，我们对一个进程发送一个信号后，其实并没有硬中断发生，只是简单把信号挂载到目标进程的信号pending队列上去，信号真正得到执行的时机是进程执行完异常/中断返回到用户态的时刻；</p>
-<p>让信号看起来是一个异步中断的关键是,正常的用户进程是会频繁的在用户态和内核态之间切换的（这种切换包括：系统调用，缺页异常，系统中断..）,所以信号能很快得到执行。这样也带来一个问题，内核进程是不响应信号的，除非它刻意的去查询。所以通常情况下我们无法通过kill命令去杀死一个内核进程；</p>
-<p><strong>信号响应时机：</strong></p>
-<p><img src="/2018/12/13/standby/kernel_suspend/信号响应时机.jpg" alt="信号响应时机"></p>
-<pre><code>arch/arm64/kernel/signal.c    
-do_notify_resume -&gt; do_signal(regs) -&gt; get_signal
-                                            task_work_run
-                                            try_to_freeze
-
-                                    -&gt; handle_signal
-</code></pre><h4><span id="2内核线程冻结">2.内核线程冻结</span></h4><p><strong>内核线程和workqueue</strong>默认是不能被冻结的，少数内核线程和workqueue在创建的时指定了freezable标志。这些任务需要对freeze状态进行判断，当系统进入freezing时，可以通过调用freezing来判断freezing状态，<strong>并主动调用</strong>，try_to_freeze进入冻结；</p>
-<pre><code>代码范例如下：
-static int autohotplug_thread_task(void *data)
-{
-    set_freezable();
-    while (1) {
-            if (freezing(current)) {
-                    if (try_to_freeze())
-                            continue;
-            }    
-
-            if (hotplug_enable)
-                    autohotplug_governor_judge();
-
-            set_current_state(task_interruptible);
-            schedule();
-            if (kthread_should_stop())
-                    break;
-            set_current_state(task_running);
-    }    
-
-    return 0;
-}
-</code></pre><h4><span id="3workqueue冻结">3.workqueue冻结</span></h4><p>work_queue通过max_active属性，<strong>如果max_active=0则不能入队新的work</strong>,所有的work延后执行；</p>
-<pre><code>freeze_workqueues_begin -&gt;     workqueue_freezing = true; 
-                            pwq_adjust_max_active(pwq); 
-                                -&gt; pwq-&gt;max_active = 0;
-
-schedule_work -&gt; queue_work -&gt; queue_work_on -&gt;
- __queue_work 
-    ...
-    如果还没有达到max_active,将work挂载到worklist
-          if (likely(pwq-&gt;nr_active &lt; pwq-&gt;max_active)) {
-                trace_workqueue_activate_work(work);
-                pwq-&gt;nr_active++;
-                worklist = &amp;pwq-&gt;pool-&gt;worklist;
-                if (list_empty(worklist))
-                        pwq-&gt;pool-&gt;watchdog_ts = jiffies;
-       否则将work挂载到临时队列 pwq-&gt;delayed_works
-            } else {
-                work_flags |= work_struct_delayed;
-                worklist = &amp;pwq-&gt;delayed_works;
-            }                       
-  ...
-</code></pre><h3><span id="冻结进程何时被打断">冻结进程何时被打断</span></h3><p>进程怎么阻止休眠：无论通过wake_lock接口，__pm_stay_awake等，最终调用的都是wakeup_source_activate，都是增加inpr表示有事件在处理不准休眠；</p>
-<pre><code>wakeup_source_activate
-    /* increment the counter of events in progress. */
-    cec = atomic_inc_return(&amp;combined_event_count);   也即解下来要讲的变量inpr
-
-在系统休眠过程中：上层会判断cnt == saved_count, inpr == 0；底层也是如此
- bool pm_wakeup_pending(void)                                                                                     
- {                                                                                                                
-     unsigned long flags;                                                                                     
-     bool ret = false;                                                                                        
-
-     spin_lock_irqsave(&amp;events_lock, flags);                                                                  
-     printk(&quot;++%s %d++\n&quot;,__func__, events_check_enabled);                                                    
-     if (events_check_enabled) {                                                                              
-             unsigned int cnt, inpr;                                                                          
-
-             split_counters(&amp;cnt, &amp;inpr);    
-             用户空间还有内核都是判断这两个变量；如果写入的值和cnt不同，说明读写的过程中出现产生了events；
-             inpr表示用唤醒事件在处理，这两种都会阻止系统休眠                                                                
-             ret = (cnt != saved_count || inpr &gt; 0);                                                          
-             events_check_enabled = !ret;                                                                     
-             printk(&quot;+++%s cnt:%d saved_count:%d inpr:%d ret:%d++\n&quot;,__func__, cnt, saved_count, inpr, ret);  
-     }                                                                                                        
-     spin_unlock_irqrestore(&amp;events_lock, flags);                                                             
-
-     if (ret) {                                                                                               
-             pr_info(&quot;pm: wakeup pending, aborting suspend\n&quot;);                                               
-             pm_print_active_wakeup_sources();                                                                
-     }                                                                                                        
-
-     return ret || pm_abort_suspend;                                                                          
- }
-</code></pre><h1><span id="device_suspend设备休眠">device_suspend(设备休眠)</span></h1><pre><code>suspend_devices_and_enter
---&gt; platform_suspend_begin
-    suspend_console();
-    dpm_suspend_start(pmsg_suspend);
-        --&gt;dpm_prepare(state);
-        --&gt;dpm_suspend(state);
-            device_suspend(dev);    
-                --&gt;async_schedule(async_suspend, dev); 
-                //在设备中如果通过device_enable_async_suspend设置过，async_schedule使设备走异步的休眠唤醒流程；
-                --&gt;__device_suspend(dev, pm_transition, false);
-                        dpm_watchdog_set//设置超时watchdog，若休眠时间过长，则打印打钱的设置和函数栈默认超时时间为120s
-                --&gt;    dpm_run_callback(callback, dev, state, info);    
-                        由于设备模型有bus、driver、device等多个层级，而suspend接口可能由任意一个层级实现。这里的优先顺序
-                        是指，只要优先级高的层级注册了suspend，就会优先使用它，而不会使用优先级低的prepare。优先顺序为：dev-&gt;pm_domain-&gt;ops、dev-&gt;type-&gt;pm、dev-&gt;class-&gt;pm、dev-&gt;bus-&gt;pm、dev-&gt;driver-&gt;pm（这个优先顺序同样适用于其它callbacks）。 
-</code></pre><h1><span id="platform关闭不需要唤醒的中断">platform（关闭不需要唤醒的中断）</span></h1><pre><code>suspend_enter(state, &amp;wakeup);
-    --&gt;platform_suspend_prepare(state);        
-       dpm_suspend_late(pmsg_suspend);
-       platform_suspend_prepare_late(state);
-       dpm_suspend_noirq(pmsg_suspend)
-               --&gt;cpuidle_pause();
-               device_wakeup_arm_wake_irqs();
-                    如果设备具有唤醒功能(dev-&gt;power.can_wakeup)那么设置唤醒标志(irqd_wakeup_state)
-                    --&gt;enable_irq_wake-&gt;irq_set_irq_wake-&gt;set_irq_wake_real-&gt;irq_set_wake-&gt;sunxi_irq_set_wake 
-                        这样传递后怎么处理？？
-                  suspend_device_irqs();
-                    --&gt;没有唤醒标志的 enable_irq_wake,  request_irq(irq, xxx_isr, flag | irqf_no_suspend, xxx, xxx)的时候，此时中断会被清除,此时切断的是irq device和irq controller之间的联系
-                        这两者的区别在于enable_irq_wake还会走到synchronize_irq(irq),等待中断处理完毕
-
-              device_suspend_noirq(dev) //处理关闭中断后的事情    
-       platform_suspend_prepare_noirq(state)            
-</code></pre><h1><span id="cpus关闭no-bootcpu">cpus(关闭no bootcpu)</span></h1><pre><code>disable_nonboot_cpus() //关闭no boot cpu
-    freeze_secondary_cpus(0)
-            _cpu_down(cpu, 1, cpuhp_offline);
-</code></pre><h1><span id="core关闭cpu中断通知arisc走休眠处理流程">core(关闭cpu中断，通知arisc走休眠处理流程)</span></h1><pre><code>arch_suspend_disable_irqs(); //此时关闭的是irq controller和cpu的联系，在这个时候中断便不能唤醒cpu了;
-     local_irq_disable();
-syscore_suspend(); 
-suspend_ops-&gt;enter(state);    
-        sunxi_suspend_enter//向小cpus传递电源相关参数
-            arm_cpuidle_suspend
-                 cpuidle_ops[cpu].suspend(index)
-                    psci_cpu_suspend_enter
-                        cpu_suspend(3, psci_suspend_finisher)
-                    svc：psci_fn_cpu_suspend
-</code></pre><h1><span id="arisc小cpu的休眠处理流程">arisc(小cpu的休眠处理流程)</span></h1><pre><code>extended_super_standby_entry(pmessage)
-    esstandby_process_init(request, para, config) 
-        dram进入自刷新；
-        将系统相关的clk切换到低频状态
-        将系统相关的电源关闭
-    get_wakeup_src(para)
-        轮询检测中断源
-</code></pre><h1><span id="休眠唤醒流程">休眠唤醒流程</span></h1><p><img src="/2018/12/13/standby/kernel_suspend/suspend_resume_trace.jpg" alt="suspend_resume_trace">                         </p>
-<h2><span id="思考题">思考题：</span></h2><p><strong>1：进行如下操作后</strong></p>
-<p>echo 1 &gt; /sys/power/wake_lock</p>
-<p>echo mem &gt; /sys/power/state</p>
-<p><strong>此时系统能否休眠？？</strong></p>
-<pre><code>能,events_check_enabled此时的值为false，故系统会直接进入休眠状态;只有上层程序在调用save_wakeup_count的时候，会去使能events_check_enabled，从这个层面讲，休眠的时候需不需要被唤醒事件打断，其实是看用户自身是否需要这种同步机制；
-</code></pre><p>有正在处理的事件inpr，为什么还要cnt作为判断进入休眠唤醒的标志呢？</p>
-<pre><code>一般而言inpr已经足够表示系统有事件在进行，不要进入休眠；引入这个条件笔者认为只是为了能更新该值，保证wakeup_event都能被统计到；
-当cnt != save_cnt 
-打印如下 last active wakeup source: axp22_wakeup_source；表明是上次是被谁影响到休眠
-</code></pre><p><strong>2: 为什么即有request_irq(irq, xxx_isr, flag | irqf_no_suspend, xxx, xxx)又有，enanle_irq_wake?</strong></p>
-<pre><code>http://www.wowotech.net/forum/viewtopic.php?id=20
-这里有相关的讨论，大意是
-这两个方法，做的是同一件事情，都是控制“request line和irq controller之间的联系”。
-irqf_no_suspend是旧方法；
-enable_irq_wake是新方法。
-之所以所有的driver都调用这两个接口，有两种可能：一是为兼容；而是不太理解，为保险起见，都调用。
-从代码上看request的时候带的参数irqf_no_suspend只能在内核休眠的时候起到阻止休眠的功能，而enable_irq_wake则可以在深度休眠后仍然能唤醒；
-当休眠到core阶段的时候cpu的irq和fiq都已关闭，但仍保存着wakeup信号线，通过wakeup信号线唤醒从而唤醒cpu,当cpu中断使能开启后再响应中断
-</code></pre><p><strong>3：怎么对休眠流程进行分解debug</strong></p>
-<pre><code>内核在休眠的流程中加入了trace point可以根据这个去定位是哪个流程去定位哪个流程异常：
-    echo 1 &gt; /sys/kernel/debug/tracing/events/power/suspend_resume/enable
-    echo &gt; /sys/kernel/debug/tracing/trace //清空trace
-    echo 1 &gt; /sys/kernel/debug/tracing/tracing_on
-    按power键进入休眠的流程
-    按power键唤醒
-    cat  /sys/kernel/debug/tracing/trace
-    查看在哪个流程就退出
-
-如当怀疑休眠流程在device_suspend中挂死的；
-可以echo devices &gt; /sys/power/pm_test
-然后修改dpm_suspend设备的休眠流程，让其逐一进入休眠后退出，观察是哪个设备休眠唤醒后系统异常；
-其他处于内核阶段的类似；
-
-如果没有异常，那么可以怀疑是否由于cpus中dram进入自刷新后异常导致；或者系统电上下电导致；或者时钟频率不稳导致；    
-在cpus中挂死，即走到arisc的休眠流程中,表现为串口log处于深度休眠，且无任何异常打印；
-在重启的log中：
-可以观察rtc寄存器的值：正常的值如下：
-[371]rtc[0] value = 0x00000000
-[374]rtc[1] value = 0x00000000
-[377]rtc[2] value = 0x00000000
-[380]rtc[3] value = 0x0000a101
-[383]rtc[4] value = 0x00000000
-[386]rtc[5] value = 0x00000000
-此时观察rtc[3],查看相关代码定位挂死的地方
-如怀疑dram导致的异常,可进行DRAM_CRC的校验，如下校验1G的空间
-usage:
-        echo  1 0x40000000 0x40000000 &gt; sys/devices/platform/soc/soc@03000000:arisc/dram_crc_paras
-
-        1:           enable
-        0x40024080:  dram crc start address
-        0xf0000:     dram crc length(byte)
-venus-a1:/ # cat ./sys/devices/platform/soc/soc@03000000:arisc/dram_crc_result
-dram info:
- enable 0
-  error 0
- total count 0
-error count 0
-src:40000000
-len:0x100000
-</code></pre><p><strong>4.项目经验总结</strong></p>
-<pre><code>1. 硬件需确保电源信号稳定性；
-2. 在项目开发过程中，休眠唤醒稳定性测试，在每次迭代的时候尽量做到一周进行一次多台机器休眠唤醒老化测试,测试老化的时候，应加大负载，如同时播放视频;
-   以便增加问题的复现概率 
-</code></pre><h1><span id="参考资料">参考资料</span></h1><p><a href="http://www.wowotech.net/pm_subsystem/237.html" target="_blank" rel="noopener">linux进程冻结技术</a></p>
-<p><a href="http://www.wowotech.net/pm_subsystem/suspend_and_resume.html" target="_blank" rel="noopener">Linux电源管理（6）_Generic PM之Suspend功能</a></p>
-<p><a href="http://www.wowotech.net/irq_subsystem/workqueue.html" target="_blank" rel="noopener">Concurrency Managed Workqueue之（一）：workqueue的基本概念</a></p>
-<p><a href="https://www.ibm.com/developerworks/cn/linux/l-cn-cncrrc-mngd-wkq/index.html" target="_blank" rel="noopener">Linux 的并发可管理工作队列机制探讨</a></p>
-<p><a href="http://kernel.meizu.com/linux-workqueue.html" target="_blank" rel="noopener">linux workqueue</a></p>
 
           
         
@@ -2525,6 +2525,192 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/cpu/cpu概述/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/25/cpu/cpu概述/" itemprop="url">CPU概述</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index">
+                    <span itemprop="name">cpu</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <!-- toc-aside -->
+<h1><span id="cpu-topology">cpu topology</span></h1><h2><span id="11-cpu拓扑">1.1. cpu拓扑</span></h2><p><strong>cluster(socket)-&gt;core-&gt;Threads(目前为止arm没有提出多线程的概念)</strong><br><img src="/2018/06/25/cpu/cpu概述/cpu拓扑.png" alt="cpu拓扑图"> </p>
+<h2><span id="12-多核技术">1.2 多核技术</span></h2><p>  基于制程，扩充性等考虑，芯片厂商会把多个core封装在一个chip上，称为socket。socket的概念在X86架构上使用尤其多，可以理解为插槽；<br>假设一个插槽上有两个core,那么我在主板上插2个插槽，就是4核系统，插上4个插槽就是8核；arm的话则是另外一个概念cluster,簇<br>  在X86架构的PC上，唯一目的的话是提高CPU的处理性能（不在乎功耗），但在移动市场中（大多是arm），性能提高后，对应着就更多的power消耗；对于设备电源管理以及散热提出了更高的要求。与此同时电池并没有随着CPU的拓扑的进化而进化，于是HMP技术就被提出来了；</p>
+<h2><span id="13hmpheterogeneous-multi-processing">1.3HMP(Heterogeneous Multi-Processing)</span></h2><p><strong>big-little:</strong></p>
+<ul>
+<li>在一个chip中封装两类ARM Core,以kirin 960为例:一类为高性能Core,4核ARM A73，最高主频为2.4G，一类为低性能Core,4核ARM A53，最高主频为1.8G<br><img src="/2018/06/25/cpu/cpu概述/kirin960.png" alt="cpu拓扑图"></li>
+</ul>
+<p><strong>DynamIQ:</strong></p>
+<ul>
+<li>在单一cluster内可有8个核心，且可由不同架构，时钟的核心组成，提升了运作效率与配置的弹性,如高通的845 4核ARM A75，最高为2.8，4核 ARM A55，最高为1.8G</li>
+</ul>
+<p><strong>DynamIQ较big-little好处:</strong></p>
+<ol>
+<li>单cluster可有8核心</li>
+<li>cluster可搭配不同架构的CPU</li>
+<li>各cpu可有独立的运作时钟</li>
+<li>CPU各自开关休眠互不影响</li>
+<li>依照效能需求弹性运用各核心</li>
+</ol>
+<p>以龙舟比喻ARM的DynamIQ与先前的big.LITTLE技术，我们把龙舟当成cluster,船员当成core,那么big.LITTLE龙舟上只能有4个船员，而且每个船员身材需要一样（核心架构），划船的时候若多位船员一起划船时，每个人的出力均等(频率一致),不能有人慢划或者快划;<br>当使用DynamIQ时，每艘船（cluster）上可以有8位高低胖瘦不等(架构)的船员（core），换船频率可以不等，且船员可以依照指令睡觉（关闭）,休息（休眠），或划船（运作）；</p>
+<h1><span id="cpu内核代码框架">cpu内核代码框架</span></h1><ol>
+<li><a href="./cpu_init.md">系统启动时，CPU core的初始化，信息获取</a></li>
+<li>系统启动时，CPU core的启动（enable）</li>
+<li>系统运行过程中，根据当前负荷，动态enable/disable 某些CPU core,以便在性能与功耗间平衡</li>
+<li>cpu core的hotplug支持，所谓的hotplug,是可以在系统运行的过程中，动态的增加或者减少CPU core(可以是物理上，也可以是逻辑上)</li>
+<li>系统运行过程中CPU idle管理</li>
+<li>系统运行过程中，根据当前负荷，动态的调整CPU core的电压和频率，以便在性能和功耗之间平衡</li>
+</ol>
+<p><img src="/2018/06/25/cpu/cpu概述/cpu代码框架.png" alt="cpu拓扑图"><br>arch-depedent部分位于”arch\arm64\kernel”负责平台相关的控制操作，包括</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu 信息的获取（cpuinfo）</span><br><span class="line">cpu拓扑结构的获取（cpu topology）</span><br><span class="line">底层的CPU操作（init,disable等）的实现，cpu ops</span><br><span class="line">SMP相关的初始化（smp）</span><br></pre></td></tr></table></figure>
+<p>arch-independent负责实现平台无关的抽象，包括</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu control模块，屏蔽底层平台相关实现细节，提供控制CPU(enable,disable等)的统一API，供系统启动，进程调度等模块调用</span><br><span class="line">cpu subsystem driver像用户空间提供CPU hotplug有关的功能；</span><br><span class="line">cpuidle,处理CPU idle有关的逻辑</span><br><span class="line">cpufreq 处理CPU frequency调整有关的逻辑</span><br></pre></td></tr></table></figure>
+<h1><span id="cpu的状态表示">cpu的状态表示</span></h1><ol>
+<li><strong>possible CPU:</strong> 就是在DTS中指定了的，物理存在的CPU core</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;boot_cpu_init-&gt;smp_process_id用于获取cpu id</span><br><span class="line">		           -&gt;set_cpu_xxx,用于将指定的CPU设置为（或清除）指定状态</span><br><span class="line">	    -&gt;setup_arch-&gt;smp_init_cpus-&gt;sunxi_smp_init_cpus-&gt;set_cpu_possible(i, true)</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li><strong>present cpu:</strong> 被kernel标识的，具备执行代码条件，后续可以在需要的时候（如hotplug的时候），启动该CPU </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;rest_init-&gt;kernel_init-&gt;kernel_init_freeable</span><br><span class="line">				     -&gt;smp_prepare_cpus</span><br><span class="line">			     	if (cpu_prepare(cpu)) /**/</span><br><span class="line">					set_cpu_present(cpu,true);</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li><strong>online CPU:</strong> 某个CPU是present的，不一定是boot,所谓CPU boot,就是让CPU执行（取指译码/执行）代码</li>
+<li><strong>active CPU</strong> 只是为了方便调度器操作</li>
+</ol>
+<h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cool3c.com/article/124149" target="_blank" rel="noopener">一图看懂ARM DynamIQ运作原理</a><br><a href="http://www.wowotech.net/pm_subsystem/cpu_core_pm_overview.html" target="_blank" rel="noopener">Linux CPU core的电源管理(1)概述</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/cpu/cpu_freq/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2620,169 +2806,6 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
           
             <h1><span id="代码主要的功能">代码主要的功能</span></h1><p>1) 平台相关的初始化动作，包括CPU core的clock/regulator获取，初始化<br>2) 生成frequency table,即 CPU core所支持的频率/电压列表。并在初始化的时候将该table保存在policy<br>3) 定义一个strcut cpufreq_driver变量，填充必要的字段，并根据平台的特性，实现其中的回调函数；<br>4) 调用cpufreq_register_driver将driver注册到cpufreq framework中<br>5) cpufreq core会在CPU设备添加时，调用driver的init接口。driver需要在接口中初始化struct cpufreq变量<br>6) 系统运行过程中，cpufreq core会根据实际情况，调用driver的sepolicy或者target/target_index等接口，设置<br>CPU的调频策略或者频率值<br>7) 系统suspend的时候，会将CPU的频率设置为指定的值，或者调用driver的suspend回调函数；系统resume时调用driver的resume回调函数；</p>
 <h1><span id="cpufreq-driver">cpufreq driver</span></h1><p>frequency table是CPU core可以正确运行的一组频率/电压组合</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/process/process_day1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/25/process/process_day1/" itemprop="url">进程初识</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
-                2018-06-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/进程/" itemprop="url" rel="index">
-                    <span itemprop="name">进程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1><span id="一进程结构体">一：进程结构体</span></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">声明目录：include/linux/sched.h</span><br></pre></td></tr></table></figure>
-<h2><span id="进程的状态">进程的状态</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">volatile long state; /* -1 unrunnable, 0 runnable, &gt;0 stopped */ </span><br><span class="line">//1. R:运行(正在运行或在运行队列中等待)</span><br><span class="line">//2. S:中断(休眠中，受阻，在等待某个条件形成或接受到信号)</span><br><span class="line">//3. D:不可中断(收到信号不唤醒和不可运行，进程必须等待直到有中断发生): </span><br><span class="line">//4. T:僵死(进程已终止，但进程描述符存在，直到父进程调用wait4()系统调用后释放)</span><br><span class="line">//5. Z:停止(进程收到SIGSTOP,STGSTP,SIGIN,SIGOU信号后停止运行)</span><br></pre></td></tr></table></figure>
-<p><img src="/2018/06/25/process/process_day1/process_life.jpg" alt="进程的生命周期"></p>
-<h2><span id="进程的进程标识">进程的进程标识</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pid_t pid;</span><br><span class="line">pid_t tgid;</span><br></pre></td></tr></table></figure>
-<p>在linux系统中，所有进程都有直接或间接的联系，每个进程都有其父进程<br>linux把不同的pid与系统中的每个进程或轻量级线程关联，一个线程组所有线程与零头线程具有相同的pid,存入tgid中；</p>
-<h2><span id="进程标记">进程标记</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">unsigned int flags;</span><br></pre></td></tr></table></figure>
-<p>反应进程状态信息,但不是运行状态，用于内核识别进程当前的状态，以备下一步操作</p>
-<h2><span id="表示进程亲属关系的成员">表示进程亲属关系的成员</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">/*  </span><br><span class="line"> * pointers to (original) parent process, youngest child, younger sibling,</span><br><span class="line"> * older sibling, respectively.  (p-&gt;father can be replaced with</span><br><span class="line"> * p-&gt;real_parent-&gt;pid)</span><br><span class="line"> */</span><br><span class="line"> struct task_struct __rcu *real_parent; /* real parent process */</span><br><span class="line"> struct task_struct __rcu *parent; /* recipient of SIGCHLD, wait4() reports */</span><br><span class="line">/*   </span><br><span class="line"> * children/sibling forms the list of my natural children</span><br><span class="line">*/</span><br><span class="line"> struct list_head children;      /* list of my children */</span><br><span class="line"> struct list_head sibling;       /* linkage in my parent&apos;s children list */</span><br><span class="line"> struct task_struct *group_leader;       /* threadgroup leader */</span><br></pre></td></tr></table></figure>
-<h2><span id="进程内核栈">进程内核栈</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">struct thread_info thread_info;</span><br><span class="line">void *stack;</span><br></pre></td></tr></table></figure>
-<h2><span id="ptrace系统调用">ptrace系统调用</span></h2><p>提供一种父进程可以控制子进程运行,并可以检查和改变它的核心image;</p>
-<h2><span id="优先级">优先级</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">int prio,保存静态优先级，可以通过nice系统调用来进行修改</span><br><span class="line">rt_prority,用于保存实时优先级</span><br><span class="line">normal_prio 取决于静态优先级和调度策略</span><br><span class="line">prio 用于保存动态优先级</span><br></pre></td></tr></table></figure>
-<h2><span id="调度策略相关字段">调度策略相关字段</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">policy 调度策略</span><br><span class="line">sched_class 调度类</span><br></pre></td></tr></table></figure>
-<h1><span id="task_struct的初始化">task_struct的初始化</span></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">__mmap_switched_data  arch/arm/kernel/head-common.S</span><br><span class="line">  --&gt;__mmap_switched_data</span><br><span class="line">     --&gt;.long   init_thread_union + THREAD_START_SP @ sp</span><br><span class="line">         --&gt; INIT_THREAD_INFO(init_task) init/init_task</span><br></pre></td></tr></table></figure>
-<p><code>`</code></p>
-<h1><span id="init进程">init进程</span></h1><p>linux下有3个特殊的进程，idle进程（PID=0）,init进程(PID=1)和kthreadd(PID=2)<br><em>ilde进程由系统自动创建，运行在内核态<br>idle进程其pid=0,其前身是系统创建的第一个进程，也是唯一一个没有通过fork或者kernel_thread产生的进程。完成加载系统后，演变成为进程调度，交换;
-</em>init进程由idle通过kernel_thread创建，在内核空间中完成初始化后，加载init程序;</p>
-<h1><span id="三僵尸进程">三：僵尸进程</span></h1><h1><span id="其他">其他</span></h1><p> 当一个进程在执行时，CPU的所有寄存器中的值，进程的状态以及堆栈中的内容被称为该进程中的上下文。当内核需要切换到另外一个进程时，它需要保存当前的所有状态，即保存当前进程的上下文;以便在再次执行该进程时，能够必得到切换时的状态执行下去。在linux中，当前进程上下文均保存在任务数据结构中；<br> 当发生中断时，内核就在被中断的上下文中，在内核态下执行中断服务历程。但同时会保留所有需要用到的资源，以便中继服务结束时能恢复被中断进程的执行；</p>
-<h1><span id="进程优先级">进程优先级</span></h1><p>设置SCHED_FIFO和50 RT优先级</p>
-<p>#chrt -f -a -p 50 10576<br>设置nice</p>
-<p>#renice -n -5 -g 9394</p>
-<p>#nice -n 5 ./a.out</p>
-<h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.ibm.com/developerworks/cn/linux/l-cn-scheduler/index.html" target="_blank" rel="noopener">linux调度器发展简述</a><br><a href="https://blog.csdn.net/gatieme/article/details/51383272" target="_blank" rel="noopener">linux进程描述符task_struct结构体详解–linux进程的管理与调度(一)</a><br><a href="https://blog.csdn.net/gatieme/article/details/51484562" target="_blank" rel="noopener">Linux下0号进程的前世(init_task进程)今生(idle进程)—-Linux进程的管理与调度（五）</a></p>
 
           
         
