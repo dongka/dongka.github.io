@@ -1955,6 +1955,7 @@ PARTIAL_WAKE_LOCK              &apos;messaging_service_start_wakelock&apos;
       cat /sys/kernel/debug/wakeup_sources
 上层传向底层的锁
 cat /sys/power/wake_lock
+当这几步查找后都没有对应的锁时，可以通过/sys/power/pm_test结点,操作设备进入对应的休眠阶段，详见linux休眠篇章
 </code></pre><p><strong>进入深度休眠后被唤醒问题debug</strong></p>
 <pre><code>一般而言，平台会提供深度休眠后如何查看系统唤醒源，如全志平台的查看方式为
     一：休眠的时候不关闭终端

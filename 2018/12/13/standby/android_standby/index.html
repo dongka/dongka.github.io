@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="知识总结">
 <meta property="og:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-05-22T04:14:10.254Z">
+<meta property="og:updated_time" content="2019-07-11T03:34:07.484Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓休眠流程">
 <meta name="twitter:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
@@ -627,6 +627,7 @@ PARTIAL_WAKE_LOCK              &apos;messaging_service_start_wakelock&apos;
       cat /sys/kernel/debug/wakeup_sources
 上层传向底层的锁
 cat /sys/power/wake_lock
+当这几步查找后都没有对应的锁时，可以通过/sys/power/pm_test结点,操作设备进入对应的休眠阶段，详见linux休眠篇章
 </code></pre><p><strong>进入深度休眠后被唤醒问题debug</strong></p>
 <pre><code>一般而言，平台会提供深度休眠后如何查看系统唤醒源，如全志平台的查看方式为
     一：休眠的时候不关闭终端
