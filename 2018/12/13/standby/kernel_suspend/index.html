@@ -89,7 +89,7 @@
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2018/12/13/standby/kernel_suspend/信号响应时机.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/12/13/standby/kernel_suspend/suspend_resume_trace.jpg">
-<meta property="og:updated_time" content="2018-12-23T11:24:37.113Z">
+<meta property="og:updated_time" content="2019-07-12T08:50:40.093Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="内核的休眠流程">
 <meta name="twitter:description" content="内核休眠流程当安卓合适的时机(wakeup_count = save_count &amp;amp;&amp;amp; inpr == 0),与内核一致，在没有wakeup事件的时候，走进一步的流程，发echo mem &amp;gt; /sys/power/state命令后，内核开始处理休眠流程 ./kernel/power/main.c  state_store     -&amp;gt;pm_suspend">
@@ -536,17 +536,8 @@ enable_irq_wake是新方法。
 之所以所有的driver都调用这两个接口，有两种可能：一是为兼容；而是不太理解，为保险起见，都调用。
 从代码上看request的时候带的参数irqf_no_suspend只能在内核休眠的时候起到阻止休眠的功能，而enable_irq_wake则可以在深度休眠后仍然能唤醒；
 当休眠到core阶段的时候cpu的irq和fiq都已关闭，但仍保存着wakeup信号线，通过wakeup信号线唤醒从而唤醒cpu,当cpu中断使能开启后再响应中断
-</code></pre><p><strong>3：怎么对休眠流程进行分解debug</strong></p>
-<pre><code>内核在休眠的流程中加入了trace point可以根据这个去定位是哪个流程去定位哪个流程异常：
-    echo 1 &gt; /sys/kernel/debug/tracing/events/power/suspend_resume/enable
-    echo &gt; /sys/kernel/debug/tracing/trace //清空trace
-    echo 1 &gt; /sys/kernel/debug/tracing/tracing_on
-    按power键进入休眠的流程
-    按power键唤醒
-    cat  /sys/kernel/debug/tracing/trace
-    查看在哪个流程就退出
-
-如当怀疑休眠流程在device_suspend中挂死的；
+</code></pre><p><strong>3：怎么对休眠流程进行分解debug</strong><br>    查看内核锁的申请释放流程：<br>        echo 1 &gt; /sys/kernel/debug/tracing/events/power/wakeup_source_activate/enable<br>        echo 1 &gt; /sys/kernel/debug/tracing/events/power/wakeup_source_deactivate/enable<br>        echo &gt; /sys/kernel/debug/tracing/trace //清空trace<br>        echo 1 &gt; /sys/kernel/debug/tracing/tracing_on<br>        cat  /sys/kernel/debug/tracing/trace<br>    内核在休眠的流程中加入了trace point可以根据这个去定位是哪个流程去定位哪个流程异常：<br>        echo 1 &gt; /sys/kernel/debug/tracing/events/power/suspend_resume/enable<br>        echo &gt; /sys/kernel/debug/tracing/trace //清空trace<br>        echo 1 &gt; /sys/kernel/debug/tracing/tracing_on<br>        按power键进入休眠的流程<br>        按power键唤醒<br>        cat  /sys/kernel/debug/tracing/trace<br>        查看在哪个流程就退出</p>
+<pre><code>如当怀疑休眠流程在device_suspend中挂死的；
 可以echo devices &gt; /sys/power/pm_test
 然后修改dpm_suspend设备的休眠流程，让其逐一进入休眠后退出，观察是哪个设备休眠唤醒后系统异常；
 其他处于内核阶段的类似；
@@ -616,8 +607,8 @@ len:0x100000
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/12/13/standby/android_standby/" rel="next" title="安卓休眠流程">
-                <i class="fa fa-chevron-left"></i> 安卓休眠流程
+              <a href="/2018/11/17/cpu/arm体系架构的发展/" rel="next" title="ARM体系架构概述">
+                <i class="fa fa-chevron-left"></i> ARM体系架构概述
               </a>
             
           </div>
@@ -626,8 +617,8 @@ len:0x100000
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/02/27/display/display_hardware/" rel="prev" title="显示硬件篇">
-                显示硬件篇 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/12/13/standby/android_standby/" rel="prev" title="安卓休眠流程">
+                安卓休眠流程 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
