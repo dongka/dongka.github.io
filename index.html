@@ -1689,8 +1689,7 @@ goToSleepNoUpdateLocked
     GO_TO_SLEEP_REASON_ACCESSIBILITY//Going to sleep by an accessibility service request
     如果不是以上几种情况，则默认为应用导致的休眠：
     GO_TO_SLEEP_REASON_APPLICATION//Going to sleep by application request
-</code></pre><p><strong>2.nap：</strong>进入屏保</p>
-<p><strong>3.wakeup：</strong>唤醒</p>
+</code></pre><p><strong>2.nap：</strong>进入屏保<br>    默认屏幕超时后进入休眠，如果希望进入的是屏保模式<br>    则需要在overlay/frameworks/base/core/res/res/values/config.xml中将屏保模式打开<br>    <bool name="config_dreamsActivatedOnSleepByDefault">true</bool><br><strong>3.wakeup：</strong>唤醒</p>
 <pre><code>wakeUpNoUpdateLocked
 从以下状态中唤醒,reason不固定：
     WAKEFULNESS_ASLEEP:
