@@ -365,7 +365,7 @@
 <li><p>Android 系统在特定情况下与App之间的消息通信</p>
 </li>
 </ol>
-<p>​    <strong>常用方法：Broadcast Receiver</strong></p>
+<p>​    <strong>常用方法：PendingIntent</strong></p>
 <p>​    <strong>原理图：</strong></p>
 <p><em>**</em>        <img src="/2019/07/18/standby/alarm/Brocast_Receive.png" alt="1562056294011"></p>
 <p>​        </p>
@@ -420,7 +420,7 @@
 <p><strong>如图为batch的形成过程：</strong></p>
 <p><img src="/2019/07/18/standby/alarm/batch.png" alt="1562911201925"></p>
 <h2><span id="闹钟时间分发">闹钟时间分发</span></h2><p>对于时间事件的分发，我们主要看<strong>AlarmThread</strong></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">AlarmThread</span> <span class="title">extends</span> <span class="title">Thread</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> result = waitForAlarm();</span><br><span class="line">        <span class="keyword">if</span> (WAKEUP_STATS) &#123;</span><br><span class="line">        ...</span><br><span class="line">            <span class="comment">//可以记录一天内的闹钟唤醒历史，可以用来统计闹钟优化的程度；</span></span><br><span class="line">            recordWakeupAlarms(mAlarmBatches, nowELAPSED, nowRTC);</span><br><span class="line">        ...</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//查找alarm列表中是否存在可以将系统从idle状态中唤醒的alarm,如果存在则返回true,</span></span><br><span class="line">        <span class="comment">//并获取闹钟列表</span></span><br><span class="line">        boolean hasWakeup = triggerAlarmsLocked(triggerList, nowELAPSED);</span><br><span class="line">        <span class="comment">//主要的派发流程</span></span><br><span class="line">        deliverAlarmsLocked(triggerList, nowELAPSED);</span><br><span class="line">        这几个在<span class="built_in">set</span>的时候也会被调用不再赘述</span><br><span class="line">        reorderAlarmsBasedOnStandbyBuckets(triggerPackages);</span><br><span class="line">        rescheduleKernelAlarmsLocked();</span><br><span class="line">        updateNextAlarmClockLocked();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">AlarmThread</span> <span class="title">extends</span> <span class="title">Thread</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> result = waitForAlarm();</span><br><span class="line">        <span class="keyword">if</span> (WAKEUP_STATS) &#123;</span><br><span class="line">        ...</span><br><span class="line">            <span class="comment">//可以记录一天内的闹钟唤醒历史，可以用来统计闹钟优化的程度；</span></span><br><span class="line">            recordWakeupAlarms(mAlarmBatches, nowELAPSED, nowRTC);</span><br><span class="line">        ...</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//并获取到点闹钟列表，根据当前是否处于Doze模式或者app standby更新闹钟的响应时间</span></span><br><span class="line">        boolean hasWakeup = triggerAlarmsLocked(triggerList, nowELAPSED);</span><br><span class="line">        <span class="comment">//将获取到的闹钟进行派发</span></span><br><span class="line">        deliverAlarmsLocked(triggerList, nowELAPSED);</span><br><span class="line">        这几个在<span class="built_in">set</span>的时候也会被调用不再赘述</span><br><span class="line">        reorderAlarmsBasedOnStandbyBuckets(triggerPackages);</span><br><span class="line">        rescheduleKernelAlarmsLocked();</span><br><span class="line">        updateNextAlarmClockLocked();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>Alarm消息的传递流程如下所示，如果设置的时候传入的是PendingIntent则会进入send流程，如果设置的时候传入的是Listener那么就会走到onAlarm的流程；</p>
 <p><img src="/2019/07/18/standby/alarm/Alarm事件派发.png" alt="1563105032995"></p>
 <h1><span id="内核闹钟流程">内核闹钟流程</span></h1><p>当用户层设置闹钟的时候，内核不会马上设置到RTC寄存器；而是在suspend的时候从队列里面取出最早的时钟，然后设置进去；通过trace我们就能直接看出这种关系来</p>
@@ -2782,7 +2782,7 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/cpu/cpu_freq/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/other/TYPE-C耳机适配工作/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dongka">
@@ -2801,7 +2801,7 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/25/cpu/cpu_freq/" itemprop="url">CPUFreq</a></h1>
+                <a class="post-title-link" href="/2018/06/25/other/TYPE-C耳机适配工作/" itemprop="url">全志TYPE-C使用介绍</a></h1>
         
 
         <div class="post-meta">
@@ -2836,8 +2836,8 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cpu/" itemprop="url" rel="index">
-                    <span itemprop="name">cpu</span>
+                  <a href="/categories/TYPE-C/" itemprop="url" rel="index">
+                    <span itemprop="name">TYPE-C</span>
                   </a>
                 </span>
 
@@ -2875,9 +2875,86 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
       
         
           
-            <h1><span id="代码主要的功能">代码主要的功能</span></h1><p>1) 平台相关的初始化动作，包括CPU core的clock/regulator获取，初始化<br>2) 生成frequency table,即 CPU core所支持的频率/电压列表。并在初始化的时候将该table保存在policy<br>3) 定义一个strcut cpufreq_driver变量，填充必要的字段，并根据平台的特性，实现其中的回调函数；<br>4) 调用cpufreq_register_driver将driver注册到cpufreq framework中<br>5) cpufreq core会在CPU设备添加时，调用driver的init接口。driver需要在接口中初始化struct cpufreq变量<br>6) 系统运行过程中，cpufreq core会根据实际情况，调用driver的sepolicy或者target/target_index等接口，设置<br>CPU的调频策略或者频率值<br>7) 系统suspend的时候，会将CPU的频率设置为指定的值，或者调用driver的suspend回调函数；系统resume时调用driver的resume回调函数；</p>
-<h1><span id="cpufreq-driver">cpufreq driver</span></h1><p>frequency table是CPU core可以正确运行的一组频率/电压组合</p>
+            <p>有无TYPE-C方案，主从识别和耳机的插拔检测不同;有TYPE-C情况下，主要为TYPE-C逻辑进行侦测;而没有TYPE-C的方案;主从区分需要USB-ID detect管脚进行判断,耳机则靠HP-DET进行区分;</p>
+<h1><span id="传统侦测方式">传统侦测方式</span></h1><h2><span id="主从侦测">主从侦测</span></h2><p><img src="/2018/06/25/other/TYPE-C耳机适配工作/usb_id_detect.jpg" alt="usb_id_detect"></p>
+<p>在没有TYPE-C的硬件上，主要靠USB-ID管脚的上下拉来区分主从;</p>
+<h1><span id="耳机侦测">耳机侦测</span></h1><h2><span id="耳机结构">耳机结构</span></h2><p>3.5mm耳机插头有三段（TRS,Tip-Ring-Sleeve）和四段（TRRS,Tip-Ring-Sleeve）之分，其中三段的不带麦克风，尾段（Sleeve)是公共地；中间环（Ring）是右声道，尖部（Tip）是左声道，四节的分两种，一种是CTIA,一种是OMTP;</p>
+<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/耳机结构.png" alt="耳机结构"></p>
+<p>HP-L耳机左声道，HP-R耳机右声道，GND接地，V-Mic语音麦克风</p>
+<h2><span id="耳机座以及传统耳机侦测介绍">耳机座以及传统耳机侦测介绍</span></h2><p>耳机座分为支持欧标设计的耳机座和支持美标的耳机座。另外从耳机座左声道的检测方式来又可以分为”Normal-closed type”(常闭型)和“Normal  -type”(常开型)两种。设计图如下：</p>
+<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/耳机座子.png" alt="耳机座子"></p>
+<p>. 在常闭型中，不接耳机时，耳机座左声道和检测端HS-DET接触，接入耳机时，HS-DET与HPH-L不导通</p>
+<p>. 在常开型中，不接耳机时，耳机座左声道和检测端HS-DET不接触，插入耳机时，HS-DET与HPH-L导通</p>
+<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/headphone.jpg" alt="耳机侦测电路"></p>
+<p>如图为常开型结构，HP-DET上拉，当插入耳机后HP-DET和HP-OUTL导通，DET下拉引起软件中断。软件上通过debounce后，检测到持续的低电平，于是认为耳机插入；这时候需要判断，插入的还是三段还是四段，平台上打开mic_bias,当插入的是三段耳机，MIC被拉低，于是判断为三段耳机；若为四段耳机，MIC接近于MIC_BIAS，软件判断该处的直流电压为四段耳机；当按键按下时，MIC的电压发生变化，触发了系统中断，之后软件通过采样该处的电压值确定按下了哪一个按键；</p>
+<h1><span id="type-c方案侦测方式讲解">TYPE-C方案侦测方式讲解</span></h1><h2><span id="type-c主要电路如下">TYPE-C主要电路如下</span></h2><p><img src="/2018/06/25/other/TYPE-C耳机适配工作/TYPE-C关键电路.png" alt="TYPE-C关键电路"></p>
+<p>Type-C连接并没有在物理结构上区分DFP(Host)和UFP(Device),无连接时DFP未给VBUS供电，连接后通过CC信号线配置，确认连接有效，VBUS供电打开并确认使用哪一个端口传输数据;<br><strong>状态说明</strong></p>
+<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/cc_logic.jpg" alt="cc_logic"></p>
+<p><strong>如图所示</strong></p>
+<p>DFP的CC1/CC2会接上拉电阻Rp或电流源，UFP的CC1/CC2会接下拉电阻Rd,AUDIO设备则会接两个下拉电阻</p>
+<p>如何确认当前TYPE_C接入设备类型:</p>
+<pre><code>echo 1 &gt; /sys/class/axp/axp_num
+echo 0x37 &gt; /sys/class/axp_reg &amp;&amp; cat /sys/class/axp/axp_reg
+</code></pre><p>若读出状态为ATTACH_SNK 说明接入的是适配器或pc<br>若读出的状态为ATTACH_SOURCE 说明此时作为host<br>如读出为AUDIO_ACSY,说明此时为音频设备</p>
+<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/type_c_detect.jpg" alt="type_c_detect"></p>
+<p><strong>TS5USBA224RSWR</strong>：</p>
+<p> 用于将D-,D+在(USB0-DM,USB0-DP),(HPOUTL,HPOUTR)两种模式之间切换；由于VBUS默认低后，无法满足通过SEL切换状态，故VBUS一般设置为高；通过ASEL来设置高低实现切换</p>
+<p><strong>TS3A226AE</strong>:</p>
+<p>可以用于区分三四节耳机，并且可以将MIC和GROUND区分出来，降低软件设计复杂度；</p>
+<p>使用TYPE-C方案时，TYPE-C 中断服务程序负责将D-,D+选择为USB模式的Dp,Dm或者为耳机模式HP-OUTL,HP-OUTR;并通知音频驱动耳机接入;</p>
+<h2><span id="软件流程为">软件流程为：</span></h2><p>一：bmu驱动产生中断：</p>
+<pre><code>irqreturn_t axp_tc_in_isr(int irq, void *data)
+{
+    struct axp_charger_dev *chg_dev = data;
+    #ifdef CONFIG_TYPE_C_AUDIO
+    struct axp_usb_info *usb = chg_dev-&gt;spy_info-&gt;usb;
+    u8 cc_mode = 0; 
+    /*axp_usbac_in(chg_dev);*/
+    cc_mode = usb-&gt;get_cc_mode(chg_dev); //获取cc 侦测结果
+    if (cc_mode == AUDIO_ACSY) {    //如果为音频设备
+            usb-&gt;set_sel_mode(chg_dev, 1);  //D+ D- 连接到耳机的左右声道
+            call_notifier_call_chain(1);    //通知耳机驱动耳机接入
+    } else {
+            usb-&gt;set_sel_mode(chg_dev, 0); //D+ D- 连接到 USB的 Dp,Dm口
+            call_notifier_call_chain(0);   //通知耳机驱动拔出
+    }    
+    #endif
+    axp_change(chg_dev);
+    return IRQ_HANDLED;
+}
+</code></pre><p>二：耳机接受到通知：</p>
+<pre><code>static int type_c_chain_notify(struct notifier_block *nb, unsigned long mode, void *_unused)
+{
+    struct mc_private *ctx = container_of(nb, struct mc_private, type_c_chain_nb);
 
+    if (mode) {
+            ctx-&gt;detect_state = PLUG_IN; //切换接入状态
+            printk(&quot;%s PLUG_IN&quot;, __func__);
+    } else {
+            ctx-&gt;detect_state = PLUG_OUT;
+            printk(&quot;%s PLUG_OUT&quot;, __func__);
+    }
+
+    schedule_delayed_work(&amp;ctx-&gt;hs_detect_work,
+                            msecs_to_jiffies(10)); //执行音频相关的处理函数
+    return 0;
+}
+</code></pre><h1><span id="软件配置demo">软件配置demo</span></h1><p><strong>使能TYPE-C SINK与SOURCE 检测功能：</strong></p>
+<p>一：sys_config.fex中：</p>
+<pre><code>usb_id_gpio = &quot;axp_ctrl&quot;
+</code></pre><p>二：deconfig中</p>
+<pre><code>CONFIG_TYPE_C=y
+</code></pre><p><strong>使能TYPE-C耳机功能</strong></p>
+<p>一：如原理图所示，使用的是PH10作为选通管脚，故对pmu_typc_c_sel进行配置</p>
+<pre><code>[charger0]
+ compatible                 = &quot;bmu1760-charger&quot;
+pmu_type_c_sel             = port:PH10&lt;1&gt;&lt;default&gt;&lt;default&gt;&lt;0&gt;
+ pmu_chg_ic_temp            = 0
+pmu_battery_rdc            = 100
+ pmu_battery_cap            = 4200
+</code></pre><p>二：deconfig中</p>
+<pre><code>CONFIG_TYPE_C_AUDIO=y
+</code></pre>
           
         
       
