@@ -89,7 +89,7 @@
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2018/12/13/standby/kernel_suspend/信号响应时机.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/12/13/standby/kernel_suspend/suspend_resume_trace.jpg">
-<meta property="og:updated_time" content="2019-07-16T11:10:23.621Z">
+<meta property="og:updated_time" content="2019-08-21T11:20:22.715Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="内核的休眠流程">
 <meta name="twitter:description" content="内核休眠流程当安卓合适的时机(wakeup_count = save_count &amp;amp;&amp;amp; inpr == 0),与内核一致，在没有wakeup事件的时候，走进一步的流程，发echo mem &amp;gt; /sys/power/state命令后，内核开始处理休眠流程 ./kernel/power/main.c  state_store     -&amp;gt;pm_suspend">
@@ -417,7 +417,11 @@ static int autohotplug_thread_task(void *data)
 </code></pre><h4><span id="3workqueue冻结">3.workqueue冻结</span></h4><p>work_queue通过max_active属性，<strong>如果max_active=0则不能入队新的work</strong>,所有的work延后执行；</p>
 <pre><code>freeze_workqueues_begin -&gt;     workqueue_freezing = true; 
                             pwq_adjust_max_active(pwq); 
-                                -&gt; pwq-&gt;max_active = 0;
+                        if (!freezable || !workqueue_freezing){
+                                pwq-&gt;max_active = wq-&gt;saved_max_active;
+                        } else {
+                             pwq-&gt;max_active = 0;
+                        }
 
 schedule_work -&gt; queue_work -&gt; queue_work_on -&gt;
  __queue_work 
@@ -435,7 +439,12 @@ schedule_work -&gt; queue_work -&gt; queue_work_on -&gt;
                 worklist = &amp;pwq-&gt;delayed_works;
             }                       
   ...
-</code></pre><h3><span id="冻结进程何时被打断">冻结进程何时被打断</span></h3><p>进程怎么阻止休眠：无论通过wake_lock接口，__pm_stay_awake等，最终调用的都是wakeup_source_activate，都是增加inpr表示有事件在处理不准休眠；</p>
+</code></pre><p><strong>需要注意事项：</strong></p>
+<ol>
+<li>workqueue的冻结只针对带有WQ_FREEZABLE;所以如果是schedule_work这种默认使用的是system_wq类型的workqueue冻结进程的时候并不会进行冻结；</li>
+<li>对于schedule_delay_work的动作，如果休眠的时候不需要执行，则需要进行cancel_delayed_work_sync的动作，防止阻止系统休眠；    </li>
+</ol>
+<h3><span id="冻结进程何时被打断">冻结进程何时被打断</span></h3><p>进程怎么阻止休眠：无论通过wake_lock接口，__pm_stay_awake等，最终调用的都是wakeup_source_activate，都是增加inpr表示有事件在处理不准休眠；</p>
 <pre><code>wakeup_source_activate
     /* increment the counter of events in progress. */
     cec = atomic_inc_return(&amp;combined_event_count);   也即解下来要讲的变量inpr
@@ -536,27 +545,22 @@ enable_irq_wake是新方法。
 之所以所有的driver都调用这两个接口，有两种可能：一是为兼容；而是不太理解，为保险起见，都调用。
 从代码上看request的时候带的参数irqf_no_suspend只能在内核休眠的时候起到阻止休眠的功能，而enable_irq_wake则可以在深度休眠后仍然能唤醒；
 当休眠到core阶段的时候cpu的irq和fiq都已关闭，但仍保存着wakeup信号线，通过wakeup信号线唤醒从而唤醒cpu,当cpu中断使能开启后再响应中断
-</code></pre><p><strong>3：怎么对休眠流程进行分解debug</strong><br><strong>内核在休眠的流程中加入了trace point可以根据这个去定位是哪个流程去定位哪个流程异常;</strong></p>
-<pre><code>echo 1 &gt; /sys/kernel/debug/tracing/events/power/suspend_resume/enable
-echo &gt; /sys/kernel/debug/tracing/trace //清空trace
-echo 1 &gt; /sys/kernel/debug/tracing/tracing_on
-按power键进入休眠的流程
-按power键唤醒
-cat  /sys/kernel/debug/tracing/trace
-查看在哪个流程就退出
-</code></pre><p><strong>针对不休眠的问题可查看内核锁的申请释放流程</strong>：</p>
-<pre><code>echo 1 &gt; /sys/kernel/debug/tracing/events/power/wakeup_source_activate/enable
-echo 1 &gt; /sys/kernel/debug/tracing/events/power/wakeup_source_deactivate/enable
-echo &gt; /sys/kernel/debug/tracing/trace //清空trace
-echo 1 &gt; /sys/kernel/debug/tracing/tracing_on
-cat  /sys/kernel/debug/tracing/trace
-</code></pre><p><strong>休眠唤醒设备分解</strong></p>
-<pre><code>当怀疑休眠流程在device_suspend中挂死的;
+</code></pre><p><strong>3：怎么对休眠流程进行分解debug</strong></p>
+<pre><code>内核在休眠的流程中加入了trace point可以根据这个去定位是哪个流程去定位哪个流程异常：
+    echo 1 &gt; /sys/kernel/debug/tracing/events/power/suspend_resume/enable
+    echo &gt; /sys/kernel/debug/tracing/trace //清空trace
+    echo 1 &gt; /sys/kernel/debug/tracing/tracing_on
+    按power键进入休眠的流程
+    按power键唤醒
+    cat  /sys/kernel/debug/tracing/trace
+    查看在哪个流程就退出
+
+如当怀疑休眠流程在device_suspend中挂死的；
 可以echo devices &gt; /sys/power/pm_test
 然后修改dpm_suspend设备的休眠流程，让其逐一进入休眠后退出，观察是哪个设备休眠唤醒后系统异常；
 其他处于内核阶段的类似；
-</code></pre><p><strong>设备休眠挂死；（各厂家实现不同,无参考意义）</strong></p>
-<pre><code>如果没有异常，那么可以怀疑是否由于cpus中dram进入自刷新后异常导致；或者系统电上下电导致；或者时钟频率不稳导致；    
+
+如果没有异常，那么可以怀疑是否由于cpus中dram进入自刷新后异常导致；或者系统电上下电导致；或者时钟频率不稳导致；    
 在cpus中挂死，即走到arisc的休眠流程中,表现为串口log处于深度休眠，且无任何异常打印；
 在重启的log中：
 可以观察rtc寄存器的值：正常的值如下：
@@ -581,7 +585,7 @@ dram info:
  total count 0
 error count 0
 src:40000000
-len:0x100000    
+len:0x100000
 </code></pre><p><strong>4.项目经验总结</strong></p>
 <pre><code>1. 硬件需确保电源信号稳定性；
 2. 在项目开发过程中，休眠唤醒稳定性测试，在每次迭代的时候尽量做到一周进行一次多台机器休眠唤醒老化测试,测试老化的时候，应加大负载，如同时播放视频;
@@ -621,8 +625,8 @@ len:0x100000
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/12/13/standby/android_standby/" rel="next" title="安卓休眠流程">
-                <i class="fa fa-chevron-left"></i> 安卓休眠流程
+              <a href="/2018/11/17/cpu/arm体系架构的发展/" rel="next" title="ARM体系架构概述">
+                <i class="fa fa-chevron-left"></i> ARM体系架构概述
               </a>
             
           </div>
@@ -631,8 +635,8 @@ len:0x100000
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/02/27/display/display_hardware/" rel="prev" title="显示硬件篇">
-                显示硬件篇 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/12/13/standby/android_standby/" rel="prev" title="安卓休眠流程">
+                安卓休眠流程 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
