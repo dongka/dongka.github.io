@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="知识总结">
 <meta property="og:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-07-18T01:58:56.942Z">
+<meta property="og:updated_time" content="2019-08-30T03:39:54.443Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓休眠流程">
 <meta name="twitter:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
@@ -628,6 +628,7 @@ settings put system screen_off_timeout 2147483647 //设置永不休眠
 PARTIAL_WAKE_LOCK              &apos;messaging_service_start_wakelock&apos; 
 查看active_since这一项，看哪个锁不为0
       cat /sys/kernel/debug/wakeup_sources
+
 上层传向底层的锁
 cat /sys/power/wake_lock
 当这几步查找后都没有对应的锁时，可以通过/sys/power/pm_test结点,操作设备进入对应的休眠阶段，详见linux休眠篇章
@@ -727,8 +728,8 @@ venus-a3:/ # settings list system | grep  next
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/12/13/standby/kernel_suspend/" rel="next" title="内核的休眠流程">
-                <i class="fa fa-chevron-left"></i> 内核的休眠流程
+              <a href="/2018/11/17/cpu/arm体系架构的发展/" rel="next" title="ARM体系架构概述">
+                <i class="fa fa-chevron-left"></i> ARM体系架构概述
               </a>
             
           </div>
@@ -737,8 +738,8 @@ venus-a3:/ # settings list system | grep  next
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/02/27/display/display_hardware/" rel="prev" title="显示硬件篇">
-                显示硬件篇 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/12/13/standby/kernel_suspend/" rel="prev" title="内核的休眠流程">
+                内核的休眠流程 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
