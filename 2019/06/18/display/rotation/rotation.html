@@ -1,0 +1,449 @@
+<h1 id="androidQ更改默认屏幕方向"><a href="#androidQ更改默认屏幕方向" class="headerlink" title="androidQ更改默认屏幕方向"></a>androidQ更改默认屏幕方向</h1><p>由于客户的选型需要，可能需要横屏竖用，或者竖屏横用；在P之前的android SDK中，谷歌并不支持相关的功能；所以需要原厂自行定制；在P上 MTK为统一刷GSI和不刷GSI方向的统一，向谷歌mainline提供了对应的补丁；之后在Q上谷歌又进行了相关的修改；使得安卓支持改变默认显示方向的功能也日趋稳定；当然也是会存在bug,如在android Q上就出现了开机动画和应用启动动画异常问题（已解决）；但为了统一后续android平台下的横屏竖用使用配置；全志平台androidQ横屏竖用也是依托这个补丁进行横屏竖用的实现；</p>
+<p>有兴趣的可以访问这个网站查看更多的信息：<a href="https://osdn.net/projects/android-x86/scm/git/frameworks-native/commits/7501ed66a05f530062925011d1342e8651216051">GSI 支持横屏模式</a></p>
+<h1 id="本文目的"><a href="#本文目的" class="headerlink" title="本文目的"></a>本文目的</h1><p>一：梳理安卓TP,gsensor,surfaceflinger中rotation的系数之间的关系，客户配置地方；</p>
+<p>二：系统旋转监听以及应用旋转方向申请；</p>
+<p>三：现有显示框架支持横屏竖用原理；</p>
+<h1 id="参数配置"><a href="#参数配置" class="headerlink" title="参数配置"></a>参数配置</h1><h2 id="dtbo中设置TP方向"><a href="#dtbo中设置TP方向" class="headerlink" title="dtbo中设置TP方向"></a>dtbo中设置TP方向</h2><p>为了分离linux环境（dragonboard）和android环境的中TP的方向，使其不相互影响，为了使用android的新朝向，我们将TP方向更改的配置放到dtbo中；在android source并lunch对应的版型后，cbd即可到对应的路径；本文将以全志A50 A7版型为例讲解配置；</p>
+<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1565697980955.png" alt="1565697980955"></p>
+<pre><code class="diff">&amp;soc {
+    dtbo_version = &lt;0x00000001&gt;;
+    dtbo{
+        compatible = "allwinner,sunxi-dtbo";
+        dtbo_type = &lt;1&gt;;
+    };
+<span class="addition">+    ctp {</span>
+<span class="addition">+        ctp_screen_max_x = &lt;480&gt;;</span>
+<span class="addition">+        ctp_screen_max_y = &lt;800&gt;;</span>
+<span class="addition">+        ctp_revert_y_flag = &lt;1&gt;;</span>
+<span class="addition">+        ctp_exchange_x_y_flag = &lt;0&gt;;</span>
+<span class="addition">+    };</span>
+};
+
+</code></pre>
+<p>参数解释：</p>
+<pre><code>ctp_screen_max_x 触摸板的x轴最大坐标
+ctp_screen_max_y 触摸板的y轴最大坐标
+ctp_revert_x_flag 是否需要翻转x坐标，需要则置1，反之置0
+ctp_revert_y_flag 是否需要翻转y坐标，需要则置1，反之置0
+ctp_exchange_x_y_flag 是否需要x轴y轴坐标对换
+</code></pre><p>修改好需要重新编译和打包内核，在配置该参数的需注意检查驱动是否支持该方法；</p>
+<p><strong>非安全固件可以通过命令行修改参数进行验证</strong>，将default/env.cfg中将bootdelay改成3s,<strong>配合串口</strong>在uboot启动过程中按住enter键进入uboot命令行，用fdt 命令的修改验证；</p>
+<p><strong>步骤如下：</strong></p>
+<p><img src="fdt_ctp.png" alt="1569824097100"></p>
+<pre><code>如当下需要修改ctp_screen_max_x,可按
+fdt set /soc/ctp ctp_screen_max_x &lt;0x01&gt;
+fdt list /soc/ctp 确认是否修改到
+fdt save //保存配置
+boot
+</code></pre><h2 id="方案目录下配置显示和sensor方向"><a href="#方案目录下配置显示和sensor方向" class="headerlink" title="方案目录下配置显示和sensor方向"></a>方案目录下配置显示和sensor方向</h2><p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1565698555002.png" alt="1565698555002"></p>
+<pre><code class="diff"><span class="addition">+    # change SurfaceFlinger Orientation(0, 90, 180, 270)</span>
+<span class="addition">+    SF_PRIMARY_DISPLAY_ORIENTATION := 90</span>
+
+<span class="addition">+    #change minui Orientation</span>
+<span class="addition">+    #ROTATION_NONE=0, ROTATION_RIGHT=90, ROTATION_DOWN=180, ROTATION_LEFT=270</span>
+<span class="addition">+    PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \</span>
+            ro.minui.default_rotation=ROTATION_RIGHT
+<span class="addition">+    #change Gsensor rotation(0, 90, 180. 270)</span>
+<span class="addition">+    PRODUCT_PROPERTY_OVERRIDES += \</span>
+        ro.vendor.sf.rotation=270
+</code></pre>
+<h2 id="camera方向配置"><a href="#camera方向配置" class="headerlink" title="camera方向配置"></a>camera方向配置</h2><p>在有摄像头的方案下面还需调整自己的摄像头方向，提供的配置地方有：</p>
+<p>configs/camera.cfg</p>
+<pre><code>camera_orientation //可设置0，90，180，270
+</code></pre><p>hawkview/sensor_list_cfg.ini</p>
+<pre><code>sensor_hflip0  //水平反转
+sensor_vflip0  //垂直反转
+</code></pre><p>客户可以adb remount,选择busybox vi到对应的文件下；先调整camera的朝向，在调整镜像；</p>
+<pre><code>vendor/etc/camera.cfg
+vendor/etc/hawkview/sensor_list_cfg.ini
+</code></pre><h2 id="Gsensor方向调整方法二"><a href="#Gsensor方向调整方法二" class="headerlink" title="Gsensor方向调整方法二"></a>Gsensor方向调整方法二</h2><p>对于Gsensor还有一种改法与camera一样，在方案目录下面有相应的文件可以提供配置;方案商的话其实根据想要的屏幕朝向和sensor的摆放，配置这个文件会是一件更为简单和兼容性更好的操作；</p>
+<p>目录为config/gsensor.cfg,</p>
+<pre><code class="c++">gsensor_name = sc7660
+gsensor_direct_x = <span class="literal">false</span> <span class="comment">//x轴是否反向</span>
+gsensor_direct_y = <span class="literal">false</span> <span class="comment">//y轴是否反向</span>
+gsensor_direct_z = <span class="literal">false</span> <span class="comment">//z轴是否反向</span>
+gsensor_xy_revert = <span class="literal">true</span> <span class="comment">//是否反转x,y轴</span>
+</code></pre>
+<p><strong>gsensor坐标系：</strong></p>
+<p><img src="C:/Users/Administrator/Desktop/study/display/%E6%A8%AA%E5%B1%8F%E7%AB%96%E7%94%A8%E5%AE%9E%E7%8E%B0/rotation/%E7%89%A9%E7%90%86%E6%A8%AA%E7%AB%96%E5%B1%8F%E5%9D%90%E6%A0%87.png" alt="1567043212576"></p>
+<p><strong>匹配规则：</strong></p>
+<p>安卓是用的右手坐标系，Z轴相对屏幕朝外，gsensor的数据是一个三维数组，values[0]对应的x轴的值，value[1]对应的y轴,value[2]对应的Z轴，将相对轴竖直朝上放置时候，以该轴为对应的值为正（约9.8左右），其他两轴对应为0为准；</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>对于Q平台上需要更改默认屏幕方向，为兼容多个设备，且统一后续平台谷歌方案配置需要配置的选项如上述所述配置Android显示方向，recovery显示方向，TP方向，gsensor，camera，以及bootlogo图片方向；</p>
+<p><strong>至此，若是只需要知道怎么配置的可以不看以下的章节；</strong></p>
+<h1 id="Input系统"><a href="#Input系统" class="headerlink" title="Input系统"></a>Input系统</h1><h2 id="linux-input简介"><a href="#linux-input简介" class="headerlink" title="linux input简介"></a>linux input简介</h2><h3 id="软件框图"><a href="#软件框图" class="headerlink" title="软件框图"></a>软件框图</h3><p><img src="./1565673944332.png" alt="1565673944332"></p>
+<h3 id="Tp驱动流程"><a href="#Tp驱动流程" class="headerlink" title="Tp驱动流程"></a>Tp驱动流程</h3><p>借着梳理这个事件上报流程，我们也可以将主要的架构和流程涵盖；</p>
+<p><strong>以TP gslx680为例：</strong></p>
+<pre><code class="c"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span>  <span class="title">gsl_ts_probe</span><span class="params">(struct i2c_client *client,</span></span>
+<span class="function"><span class="params">                         <span class="keyword">const</span> struct i2c_device_id *id)</span></span>
+<span class="function"></span>{
+...
+   queue_work(gslX680_wq, &amp;glsX680_init_work);
+        --&gt;glsX680_init_events    
+            ret = input_request_int(&amp;(config_info.input_type), gsl_ts_irq,
+            CTP_IRQ_MODE, ts_init);
+
+   gsl_ts_init_ts
+     --&gt;set_bit(ABS_MT_POSITION_X, input_device-&gt;absbit);
+         set_bit(ABS_MT_POSITION_Y, input_device-&gt;absbit);
+        set_bit(ABS_MT_TOUCH_MAJOR, input_device-&gt;absbit);
+        set_bit(ABS_MT_WIDTH_MAJOR, input_device-&gt;absbit);
+        input_set_abs_params(input_device, ABS_MT_POSITION_X, <span class="number">0</span>,
+                         SCREEN_MAX_X, <span class="number">0</span>, <span class="number">0</span>);
+        input_set_abs_params(input_device, ABS_MT_POSITION_Y, <span class="number">0</span>,
+                         SCREEN_MAX_Y, <span class="number">0</span>, <span class="number">0</span>);
+        input_set_abs_params(input_device, ABS_MT_TOUCH_MAJOR, <span class="number">0</span>,
+                         PRESS_MAX, <span class="number">0</span>, <span class="number">0</span>);
+        input_set_abs_params(input_device, ABS_MT_WIDTH_MAJOR, <span class="number">0</span>, <span class="number">200</span>, <span class="number">0</span>, <span class="number">0</span>);
+        设置TP支持的设备属性和参数
+        --&gt;  input_device = input_allocate_device();
+             c = input_register_device(input_device);
+             跟常见的platform总线模型一样，会将input_device加到input_device_list
+             在<span class="keyword">register</span>的时候通过match在input_handler_list中找到对应的handler
+             流程如下所示：
+             --&gt; input_attach_handler(dev, handler);
+                  id = input_match_device(handler, dev);
+                  error = handler-&gt;connect(handler, dev, id);
+            这里就会调到：evdev.c中的event_connect
+                --&gt;error = input_register_handle(&amp;evdev-&gt;handle);
+            evdev基本上支持所有类型，所以这里TP将会与evdev通过handle进行连接
+...
+}
+
+接下来就是中断处理流程，这里我们就能看出他的层级关系；  
+input driver  --&gt;input_dev
+gsl_ts_irq{
+    queue_work(ts-&gt;wq, &amp;ts-&gt;work);
+        gsl_ts_xy_worker
+            process_gslX680_data
+                input_report_abs(ts-&gt;input, ABS_MT_TRACKING_ID, id);
+                input_report_abs(ts-&gt;input, ABS_MT_TOUCH_MAJOR, pressure);
+                input_report_abs(ts-&gt;input, ABS_MT_POSITION_X, x);
+                input_report_abs(ts-&gt;input, ABS_MT_POSITION_Y, y);
+                input_report_abs(ts-&gt;input, ABS_MT_WIDTH_MAJOR, <span class="number">1</span>);
+}
+input core
+input_event(dev, EV_ABS, code, value);
+    input_handle_event(dev, type, code, value);
+        input_pass_values(dev, dev-&gt;vals, dev-&gt;num_vals);
+            count = input_to_handler(handle, vals, count);
+                handler-&gt;event(handle, v-&gt;type, v-&gt;code, v-&gt;value);
+evdev --&gt; input_handler
+evdev_event
+    evdev_events(handle, vals, <span class="number">1</span>);
+        evdev_pass_values(client, vals, count, ev_time);
+            __pass_event(client, &amp;event);
+            --&gt;kill_fasync(&amp;client-&gt;fasync, SIGIO, POLL_IN);
+            <span class="comment">//走到这里的时候epoll_wait dev/input/xxx的监听就能收到消息</span>
+            wake_up_interruptible(&amp;evdev-&gt;wait); 
+</code></pre>
+<p><strong>简而言之：input_dev在中断处理函数里面上报事件 -&gt; input_core找到对应的handler -&gt; input_handler:如edev通过___pass_event将事件上报给用户层；</strong></p>
+<h2 id="androd-Input流程"><a href="#androd-Input流程" class="headerlink" title="androd Input流程"></a>androd Input流程</h2><p><a href="https://blog.csdn.net/xingchenxuanfeng/article/details/79208005">安卓接受事件之后的处理流程</a></p>
+<p><img src="./Android_input.png" alt="android处理input事件处理流程"></p>
+<p><strong>流程简单介绍：</strong></p>
+<p><strong>一：APP setView建立inputChannel和window的连接</strong></p>
+<p>当一个应用程序有Activity能接受用户输入，他就要将自己的Window（ViewRoot）通过setView（)注册到Window Manager Service中；</p>
+<p>frameworks/base/core/java/android/view/ViewRootImpl.java</p>
+<pre><code class="c++"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setView</span><span class="params">(View view, WindowManager.LayoutParams attrs, View panelParentView)</span> </span>{
+...
+    requestLayout();<span class="comment">//对控件树进行测量，布局，向WMS申请修改窗口属性以及重绘的所有工作</span>
+    <span class="keyword">if</span> ((mWindowAttributes.inputFeatures
+        &amp; WindowManager.LayoutParams.INPUT_FEATURE_NO_INPUT_CHANNEL) == <span class="number">0</span>) {
+            mInputChannel = <span class="keyword">new</span> InputChannel();
+    }
+    <span class="comment">//服务端过程</span>
+    res = mWindowSession.addToDisplay(mWindow, mSeq, mWindowAttributes,
+        getHostVisibility(), mDisplay.getDisplayId(), mTmpFrame,
+        mAttachInfo.mContentInsets, mAttachInfo.mStableInsets,
+        mAttachInfo.mOutsets, mAttachInfo.mDisplayCutout, mInputChannel,
+        mTempInsets);
+    --&gt; mService.addWindow
+        --&gt;openInputChannel
+            InputChannel[] inputChannels = InputChannel.openInputChannelPair(name);
+            mInputChannel = inputChannels[<span class="number">0</span>];
+            mClientChannel = inputChannels[<span class="number">1</span>];
+            --&gt;mClientChannel.transferTo(outInputChannel);<span class="comment">//将socketPair的另外一个FD放在参数OutputChannel里，创建WindowInputEventRecevier用于接受InputDispatchor传来的事件；后者同样通过AddFd()将读端SocketFd加入到Looper中，这样一旦InputDispatchor发送Event,Looper就会立即醒来处理；</span>
+            --&gt;mWmService.mInputManager.registerInputChannel(mInputChannel, mClient.asBinder());<span class="comment">//调用到InputDispacher的RegisterInputChannel()方法；InputDispacher会通过addFd 将channel的fd加入到loop中，这样，只要某个Window在Socket的另一端写入数据，Looper就会马上从睡眠中醒来，进行处理；</span>
+
+         mInputEventReceiver = <span class="keyword">new</span> WindowInputEventReceiver(mInputChannel,
+         Looper.myLooper());
+...
+}
+</code></pre>
+<p><strong>建立Window和InputDispatch的联系；</strong></p>
+<p><strong>二：framework层的收集和分发</strong></p>
+<pre><code class="c++">framework/native/services/inputflinger/EventHub.cpp
+EventHub::EventHub(<span class="keyword">void</span>) : ｛
+    mEpollFd = epoll_create1(EPOLL_CLOEXEC);
+    mINotifyFd = inotify_init();
+    mInputWd = inotify_add_watch(mINotifyFd, DEVICE_PATH, IN_DELETE | IN_CREATE);
+    <span class="keyword">int</span> result = epoll_ctl(mEpollFd, EPOLL_CTL_ADD, mINotifyFd, &amp;eventItem);
+    result = fcntl(mWakeReadPipeFd, F_SETFL, O_NONBLOCK);
+    result = epoll_ctl(mEpollFd, EPOLL_CTL_ADD, mWakeReadPipeFd, &amp;eventItem);
+｝
+<span class="keyword">size_t</span> EventHub::getEvents(<span class="keyword">int</span> timeoutMillis, RawEvent* buffer, <span class="keyword">size_t</span> bufferSize) {
+    <span class="keyword">for</span>(;;){
+    ...
+    nRead = read(mWakeReadPipeFd, buffer, <span class="keyword">sizeof</span>(buffer));
+    <span class="keyword">int</span> pollResult = epoll_wait(mEpollFd, mPendingEventItems, EPOLL_MAX_EVENTS, timeoutMillis);
+    ...
+    }
+｝
+总结：Eventhub的作用是监听，读取/dev/input目录下产生的新事件，如节点的增删以及事件的上报，并封装成RawEvent结构体共InputReader使用。
+framework/native/services/inputflinger/InputReader.cpp
+<span class="keyword">void</span> InputReader::loopOnce() {
+<span class="keyword">size_t</span> count = mEventHub-&gt;getEvents(timeoutMillis, mEventBuffer, EVENT_BUFFER_SIZE);
+    <span class="keyword">if</span> (count) {
+        processEventsLocked(mEventBuffer, count);
+        --&gt;device-&gt;process(rawEvents, count);
+            --&gt;mapper-&gt;process(rawEvent); <span class="comment">//将事件压入队列</span>
+    }
+    mQueuedListener-&gt;flush();<span class="comment">//将事件进行分发</span>
+}
+<span class="keyword">void</span> TouchInputMapper::process(<span class="keyword">const</span> RawEvent* rawEvent) {
+...
+    sync(rawEvent-&gt;when);
+    --&gt;processRawTouches(<span class="literal">false</span> <span class="comment">/*timeout*/</span>)
+        --&gt;cookAndDispatch(mCurrentRawState.when);
+            --&gt;dispatchTouches(when, policyFlags);
+                --&gt;    dispatchMotion(when, policyFlags, mSource,
+            AMOTION_EVENT_ACTION_MOVE, <span class="number">0</span>, <span class="number">0</span>, metaState, buttonState,
+            AMOTION_EVENT_EDGE_FLAG_NONE,
+            mCurrentCookedState.deviceTimestamp,
+            mCurrentCookedState.cookedPointerData.pointerProperties,
+            mCurrentCookedState.cookedPointerData.pointerCoords,
+            mCurrentCookedState.cookedPointerData.idToIndex,
+            currentIdBits, <span class="number">-1</span>,
+            mOrientedXPrecision, mOrientedYPrecision, mDownTime);
+                --&gt;getListener()-&gt;notifyMotion(&amp;args);
+                --&gt;mArgsQueue.push_back(<span class="keyword">new</span> NotifySwitchArgs(*args));
+...
+}
+<span class="keyword">void</span> QueuedInputListener::flush() {
+    args-&gt;notify(mInnerListener);
+        --&gt;listener-&gt;notifyMotion(<span class="keyword">this</span>);<span class="comment">//这里的listen就是InputDispatcher了</span>
+     mArgsQueue.clear();
+}
+总结：InputReader的就是循环的读取EventHub中的数据，然后通过InputDispatcher进行分发
+
+framework/native/services/inputflinger/InputDispatcher.cpp
+<span class="keyword">void</span> InputDispatcher::notifyMotion(<span class="keyword">const</span> NotifyMotionArgs* args) {
+MotionEntry* newEntry = <span class="keyword">new</span> MotionEntry(args-&gt;sequenceNum, args-&gt;eventTime,
+        args-&gt;deviceId, args-&gt;source, args-&gt;displayId, policyFlags,
+        args-&gt;action, args-&gt;actionButton, args-&gt;flags,
+        args-&gt;metaState, args-&gt;buttonState, args-&gt;classification,
+        args-&gt;edgeFlags, args-&gt;xPrecision, args-&gt;yPrecision, args-&gt;downTime,
+        args-&gt;pointerCount, args-&gt;pointerProperties, args-&gt;pointerCoords, <span class="number">0</span>, <span class="number">0</span>);
+        needWake = enqueueInboundEventLocked(newEntry);
+}
+<span class="keyword">bool</span> InputDispatcherThread::threadLoop() {
+    mDispatcher-&gt;dispatchOnce();
+    --&gt;dispatchOnceInnerLocked(&amp;nextWakeupTime);
+        --&gt;done = dispatchMotionLocked(currentTime, typedEntry,
+        &amp;dropReason, nextWakeupTime);
+          --&gt;injectionResult = findTouchedWindowTargetsLocked(currentTime,
+        entry, inputTargets, nextWakeupTime, &amp;conflictingPointerActions);
+          --&gt;dispatchEventLocked(currentTime, entry, inputTargets);
+              --&gt;getConnectionIndexLocked(inputTarget.inputChannel);<span class="comment">//这个inputChannel用于与window实例通信</span>
+              --&gt;prepareDispatchCycleLocked
+                  --&gt;enqueueDispatchEntriesLocked
+                      --&gt;startDispatchCycleLocked
+                          --&gt;publishMotionEvent
+                              --&gt;mChannel-&gt;sendMessage(&amp;msg)
+    <span class="keyword">return</span> <span class="literal">true</span>;
+}
+InputDispatcher的作用就是通过sendMessage进行跨进程通信，把msg发给对应的window
+如果是按键类型的时间，那么就会通过notifyKey的流程，然后传递给PhoneWindowManager这个读者可以自行梳理
+</code></pre>
+<p><strong>流程总结：</strong>内核将原始事件写入设备节点中，InputReader不断地通过Eventhub将原始事件取出来并翻译加工成android输入事件，然后交给InputDispacther.InputDispactcher根据WMS提供的窗口信息，将事件交给格式的窗口，窗口的ViewRootimpl对象再沿着控件树将事件派发给感兴趣的控件，控件对其接收到的时间做出响应，更新自己的画面，执行特定的动作；</p>
+<h1 id="显示方向旋转"><a href="#显示方向旋转" class="headerlink" title="显示方向旋转"></a>显示方向旋转</h1><p>Sensor的框架分为三个层次，客户层，服务层，HAL层，服务端负责从HAL层读取数据，并将数据写到管道中，客户端通过管道读取服务端数据；具体细节可以看这两份文档</p>
+<p><a href="http://kernel.meizu.com/android-sensor-framework.html">Android Sensor Framework概览</a></p>
+<p><a href="https://www.cnblogs.com/lcw/p/3402770.html">sensor框架Framework层解读</a></p>
+<p><strong>流程图：</strong></p>
+<p><img src="./gsensor_flow.png" alt="1567068378839"></p>
+<h2 id="自动旋转监听"><a href="#自动旋转监听" class="headerlink" title="自动旋转监听"></a>自动旋转监听</h2><p>系统从SystemUI或者setting中获取到是否开启自动旋转；最终设置到mUserRotationMode和mUserRotation</p>
+<pre><code class="c++">systemUI:    
+./services/core/java/com/android/server/wm/DisplayRotation.java
+<span class="function"><span class="keyword">void</span> <span class="title">freezeRotation</span><span class="params">(<span class="keyword">int</span> rotation)</span> </span>{
+     rotation = (rotation == <span class="number">-1</span>) ? mDisplayContent.getRotation() : rotation;
+     setUserRotation(WindowManagerPolicy.USER_ROTATION_LOCKED, rotation);
+ }
+ <span class="function"><span class="keyword">void</span> <span class="title">thawRotation</span><span class="params">()</span> </span>{
+    setUserRotation(WindowManagerPolicy.USER_ROTATION_FREE, mUserRotation);
+}
+settings:
+updateSettings() {
+    final <span class="keyword">int</span> userRotation = Settings.System.getIntForUser(resolver,
+        Settings.System.USER_ROTATION, Surface.ROTATION_0,
+        UserHandle.USER_CURRENT);
+     final <span class="keyword">int</span> userRotationMode = Settings.System.getIntForUser(resolver,
+         Settings.System.ACCELEROMETER_ROTATION, <span class="number">0</span>, UserHandle.USER_CURRENT) != <span class="number">0</span>
+                 ? WindowManagerPolicy.USER_ROTATION_FREE
+                 : WindowManagerPolicy.USER_ROTATION_LOCKED;
+    updateOrientationListenerLw()
+        --&gt;mOrientationListener.enable(<span class="literal">true</span> <span class="comment">/* clearCurrentRotation */</span>);
+}
+
+</code></pre>
+<pre><code class="c++">services/core/java/com/android/server/policy/WindowOrientationListener.java
+一：注册监听
+<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">enable</span><span class="params">(boolean clearCurrentRotation)</span> </span>{
+    <span class="keyword">if</span> (mSensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+        mSensorManager.registerListener(
+            mOrientationJudge, mSensor, mRate, DEFAULT_BATCH_LATENCY, mHandler);
+    } <span class="keyword">else</span> {
+           mSensorManager.registerListener(mOrientationJudge, mSensor, mRate, mHandler);
+    }
+二：sensor有数据的时候就会发一个回调
+<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSensorChanged</span><span class="params">(SensorEvent event)</span> </span>{
+    这里就会计算出一个proposedRotation，分发给需要的模块
+     onProposedRotationChanged(proposedRotation);
+｝
+services/core/java/com/android/server/wm/DisplayRotation.java 
+三：决策是否旋转和启动旋转动画流程
+ <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>{
+     <span class="comment">// Send interaction hint to improve redraw performance.</span>
+     mService.mPowerManagerInternal.powerHint(PowerHint.LAUNCH, <span class="number">1</span>);
+     <span class="keyword">if</span> (isRotationChoicePossible(mCurrentAppOrientation)) {
+         final boolean isValid = isValidRotationChoice(mRotation);
+         sendProposedRotationChangeToStatusBarInternal(mRotation, isValid);
+     } <span class="keyword">else</span> {
+         mService.updateRotation(<span class="literal">false</span> <span class="comment">/* alwaysSendConfiguration */</span>,
+                 <span class="literal">false</span> <span class="comment">/* forceRelayout */</span>);
+     }
+ }
+</code></pre>
+<h2 id="rotation和orientation区别"><a href="#rotation和orientation区别" class="headerlink" title="rotation和orientation区别"></a>rotation和orientation区别</h2><p><strong>rotation:</strong>旋转方向是指界面（不是手机）相对于默认情况情况顺时针旋转的角度，平板一般默认横屏，而小屏幕设备默认竖屏；</p>
+<pre><code class="c++">frameworks/base/core/java/android/view/Surface.java
+ <span class="keyword">public</span> <span class="keyword">static</span> final <span class="keyword">int</span> ROTATION_0 = <span class="number">0</span>;
+ <span class="keyword">public</span> <span class="keyword">static</span> final <span class="keyword">int</span> ROTATION_90 = <span class="number">1</span>;
+ <span class="keyword">public</span> <span class="keyword">static</span> final <span class="keyword">int</span> ROTATION_180 = <span class="number">2</span>;
+ <span class="keyword">public</span> <span class="keyword">static</span> final <span class="keyword">int</span> ROTATION_270 = <span class="number">3</span>;
+</code></pre>
+<p><strong>orientation:</strong>分为两种情况，一个是ActivityInfo.java,另一个在Configuration.java.前者具体来说是ActivityInfo.screenOrientation,这个值用于记录App强制设定的方向或者旋转模式。具体代码如下：</p>
+<p><strong>rotation旋转的是物体坐标系，而orientation旋转的是世界坐标系，即观察视角；</strong></p>
+<h2 id="应用申请旋转"><a href="#应用申请旋转" class="headerlink" title="应用申请旋转"></a>应用申请旋转</h2><p>对于应用开发者而言可以通过调用如下api去申请屏幕朝向</p>
+<pre><code>core/java/android/app/Activity.java
+    setRequestedOrientation
+</code></pre><p>获取命令如下：</p>
+<pre><code class="c++">dumpsys window | grep mCurrentAppOrientation
+</code></pre>
+<pre><code class="c++">frameworks/base/core/java/android/content/pm/ActivityInfo.java
+<span class="comment">/**</span>
+<span class="comment"> * The preferred screen orientation this activity would like to run in.</span>
+<span class="comment"> * From the {@link android.R.attr#screenOrientation} attribute, one of</span>
+<span class="comment"> * {@link #SCREEN_ORIENTATION_UNSPECIFIED}, -1；//未指定，默认值，由安卓选择合适方向，关闭系统旋转屏幕，就不会转动屏幕</span>
+<span class="comment"> * {@link #SCREEN_ORIENTATION_LANDSCAPE}, 0//横屏</span>
+<span class="comment"> * {@link #SCREEN_ORIENTATION_PORTRAIT}, 1//竖屏</span>
+<span class="comment"> * {@link #SCREEN_ORIENTATION_USER}, 2//用户选择方向</span>
+<span class="comment"> * {@link #SCREEN_ORIENTATION_BEHIND}, 3//继承Activity堆栈中当前Activity下面的那个Activity的方向</span>
+<span class="comment"> * {@link #SCREEN_ORIENTATION_SENSOR}, 4//由物理感应器决定显示方向</span>
+<span class="comment"> * {@link #SCREEN_ORIENTATION_NOSENSOR}, 5//忽略物理感应器</span>
+<span class="comment"> * {@link #SCREEN_ORIENTATION_SENSOR_LANDSCAPE}, 6//锁定屏幕横屏，可以180旋转，相当于SCREEN_ORIENTATION_USER_LANDSCAPE并且打开自动旋转功能</span>
+<span class="comment"> * {@link #SCREEN_ORIENTATION_SENSOR_PORTRAIT},  7//锁定屏幕竖屏，可以180旋转</span>
+<span class="comment"> * {@link #SCREEN_ORIENTATION_REVERSE_LANDSCAPE}, 8//强制横屏方向</span>
+<span class="comment"> * {@link #SCREEN_ORIENTATION_REVERSE_PORTRAIT}, 9//竖屏方向转换</span>
+<span class="comment"> * {@link #SCREEN_ORIENTATION_FULL_SENSOR}, 10//当手机底部朝上时，根据重力变换朝向，形成相对竖屏旋转180的效果</span>
+<span class="comment"> * {@link #SCREEN_ORIENTATION_USER_LANDSCAPE}, 11//横屏显示，当打开自动旋转功能时，如果用户在横屏方向上调整方位，屏幕也会跟着变动</span>
+<span class="comment"> * {@link #SCREEN_ORIENTATION_USER_PORTRAIT}, 12//竖屏显示</span>
+<span class="comment"> * {@link #SCREEN_ORIENTATION_FULL_USER}, 13//相当于默认打开自动旋转功能</span>
+<span class="comment"> * {@link #SCREEN_ORIENTATION_LOCKED},14 //锁定屏幕方向</span>
+<span class="comment"> */</span>
+</code></pre>
+<p>流程图如下所示：</p>
+<p><img src="./setRequestOrientation.png" alt="setRequestOrientation"></p>
+<h1 id="横屏竖用原理"><a href="#横屏竖用原理" class="headerlink" title="横屏竖用原理"></a>横屏竖用原理</h1><h2 id="参数设置流程介绍"><a href="#参数设置流程介绍" class="headerlink" title="参数设置流程介绍"></a>参数设置流程介绍</h2><pre><code class="c++">hardware/interface
+configstore/<span class="number">1.1</span>/<span class="keyword">default</span>/surfaceflinger.mk
+    LOCAL_CFLAGS += -DPRIMARY_DISPLAY_ORIENTATION=$(SF_PRIMARY_DISPLAY_ORIENTATION)
+configstore/<span class="number">1.1</span>/<span class="keyword">default</span>/SurfaceFlingerConfigs.cpp
+    Return&lt;<span class="keyword">void</span>&gt; SurfaceFlingerConfigs::primaryDisplayOrientation(
+        ...
+        orientation = PRIMARY_DISPLAY_ORIENTATION;
+        ...
+    }
+
+services/surfaceflinger/SurfaceFlingerProperties.cpp
+SurfaceFlingerProperties::primary_display_orientation_values primary_display_orientation(
+        SurfaceFlingerProperties::primary_display_orientation_values defaultValue) {
+    ...
+DisplayOrientation result =
+        getDisplayOrientation&lt;V1_1::ISurfaceFlingerConfigs,
+                              &amp;V1_1::ISurfaceFlingerConfigs::primaryDisplayOrientation&gt;(
+                configDefault);
+    <span class="keyword">return</span> SurfaceFlingerProperties::...
+    ...
+}
+
+services/surfaceflinger/SurfaceFlinger.cpp
+    SurfaceFlinger::primaryDisplayOrientation = DisplayState::...
+    creationArgs.displayInstallOrientation = isInternalDisplay ?             primaryDisplayOrientation : DisplayState::eOrientationDefault;
+</code></pre>
+<h2 id="应用欺骗"><a href="#应用欺骗" class="headerlink" title="应用欺骗"></a>应用欺骗</h2><p>在SurfaceFlinger中初始化<strong>primaryDisplayOrientation</strong>，当应用获取显示配置的时候getDisplayConfigs，此时的应用就能够获取到对应的竖屏配置了；</p>
+<pre><code class="c++"><span class="keyword">status_t</span> SurfaceFlinger::getDisplayConfigs(<span class="keyword">const</span> sp&lt;IBinder&gt;&amp; displayToken,
+                                           Vector&lt;DisplayInfo&gt;* configs) {
+    ...
+    <span class="keyword">if</span> (displayId == getInternalDisplayIdLocked() &amp;&amp;
+    primaryDisplayOrientation &amp; DisplayState::eOrientationSwapMask) {
+    <span class="built_in">std</span>::swap(info.w, info.h);
+    ...
+}
+</code></pre>
+<h2 id="显示欺骗"><a href="#显示欺骗" class="headerlink" title="显示欺骗"></a>显示欺骗</h2><p>在DisplayDevice中就会初始化<strong>mDisplayInstallOrientation</strong>,在设置矩阵的时候oritentationToTransform就会被篡改；</p>
+<pre><code class="c++"><span class="keyword">void</span> DisplayDevice::setProjection(<span class="keyword">int</span> orientation,
+        <span class="keyword">const</span> Rect&amp; newViewport, <span class="keyword">const</span> Rect&amp; newFrame) {
+    ...
+     <span class="keyword">if</span> (isPrimary()) {
+     DisplayDevice::orientationToTransfrom(
+             (orientation + mDisplayInstallOrientation) % (DisplayState::eOrientation270 + <span class="number">1</span>),
+             w, h, &amp;R);
+     ...
+ }
+</code></pre>
+<p>这样给到GPU的Transform就会被欺骗带有一个角度；</p>
+<p><img src="./bufferTransform.png" alt="1567234573802"></p>
+<pre><code class="c++">system/core/libsystem/include/system/graphics-base-v1<span class="number">.0</span>.h
+<span class="keyword">typedef</span> <span class="keyword">enum</span> {
+    HAL_TRANSFORM_FLIP_H = <span class="number">1</span>,   <span class="comment">// (1 &lt;&lt; 0)</span>
+    HAL_TRANSFORM_FLIP_V = <span class="number">2</span>,   <span class="comment">// (1 &lt;&lt; 1)</span>
+    HAL_TRANSFORM_ROT_90 = <span class="number">4</span>,   <span class="comment">// (1 &lt;&lt; 2)</span>
+    HAL_TRANSFORM_ROT_180 = <span class="number">3</span>,  <span class="comment">// (FLIP_H | FLIP_V)</span>
+    HAL_TRANSFORM_ROT_270 = <span class="number">7</span>,  <span class="comment">// ((FLIP_H | FLIP_V) | ROT_90)</span>
+} <span class="keyword">android_transform_t</span>;
+
+include/gui/LayerState.h
+<span class="class"><span class="keyword">struct</span> <span class="title">DisplayState</span> {</span>
+    <span class="keyword">enum</span> {
+        eOrientationDefault = <span class="number">0</span>,
+        eOrientation90 = <span class="number">1</span>,
+        eOrientation180 = <span class="number">2</span>,
+        eOrientation270 = <span class="number">3</span>,
+        eOrientationUnchanged = <span class="number">4</span>,
+        eOrientationSwapMask = <span class="number">0x01</span>
+    };
+
+</code></pre>
+<p>这样就实现了从应用到显示横屏竖用的欺骗流程</p>
+<h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><h2 id="常见命令"><a href="#常见命令" class="headerlink" title="常见命令"></a>常见命令</h2><h3 id="模拟输入事件"><a href="#模拟输入事件" class="headerlink" title="模拟输入事件"></a>模拟输入事件</h3><pre><code>1. 模拟文本 input text &quot;hello,word&quot;
+2. 模拟按键 input keyevent POWER
+3. 模拟滑动 input swipe 0 20 300 500 
+4. 模拟屏幕轻触：input tap 100 400
+5. 获取输入事件的总类：getevent -p
+6. input keyevent --longpress POWER
+</code></pre><h3 id="旋转事件"><a href="#旋转事件" class="headerlink" title="旋转事件"></a>旋转事件</h3><pre><code>settings put system accelerometer_rotation 0 //关闭自动旋转
+settings put system user_rotation 0
+settings put system user_rotation 3
+</code></pre><h3 id="安卓触点显示"><a href="#安卓触点显示" class="headerlink" title="安卓触点显示"></a>安卓触点显示</h3><pre><code>settings put system show_touches 1
+settings put system pointer_location 1
+</code></pre><h3 id="传感器"><a href="#传感器" class="headerlink" title="传感器"></a>传感器</h3><pre><code>可以利用查看目前sensor上报的事件值
+dumpsys sensorservice | grep wall
+</code></pre><p><img src="./sensor_data.png" alt="1566995553990"></p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="https://zhuanlan.zhihu.com/p/31210271">一次触摸，Android到底干了啥</a></p>
+<p><a href="http://benzblog.site/2017/06/19/all-about-rotations/">Android屏幕旋转源码探索及应用实践</a></p>
+<p><a href="https://www.twblogs.net/a/5c37805fbd9eee35b21d5f5a/zh-cn">Android P图形显示系统</a></p>
+<p><a href="https://www.cnblogs.com/samchen2009/p/3368158.html">图解Android-AndroidGUI 系统（5）-Android的Event Input System</a></p>
+<p><a href="https://juejin.im/post/5b6948086fb9a04fb87771fb">Android硬件加速（二）-RenderThread与OpenGL GPU渲染</a></p>
+<p><a href="http://gityuan.com/2015/09/06/android-anaimator-4/">源码解读Android属性动画</a></p>
+<p><a href="http://wiki.jikexueyuan.com/project/android-animation/1.html">动画详解</a></p>
+<p><a href="http://wiki.jikexueyuan.com/project/deep-android-v1/surface.html">深入理解surface</a></p>
+<p><a href="https://blog.csdn.net/yanbober/article/details/46128379">应用绘制流程</a></p>
+<p><a href="https://developer.android.com/reference/android/R.attr.html#screenOrientation">screenOrientation参数解析</a></p>
+<p><a href="https://blog.csdn.net/jinzhuojun/article/details/50085491">Android中的转屏流程</a></p>
