@@ -1034,7 +1034,7 @@
 <p>目录为config/gsensor.cfg,</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">gsensor_name = sc7660</span><br><span class="line">gsensor_direct_x = <span class="literal">false</span> <span class="comment">//x轴是否反向</span></span><br><span class="line">gsensor_direct_y = <span class="literal">false</span> <span class="comment">//y轴是否反向</span></span><br><span class="line">gsensor_direct_z = <span class="literal">false</span> <span class="comment">//z轴是否反向</span></span><br><span class="line">gsensor_xy_revert = <span class="literal">true</span> <span class="comment">//是否反转x,y轴</span></span><br></pre></td></tr></table></figure>
 <p><strong>gsensor坐标系：</strong></p>
-<p><img src="/2019/06/18/display/rotation/Users/Administrator/Desktop/study/display/%E6%A8%AA%E5%B1%8F%E7%AB%96%E7%94%A8%E5%AE%9E%E7%8E%B0/rotation/%E7%89%A9%E7%90%86%E6%A8%AA%E7%AB%96%E5%B1%8F%E5%9D%90%E6%A0%87.png" alt="1567043212576"></p>
+<p><img src="/2019/06/18/display/rotation/gsensor方向.png" alt="gsensor方向"></p>
 <p><strong>匹配规则：</strong></p>
 <p>安卓是用的右手坐标系，Z轴相对屏幕朝外，gsensor的数据是一个三维数组，values[0]对应的x轴的值，value[1]对应的y轴,value[2]对应的Z轴，将相对轴竖直朝上放置时候，以该轴为对应的值为正（约9.8左右），其他两轴对应为0为准；</p>
 <h2><span id="总结">总结</span></h2><p>对于Q平台上需要更改默认屏幕方向，为兼容多个设备，且统一后续平台谷歌方案配置需要配置的选项如上述所述配置Android显示方向，recovery显示方向，TP方向，gsensor，camera，以及bootlogo图片方向；</p>
