@@ -249,224 +249,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/07/python/spider/spider_summary/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/10/07/python/spider/spider_summary/" itemprop="url">爬虫介绍</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-07T07:57:41+00:00">
-                2018-10-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spider/" itemprop="url" rel="index">
-                    <span itemprop="name">spider</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1><span id="大数据时代-数据获取方式">“大数据时代” 数据获取方式</span></h1><ol>
-<li><p>企业生产的用户数据<br><a href="https://tbi.tencent.com/" target="_blank" rel="noopener">腾讯指数</a> <a href="https://index.baidu.com/" target="_blank" rel="noopener">百度指数</a> <a href="https://index.1688.com/" target="_blank" rel="noopener">阿里指数</a> <a href="https://data.weibo.com/index" target="_blank" rel="noopener">微博指数</a></p>
-</li>
-<li><p>数据管理咨询公司<br><a href="https://www.iresearch.com.cn/" target="_blank" rel="noopener">艾瑞咨询</a> <a href="http://mckinseychina.com/" target="_blank" rel="noopener">麦肯锡</a></p>
-</li>
-<li><p>政府/机构提供的公开数据<br><a href="http://data.stats.gov.cn/" target="_blank" rel="noopener">国家数据</a> <a href="https://www.nasdaq.com/" target="_blank" rel="noopener">纳斯达克股票数据</a></p>
-</li>
-<li><p>第三方数据平台购买数据<br><a href="http://www.datatang.com/" target="_blank" rel="noopener">数据堂</a> <a href="http://www.gbdex.com/" target="_blank" rel="noopener">贵阳大数据交易所</a></p>
-</li>
-<li><p>爬虫爬取数据</p>
-</li>
-</ol>
-<h1><span id="爬虫介绍">爬虫介绍</span></h1><p>爬虫按照场景分为两种，通用爬虫和聚焦爬虫</p>
-<h2><span id="通用爬虫">通用爬虫</span></h2><hr>
-<p>通用爬虫即搜索引擎用的爬虫系统，如百度，谷歌</p>
-<p>1.尽可能把互联网上所有的网页下载下来，放到本地服务器里形成备份，再对这些网页做相关的处理（提取关键字，去掉广告），最后提供一个用户检索的窗口；</p>
-<p>2.抓取流程</p>
-<pre><code>首先选取一部分已有的URL,把这些URL放到爬取队列；
-
-从队列里取出这些URL，然后解析DNS得到主机IP;然后去这个IP对应的服务器里下载HTML页面，保存到搜索引擎对应的数据；之后把这个爬过的URL放入已爬取队列。
-
-分析网页内容，找出网页里其他的URL连接，继续执行第二步，直到爬取条件结束；
-</code></pre><p>3.搜索引擎如何获取一个新网站的URL</p>
-<pre><code>1.主动向搜索引擎提交网址： [百度搜索资源平台](https://ziyuan.baidu.com/)
-
-
-2.在其他网站里设置外链
-
-
-3.搜索引擎会和DNS服务商进行合作，可以快速收录新的网站
-</code></pre><p>4.通用爬虫并不是万物皆可爬，它也需要遵守规则：</p>
-<pre><code>Robots协议： 协议会指明通用爬虫可以爬取网页的权限
-
-Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大型的搜索引擎爬虫才会遵守，个人爬虫可以不管；
-</code></pre><p>5.通用爬虫工作流程:  爬去网页 –&gt; 存储数据 –&gt;内容处理–&gt;提供检索/排名服务<br>6.收索引擎排名</p>
-<pre><code>1.PageRank(流量越高，越值钱)
-
-2.竞价排名,谁给钱多，谁排名就高
-</code></pre><p>7.通用爬虫的缺点：</p>
-<ul>
-<li><p>只能提供文本信息，但不能提供多媒体文件（音乐，视频）</p>
-</li>
-<li><p>提供的结果千篇一律，不能针对不同背景领域的人提供不同的搜索结果</p>
-</li>
-<li><p>不能理解人类语义</p>
-</li>
-</ul>
-<h2><span id="聚焦爬虫">聚焦爬虫</span></h2><hr>
-<p>聚焦爬虫指的就是程序员写的针对某些内容的爬虫</p>
-<h3><span id="网页三大特征">网页三大特征</span></h3><ol>
-<li><p>每个网页都有自己的URL(同一资源定位符)来进行定位</p>
-</li>
-<li><p>网页都是用HTML(超文本标记语言)来描述页面信息</p>
-</li>
-<li><p>网页都使用HTTP/HTTPS(超文本传输协议)来传输HTML数据</p>
-</li>
-</ol>
-<h3><span id="爬虫的思路">爬虫的思路</span></h3><ol>
-<li>首先确定爬取的网页URL地址</li>
-<li>通过HTTP/HTTP协议来获取对应的HTML页面</li>
-<li>提取HTML页面有用的数据,如果是页面的其他URL,那就继续执行第二步</li>
-</ol>
-<p>常见步骤：</p>
-<pre><code>- HTTP请求的处理，urllib,urllib2,requests,处理后的请求可以模拟浏览器请求，获取服务器响应的文件
-
-- 通过动态页面采集： Selenium+PhantomJS(无界面)：模拟真实浏览器加载js,ajax等非静态页面数据    
-
-- Tesseract: 机器学习库，机器图像识别系统，可以处理简单验证码，复杂的验证码可以通过手动输入
-- 保存数据     re,xpath,BeautifulSoup4(bs4),jsonpath,pyquery等 使用某种描述性一样来给我们需要提取的数据定义一个匹配规则，符合这个规则的数据就会被匹配，如果是需要的数据，就保存起来
-</code></pre><h3><span id="爬虫框架">爬虫框架</span></h3><p><strong>Scrapy,Pyspider</strong></p>
-<pre><code>高定制性高性能（异步网络框架twisted）,所以数据下载熟读非常快，提供了数据下载，数据存储，数据下载，提取规则
-</code></pre><p><strong>分布式策略</strong></p>
-<pre><code>scrapy redis，在scrapy的基础上添加了以redis数据库为核心的一套组件,让scrapy框架支持分布式的功能，主要是Redis里做指纹去重，请求分配，数据临时存储
-</code></pre><h1><span id="结语">结语</span></h1><p><strong>爬虫 反爬虫 反反爬虫之间的斗争</strong></p>
-<pre><code>其实爬虫做到最后，最头疼的不是负杂的页面，也不是晦涩的数据，而是网站另外一头的运维人员
-
-反爬虫： User Agent,代理，验证码，动态数据加载，加密数据
-</code></pre>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/cpu/cpu_freq/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -725,6 +507,192 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
 <p>#renice -n -5 -g 9394</p>
 <p>#nice -n 5 ./a.out</p>
 <h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.ibm.com/developerworks/cn/linux/l-cn-scheduler/index.html" target="_blank" rel="noopener">linux调度器发展简述</a><br><a href="https://blog.csdn.net/gatieme/article/details/51383272" target="_blank" rel="noopener">linux进程描述符task_struct结构体详解–linux进程的管理与调度(一)</a><br><a href="https://blog.csdn.net/gatieme/article/details/51484562" target="_blank" rel="noopener">Linux下0号进程的前世(init_task进程)今生(idle进程)—-Linux进程的管理与调度（五）</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/cpu/cpu概述/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/25/cpu/cpu概述/" itemprop="url">CPU概述</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index">
+                    <span itemprop="name">cpu</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <!-- toc-aside -->
+<h1><span id="cpu-topology">cpu topology</span></h1><h2><span id="11-cpu拓扑">1.1. cpu拓扑</span></h2><p><strong>cluster(socket)-&gt;core-&gt;Threads(目前为止arm没有提出多线程的概念)</strong><br><img src="/2018/06/25/cpu/cpu概述/cpu拓扑.png" alt="cpu拓扑图"> </p>
+<h2><span id="12-多核技术">1.2 多核技术</span></h2><p>  基于制程，扩充性等考虑，芯片厂商会把多个core封装在一个chip上，称为socket。socket的概念在X86架构上使用尤其多，可以理解为插槽；<br>假设一个插槽上有两个core,那么我在主板上插2个插槽，就是4核系统，插上4个插槽就是8核；arm的话则是另外一个概念cluster,簇<br>  在X86架构的PC上，唯一目的的话是提高CPU的处理性能（不在乎功耗），但在移动市场中（大多是arm），性能提高后，对应着就更多的power消耗；对于设备电源管理以及散热提出了更高的要求。与此同时电池并没有随着CPU的拓扑的进化而进化，于是HMP技术就被提出来了；</p>
+<h2><span id="13hmpheterogeneous-multi-processing">1.3HMP(Heterogeneous Multi-Processing)</span></h2><p><strong>big-little:</strong></p>
+<ul>
+<li>在一个chip中封装两类ARM Core,以kirin 960为例:一类为高性能Core,4核ARM A73，最高主频为2.4G，一类为低性能Core,4核ARM A53，最高主频为1.8G<br><img src="/2018/06/25/cpu/cpu概述/kirin960.png" alt="cpu拓扑图"></li>
+</ul>
+<p><strong>DynamIQ:</strong></p>
+<ul>
+<li>在单一cluster内可有8个核心，且可由不同架构，时钟的核心组成，提升了运作效率与配置的弹性,如高通的845 4核ARM A75，最高为2.8，4核 ARM A55，最高为1.8G</li>
+</ul>
+<p><strong>DynamIQ较big-little好处:</strong></p>
+<ol>
+<li>单cluster可有8核心</li>
+<li>cluster可搭配不同架构的CPU</li>
+<li>各cpu可有独立的运作时钟</li>
+<li>CPU各自开关休眠互不影响</li>
+<li>依照效能需求弹性运用各核心</li>
+</ol>
+<p>以龙舟比喻ARM的DynamIQ与先前的big.LITTLE技术，我们把龙舟当成cluster,船员当成core,那么big.LITTLE龙舟上只能有4个船员，而且每个船员身材需要一样（核心架构），划船的时候若多位船员一起划船时，每个人的出力均等(频率一致),不能有人慢划或者快划;<br>当使用DynamIQ时，每艘船（cluster）上可以有8位高低胖瘦不等(架构)的船员（core），换船频率可以不等，且船员可以依照指令睡觉（关闭）,休息（休眠），或划船（运作）；</p>
+<h1><span id="cpu内核代码框架">cpu内核代码框架</span></h1><ol>
+<li><a href="./cpu_init.md">系统启动时，CPU core的初始化，信息获取</a></li>
+<li>系统启动时，CPU core的启动（enable）</li>
+<li>系统运行过程中，根据当前负荷，动态enable/disable 某些CPU core,以便在性能与功耗间平衡</li>
+<li>cpu core的hotplug支持，所谓的hotplug,是可以在系统运行的过程中，动态的增加或者减少CPU core(可以是物理上，也可以是逻辑上)</li>
+<li>系统运行过程中CPU idle管理</li>
+<li>系统运行过程中，根据当前负荷，动态的调整CPU core的电压和频率，以便在性能和功耗之间平衡</li>
+</ol>
+<p><img src="/2018/06/25/cpu/cpu概述/cpu代码框架.png" alt="cpu拓扑图"><br>arch-depedent部分位于”arch\arm64\kernel”负责平台相关的控制操作，包括</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu 信息的获取（cpuinfo）</span><br><span class="line">cpu拓扑结构的获取（cpu topology）</span><br><span class="line">底层的CPU操作（init,disable等）的实现，cpu ops</span><br><span class="line">SMP相关的初始化（smp）</span><br></pre></td></tr></table></figure>
+<p>arch-independent负责实现平台无关的抽象，包括</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu control模块，屏蔽底层平台相关实现细节，提供控制CPU(enable,disable等)的统一API，供系统启动，进程调度等模块调用</span><br><span class="line">cpu subsystem driver像用户空间提供CPU hotplug有关的功能；</span><br><span class="line">cpuidle,处理CPU idle有关的逻辑</span><br><span class="line">cpufreq 处理CPU frequency调整有关的逻辑</span><br></pre></td></tr></table></figure>
+<h1><span id="cpu的状态表示">cpu的状态表示</span></h1><ol>
+<li><strong>possible CPU:</strong> 就是在DTS中指定了的，物理存在的CPU core</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;boot_cpu_init-&gt;smp_process_id用于获取cpu id</span><br><span class="line">		           -&gt;set_cpu_xxx,用于将指定的CPU设置为（或清除）指定状态</span><br><span class="line">	    -&gt;setup_arch-&gt;smp_init_cpus-&gt;sunxi_smp_init_cpus-&gt;set_cpu_possible(i, true)</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li><strong>present cpu:</strong> 被kernel标识的，具备执行代码条件，后续可以在需要的时候（如hotplug的时候），启动该CPU </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;rest_init-&gt;kernel_init-&gt;kernel_init_freeable</span><br><span class="line">				     -&gt;smp_prepare_cpus</span><br><span class="line">			     	if (cpu_prepare(cpu)) /**/</span><br><span class="line">					set_cpu_present(cpu,true);</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li><strong>online CPU:</strong> 某个CPU是present的，不一定是boot,所谓CPU boot,就是让CPU执行（取指译码/执行）代码</li>
+<li><strong>active CPU</strong> 只是为了方便调度器操作</li>
+</ol>
+<h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cool3c.com/article/124149" target="_blank" rel="noopener">一图看懂ARM DynamIQ运作原理</a><br><a href="http://www.wowotech.net/pm_subsystem/cpu_core_pm_overview.html" target="_blank" rel="noopener">Linux CPU core的电源管理(1)概述</a></p>
 
           
         
@@ -1424,192 +1392,6 @@ k_d 为求导，一般设置为0
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/cpu/cpu概述/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/25/cpu/cpu概述/" itemprop="url">CPU概述</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
-                2018-06-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cpu/" itemprop="url" rel="index">
-                    <span itemprop="name">cpu</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <!-- toc-aside -->
-<h1><span id="cpu-topology">cpu topology</span></h1><h2><span id="11-cpu拓扑">1.1. cpu拓扑</span></h2><p><strong>cluster(socket)-&gt;core-&gt;Threads(目前为止arm没有提出多线程的概念)</strong><br><img src="/2018/06/25/cpu/cpu概述/cpu拓扑.png" alt="cpu拓扑图"> </p>
-<h2><span id="12-多核技术">1.2 多核技术</span></h2><p>  基于制程，扩充性等考虑，芯片厂商会把多个core封装在一个chip上，称为socket。socket的概念在X86架构上使用尤其多，可以理解为插槽；<br>假设一个插槽上有两个core,那么我在主板上插2个插槽，就是4核系统，插上4个插槽就是8核；arm的话则是另外一个概念cluster,簇<br>  在X86架构的PC上，唯一目的的话是提高CPU的处理性能（不在乎功耗），但在移动市场中（大多是arm），性能提高后，对应着就更多的power消耗；对于设备电源管理以及散热提出了更高的要求。与此同时电池并没有随着CPU的拓扑的进化而进化，于是HMP技术就被提出来了；</p>
-<h2><span id="13hmpheterogeneous-multi-processing">1.3HMP(Heterogeneous Multi-Processing)</span></h2><p><strong>big-little:</strong></p>
-<ul>
-<li>在一个chip中封装两类ARM Core,以kirin 960为例:一类为高性能Core,4核ARM A73，最高主频为2.4G，一类为低性能Core,4核ARM A53，最高主频为1.8G<br><img src="/2018/06/25/cpu/cpu概述/kirin960.png" alt="cpu拓扑图"></li>
-</ul>
-<p><strong>DynamIQ:</strong></p>
-<ul>
-<li>在单一cluster内可有8个核心，且可由不同架构，时钟的核心组成，提升了运作效率与配置的弹性,如高通的845 4核ARM A75，最高为2.8，4核 ARM A55，最高为1.8G</li>
-</ul>
-<p><strong>DynamIQ较big-little好处:</strong></p>
-<ol>
-<li>单cluster可有8核心</li>
-<li>cluster可搭配不同架构的CPU</li>
-<li>各cpu可有独立的运作时钟</li>
-<li>CPU各自开关休眠互不影响</li>
-<li>依照效能需求弹性运用各核心</li>
-</ol>
-<p>以龙舟比喻ARM的DynamIQ与先前的big.LITTLE技术，我们把龙舟当成cluster,船员当成core,那么big.LITTLE龙舟上只能有4个船员，而且每个船员身材需要一样（核心架构），划船的时候若多位船员一起划船时，每个人的出力均等(频率一致),不能有人慢划或者快划;<br>当使用DynamIQ时，每艘船（cluster）上可以有8位高低胖瘦不等(架构)的船员（core），换船频率可以不等，且船员可以依照指令睡觉（关闭）,休息（休眠），或划船（运作）；</p>
-<h1><span id="cpu内核代码框架">cpu内核代码框架</span></h1><ol>
-<li><a href="./cpu_init.md">系统启动时，CPU core的初始化，信息获取</a></li>
-<li>系统启动时，CPU core的启动（enable）</li>
-<li>系统运行过程中，根据当前负荷，动态enable/disable 某些CPU core,以便在性能与功耗间平衡</li>
-<li>cpu core的hotplug支持，所谓的hotplug,是可以在系统运行的过程中，动态的增加或者减少CPU core(可以是物理上，也可以是逻辑上)</li>
-<li>系统运行过程中CPU idle管理</li>
-<li>系统运行过程中，根据当前负荷，动态的调整CPU core的电压和频率，以便在性能和功耗之间平衡</li>
-</ol>
-<p><img src="/2018/06/25/cpu/cpu概述/cpu代码框架.png" alt="cpu拓扑图"><br>arch-depedent部分位于”arch\arm64\kernel”负责平台相关的控制操作，包括</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu 信息的获取（cpuinfo）</span><br><span class="line">cpu拓扑结构的获取（cpu topology）</span><br><span class="line">底层的CPU操作（init,disable等）的实现，cpu ops</span><br><span class="line">SMP相关的初始化（smp）</span><br></pre></td></tr></table></figure>
-<p>arch-independent负责实现平台无关的抽象，包括</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu control模块，屏蔽底层平台相关实现细节，提供控制CPU(enable,disable等)的统一API，供系统启动，进程调度等模块调用</span><br><span class="line">cpu subsystem driver像用户空间提供CPU hotplug有关的功能；</span><br><span class="line">cpuidle,处理CPU idle有关的逻辑</span><br><span class="line">cpufreq 处理CPU frequency调整有关的逻辑</span><br></pre></td></tr></table></figure>
-<h1><span id="cpu的状态表示">cpu的状态表示</span></h1><ol>
-<li><strong>possible CPU:</strong> 就是在DTS中指定了的，物理存在的CPU core</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;boot_cpu_init-&gt;smp_process_id用于获取cpu id</span><br><span class="line">		           -&gt;set_cpu_xxx,用于将指定的CPU设置为（或清除）指定状态</span><br><span class="line">	    -&gt;setup_arch-&gt;smp_init_cpus-&gt;sunxi_smp_init_cpus-&gt;set_cpu_possible(i, true)</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li><strong>present cpu:</strong> 被kernel标识的，具备执行代码条件，后续可以在需要的时候（如hotplug的时候），启动该CPU </li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;rest_init-&gt;kernel_init-&gt;kernel_init_freeable</span><br><span class="line">				     -&gt;smp_prepare_cpus</span><br><span class="line">			     	if (cpu_prepare(cpu)) /**/</span><br><span class="line">					set_cpu_present(cpu,true);</span><br></pre></td></tr></table></figure>
-<ol start="3">
-<li><strong>online CPU:</strong> 某个CPU是present的，不一定是boot,所谓CPU boot,就是让CPU执行（取指译码/执行）代码</li>
-<li><strong>active CPU</strong> 只是为了方便调度器操作</li>
-</ol>
-<h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cool3c.com/article/124149" target="_blank" rel="noopener">一图看懂ARM DynamIQ运作原理</a><br><a href="http://www.wowotech.net/pm_subsystem/cpu_core_pm_overview.html" target="_blank" rel="noopener">Linux CPU core的电源管理(1)概述</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/other/TYPE-C耳机适配工作/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1978,6 +1760,163 @@ pmu_battery_rdc            = 100
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-mtp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/17/memory/memory-mtp/" itemprop="url">内存管理（二）mtp拷贝流程</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-17T00:07:09+00:00">
+                2018-06-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/内存管理/" itemprop="url" rel="index">
+                    <span itemprop="name">内存管理</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2><span id="背景知识介绍">背景知识介绍</span></h2><p>android 从3.0开始集成MTP功能，主要原因有三个：<br>1.手机要支持UMS的话，必须要有一个sd卡，因为sd卡往往采用Windows支持的分区格式。如果想把内部存储空间通过UMS挂载到Windows上，则内部存储空间需采用特定的分区格式。这对某些手机而言根本不可行。因为内部存储空间本身可能就是一个设备，它们采用统一的分区格式。不能因为需要使用UMS，而再增加一块特定的分区格式的存储设备。<br>2.UMS挂载到PC后，PC操作系统拥有绝对的控制权。此时，Android系统无法操作这些设备。<br>3.window所占市场份额较大，故即使linux，MacOS支持力度不够，Android也要集成的；<br>MTP的主要缺点：<br>1.传输大文件的速度较慢 ??<br>2.MTP不能直接修改文件本身，只能先拷贝到本地修改，完毕后再拷贝回去</p>
+<h2><span id="mtp协议介绍">MTP协议介绍</span></h2><p>MTP使用者包括两个部分，分别为Initiator和Resoponder</p>
+<ol>
+<li>Initiator:主要是指USB Host,例如PC机，笔记本等，协议规定所有的MTP操作只能由Initator发起</li>
+<li>Responder:一般是诸如数码相机，智能手机等存储媒体文件的设备，Responder在MTP中的作用就是处理Initator发起的请求。同时，它还会根据自身状态的变化发送Event以通知Initator.</li>
+</ol>
+<h1><span id="mtp-协议栈">MTP 协议栈</span></h1><ol>
+<li>Pyshical Layer(物理层)：物理层在MTP协议中用来传输数据。目前有三种物理层可供MTP使用。它们分别是USB:其主要特点是传输文件，同步媒体文件时速度快，而且可以变工作边充电，这是目前用的最多的一种方式；IP：基于IP的MTP(简称MTP/TP)将通过UPnp来匹配和发现设备。它是家庭网络中最理想的传输方式；Bluetooth:MTP/BT是最省电，同时速度最慢的一种传输方式，用处较少；</li>
+<li>传输层：MTP中，数据传输格式遵循PTP协议</li>
+<li>命令层：实现了MTP协议中的各种命令；</li>
+</ol>
+<p>MTP采用命令-应答方式来工作，(Initator发送命令给Responder处理，Responser反馈处理结果)，这种方式主要特点有：</p>
+<ol>
+<li>所有MTP命令均以Package(数据包)的方式在设备两端进行传递</li>
+<li>Initiator必须接收到前一条消息处理结果，无论是成功或者超时后，才能发送下一条消息</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-hardware-md/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2135,7 +2074,7 @@ b.根据物理地址获取数据
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-mtp/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/25/pinctrl/sunxi_pinctrl/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dongka">
@@ -2154,7 +2093,7 @@ b.根据物理地址获取数据
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/17/memory/memory-mtp/" itemprop="url">内存管理（二）mtp拷贝流程</a></h1>
+                <a class="post-title-link" href="/2018/02/25/pinctrl/sunxi_pinctrl/" itemprop="url">gpio pinctrl的使用demo</a></h1>
         
 
         <div class="post-meta">
@@ -2166,8 +2105,8 @@ b.根据物理地址获取数据
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-17T00:07:09+00:00">
-                2018-06-17
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-25T10:07:09+00:00">
+                2018-02-25
               </time>
             
 
@@ -2189,8 +2128,8 @@ b.根据物理地址获取数据
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/内存管理/" itemprop="url" rel="index">
-                    <span itemprop="name">内存管理</span>
+                  <a href="/categories/gpio/" itemprop="url" rel="index">
+                    <span itemprop="name">gpio</span>
                   </a>
                 </span>
 
@@ -2228,22 +2167,141 @@ b.根据物理地址获取数据
       
         
           
-            <h2><span id="背景知识介绍">背景知识介绍</span></h2><p>android 从3.0开始集成MTP功能，主要原因有三个：<br>1.手机要支持UMS的话，必须要有一个sd卡，因为sd卡往往采用Windows支持的分区格式。如果想把内部存储空间通过UMS挂载到Windows上，则内部存储空间需采用特定的分区格式。这对某些手机而言根本不可行。因为内部存储空间本身可能就是一个设备，它们采用统一的分区格式。不能因为需要使用UMS，而再增加一块特定的分区格式的存储设备。<br>2.UMS挂载到PC后，PC操作系统拥有绝对的控制权。此时，Android系统无法操作这些设备。<br>3.window所占市场份额较大，故即使linux，MacOS支持力度不够，Android也要集成的；<br>MTP的主要缺点：<br>1.传输大文件的速度较慢 ??<br>2.MTP不能直接修改文件本身，只能先拷贝到本地修改，完毕后再拷贝回去</p>
-<h2><span id="mtp协议介绍">MTP协议介绍</span></h2><p>MTP使用者包括两个部分，分别为Initiator和Resoponder</p>
-<ol>
-<li>Initiator:主要是指USB Host,例如PC机，笔记本等，协议规定所有的MTP操作只能由Initator发起</li>
-<li>Responder:一般是诸如数码相机，智能手机等存储媒体文件的设备，Responder在MTP中的作用就是处理Initator发起的请求。同时，它还会根据自身状态的变化发送Event以通知Initator.</li>
+            <p>本文主旨在于介绍gpio功能的使用，故不会去细剖pinctrl中的代码框架；为了介绍gpio在全志平台的使用，分为三个部分，uboot中的gpio使用，内核中的gpio使用，内核中的pinctrl使用以及debug;<br>并附上简单的demo驱动，方便驱动工程师快速使用全志平台进行gpio相关的驱动开发;</p>
+<h1><span id="uboot中gpio的使用">uboot中gpio的使用</span></h1><p>对于gpio的操作，封装在include/sys_config.h,用户可在查阅其他驱动（如显示屏）借鉴完成所需的代码；以下是uboot中实现gpio_led的量灭简单demo；</p>
+<h2><span id="uboot中使用gpio-demo">uboot中使用gpio demo</span></h2><p><strong>gpio_led.c</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#include &lt;common.h&gt;</span><br><span class="line">#include &lt;sys_config.h&gt;</span><br><span class="line">#include &lt;asm/arch/platform.h&gt;</span><br><span class="line">#include &lt;fdt_support.h&gt;    </span><br><span class="line">#include &lt;sys_config_old.h&gt;  </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">static __u32 gpio_red_led_hd;</span><br><span class="line">static __u32 gpio_blue_led_hd;</span><br><span class="line"></span><br><span class="line">int gpio_led_init(void)&#123;</span><br><span class="line">    u8 ret;</span><br><span class="line">    user_gpio_set_t gpio_init;</span><br><span class="line">    memset(&amp;gpio_init, 0, sizeof(user_gpio_set_t)); </span><br><span class="line"></span><br><span class="line">    ret = script_parser_fetch(&quot;gpio_led&quot;, &quot;gpio_red_led&quot;, (void *)&amp;gpio_init, sizeof(user_gpio_set_t)&gt;&gt;2);</span><br><span class="line">    if (!ret) &#123;</span><br><span class="line">		//获取gpio句柄</span><br><span class="line">        gpio_red_led_hd = gpio_request(&amp;gpio_init, 1); </span><br><span class="line">        if(!gpio_red_led_hd)&#123;</span><br><span class="line">            printf(&quot;gpio_red_led_hd request err\n&quot;);</span><br><span class="line">        &#125;   </span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        printf(&quot;gpio red init err\n&quot;);</span><br><span class="line">    &#125;   </span><br><span class="line">    ret = script_parser_fetch(&quot;gpio_led&quot;, &quot;gpio_blue_led&quot;, (void *)&amp;gpio_init, sizeof(user_gpio_set_t)&gt;&gt;2);</span><br><span class="line">    if (!ret) &#123;</span><br><span class="line">        gpio_blue_led_hd = gpio_request(&amp;gpio_init, 1); </span><br><span class="line">        if(!gpio_blue_led_hd)&#123;</span><br><span class="line">            printf(&quot;gpio_blue_led_hd request err\n&quot;);</span><br><span class="line">        &#125;   </span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        printf(&quot;gpio blue init err\n&quot;);</span><br><span class="line">    &#125;   </span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br><span class="line">int gpio_red_led_set_value(int value)&#123;</span><br><span class="line">    u8 ret;</span><br><span class="line">	设置gpio</span><br><span class="line">    ret = gpio_write_one_pin_value(gpio_red_led_hd, value, &quot;gpio_red_led&quot;); </span><br><span class="line">    if (ret) &#123;</span><br><span class="line">         printf(&quot;gpio_red_led_set_value%d err\n&quot;,value);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br><span class="line">int gpio_blue_led_set_value(int value)&#123;</span><br><span class="line">    u8 ret;</span><br><span class="line">    ret = gpio_write_one_pin_value(gpio_blue_led_hd, value, &quot;gpio_blue_led&quot;);</span><br><span class="line">    if (ret) &#123;</span><br><span class="line">         printf(&quot;gpio_blue_led_set_value%d err\n&quot;,value);</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>gpio_led.h</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#ifndef __GPIO_LED_H</span><br><span class="line">#define __GPIO_LED_H</span><br><span class="line">extern int gpio_led_init(void);</span><br><span class="line">extern int gpio_red_led_set_value(int value);</span><br><span class="line">extern int gpio_blue_led_set_value(int value); </span><br><span class="line">#endif</span><br></pre></td></tr></table></figure></p>
+<p><strong>调用接口流程：</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">--- a/u-boot-2014.07/board/sunxi/common/secondary_main.c</span><br><span class="line">+++ b/u-boot-2014.07/board/sunxi/common/secondary_main.c</span><br><span class="line">@@ -34,6 +34,7 @@</span><br><span class="line"> #include &lt;asm/arch/platsmp.h&gt;</span><br><span class="line"> #include &lt;cputask.h&gt;</span><br><span class="line"> #include &lt;smc.h&gt;</span><br><span class="line">+#include &lt;gpio_led.h&gt;</span><br><span class="line"> #include &lt;securestorage.h&gt;</span><br><span class="line"> #include &lt;fdt_support.h&gt;</span><br><span class="line"> #include &lt;bmp_layout.h&gt;</span><br><span class="line">@@ -196,6 +197,7 @@ static int sunxi_probe_power_state(void)</span><br><span class="line">        int ret = 0, __power_on_cause;</span><br><span class="line">        SUNXI_BOOT_POWER_STATE_E __boot_state;</span><br><span class="line">        int pmu_bat_unused = 0;</span><br><span class="line">+       int gpio_led_used = 0;</span><br><span class="line"> </span><br><span class="line"> /* power_start</span><br><span class="line"> 0: not allow boot by insert dcin,boot condition:</span><br><span class="line">@@ -223,6 +225,13 @@ static int sunxi_probe_power_state(void)</span><br><span class="line">        __power_source = axp_probe_power_source();</span><br><span class="line">        pr_notice(&quot;PowerBus = %d( %d:vBus %d:acBus other: not exist)\n&quot;,</span><br><span class="line">                __power_source,AXP_VBUS_EXIST,AXP_DCIN_EXIST);</span><br><span class="line">+    script_parser_fetch(&quot;gpio_led&quot;, &quot;gpio_led_used&quot;, &amp;gpio_led_used, 1);</span><br><span class="line">+    if (gpio_led_used)&#123;</span><br><span class="line">+                printf(&quot;gpio_led_used 11\n&quot;);</span><br><span class="line">+                gpio_led_init();</span><br><span class="line">+                gpio_red_led_set_value(0);</span><br><span class="line">+                gpio_blue_led_set_value(1);</span><br><span class="line">+    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果在uboot中调用了gpio设置方向，那么内核中probe就不必去调用gpio_direction_output(led_red,0)，这样才不会导致uboot中设置的电源状态被修改；</p>
+<h1><span id="内核中的gpio使用">内核中的gpio使用</span></h1><p>对于驱动工程师，使用gpio驱动是件无法逃避的一件事情，gpio的常见操作包括，输入输出，驱动能力，上下拉，电平；</p>
+<h2><span id="内核中gpio的一般使用步骤">内核中gpio的一般使用步骤</span></h2><p><strong>一：添加所要申请的gpio</strong></p>
+<p>方法一：sys_config.fex添加对应的描述</p>
+<pre><code>pmu_type_c_sel             = port:PH10&lt;1&gt;&lt;default&gt;&lt;default&gt;&lt;0&gt;
+</code></pre><p>方法二：dts的配置方法</p>
+<pre><code>pmu_type_c_sel=&lt;&amp;pio PH 10 1 1 1 0&gt;;
+        |         |  |   | | | | |-------------------电平
+        |         |  |   | | | |----------------------上下拉
+        |         |  |   | | |-------------------------驱动力
+        |         |  |   | |----------------------------复用类型，0-GPIOIN 1-GPIOOUT..
+        |         |  |   |------------------------------pin bank内偏移.
+        |         |  |---------------------------------哪个bank 
+        |         |--------------------------------------指向哪个pio，属于cpus要用&amp;r_pio
+        |-----------------------------------------------------属性名字，相当sys_config子键名
+</code></pre><p><strong>二：获取相关的gpio端口</strong></p>
+<pre><code> chg_dev-&gt;pmu_type_c_sel.gpio =
+        of_get_named_gpio(pdev-&gt;dev.of_node, &quot;pmu_type_c_sel&quot;, 0);
+if (!gpio_is_valid(chg_dev-&gt;pmu_type_c_sel.gpio)) {
+        pr_err(&quot;get pmu_type_c_sel failed\n&quot;);
+} else {
+        ret = gpio_request(
+                chg_dev-&gt;pmu_type_c_sel.gpio,
+                &quot;pmu_type_c_sel&quot;);
+        if (ret != 0) {
+                pr_err(&quot;ERR: pmu_type_c_sel request failed\n&quot;);
+                return -EINVAL;
+        }   
+        ret = gpio_direction_output(chg_dev-&gt;pmu_type_c_sel.gpio, 0); 
+        if (ret &lt; 0) {
+                pr_err(&quot;can&apos;t request output direction pmu_type_c_sel %d\n&quot;,
+                                chg_dev-&gt;pmu_type_c_sel.gpio);
+                return ret;
+        }   
+}   
+</code></pre><p><strong>三：根据需求设置相关的电平</strong></p>
+<pre><code>static int bmu1760_set_sel_mode(struct axp_charger_dev *cdev, int mode)
+{
+    if (mode) {
+            gpio_set_value(cdev-&gt;pmu_type_c_sel.gpio, 1); 
+    } else {
+            gpio_set_value(cdev-&gt;pmu_type_c_sel.gpio, 0); 
+    }   
+    AXP_DEBUG(AXP_SPLY, cdev-&gt;chip-&gt;pmu_num,
+            &quot;set_sel_mode = %x\n&quot;, mode);
+    return 0;
+}
+</code></pre><p><strong>四：设置管脚的驱动能力</strong></p>
+<p>正常以上三个步骤已经满足基本需求，但如果对管脚的驱动能力不满意；以下对PL管脚进行设置</p>
+<pre><code>DTS设置如下：
+gpio_led_led = &lt;&amp;r_pio PL 10 1 1 3 0&gt;
+
+--- a/drivers/misc/sunxi-rf/sunxi-wlan.c
++++ b/drivers/misc/sunxi-rf/sunxi-wlan.c
+@@ -367,6 +367,8 @@ static int sunxi_wlan_probe(struct platform_device *pdev)
+        struct device *dev = &amp;pdev-&gt;dev;
+        struct sunxi_wlan_platdata *data;
+        struct gpio_config config;
++       unsigned long drv_level;
++       char pin_name[SUNXI_PIN_NAME_MAX_LEN];
+        u32 val;
+        const char *power, *io_regulator;
+        int ret = 0;
+@@ -439,6 +441,14 @@ static int sunxi_wlan_probe(struct platform_device *pdev)
+                                data-&gt;gpio_wlan_regon);
+                        return ret;
+                }   
++               printk(&quot;%s %d\n&quot;,__func__,__LINE__);
++               sunxi_gpio_to_name(config.gpio, pin_name);
++               if (config.drv_level != GPIO_DRVLVL_DEFAULT) {
++                       printk(&quot;%s %d\n&quot;,__func__,__LINE__);
++                       drv_level = SUNXI_PINCFG_PACK(SUNXI_PINCFG_TYPE_DRV, config.drv_level);
++                       pin_config_set(SUNXI_R_PINCTRL, pin_name, drv_level);
++               }
++
+    }   
+</code></pre><p>如果使用pinctrl的设置方式的话，pinctrl会为我们初始化好设置的东西,GPIO的设置方式则需要手动配置；</p>
+<p>讲完输出以及电平的设置，另外一个管脚常用的功能中断的申请步骤这里也顺便讲一下</p>
+<h2><span id="中断管脚申请流程">中断管脚申请流程</span></h2><pre><code>dts配置如下
+     pmu_acin_det               = &lt;&amp;pio PH 10 0 1 1 0&gt;
+
+chg_dev-&gt;axp_acin_det.gpio =  of_get_named_gpio(pdev-&gt;dev.of_node,
+                            &quot;pmu_acin_det_gpio&quot;, 0);
+if (!gpio_is_valid(chg_dev-&gt;axp_acin_det.gpio)) {
+    pr_err(&quot;ERR: get pmu_acin_det_gpio is fail\n&quot;);
+    return -EINVAL;
+}
+
+ ret = gpio_request( chg_dev-&gt;axp_acin_det.gpio， &quot;pmu_acin_det_gpio&quot;);
+ if (ret != 0) {
+     pr_err(&quot;ERR: pmu_acin_det gpio_request failed\n&quot;);
+     return -EINVAL;
+}
+id_irq_num = gpio_to_irq(chg_dev-&gt;axp_acin_det.gpio);
+if (IS_ERR_VALUE((unsigned long)id_irq_num)) {
+    pr_err(&quot;ERR: map pmu_acin_det gpio to virq failed, err %d\n&quot;,
+               id_irq_num);
+    return -EINVAL;
+}
+ret = request_irq(id_irq_num, axp_acin_gpio_isr, irq_flags,
+            &quot;pmu_acin_det_gpio&quot;, chg_dev);
+if (IS_ERR_VALUE((unsigned long)ret)) {
+    pr_err(&quot;ERR: request pmu_acin_det virq %d failed, err %d\n&quot;,
+             id_irq_num, ret);
+    return -EINVAL;
+}
+</code></pre><p><strong>gpio需要在休眠时唤醒系统：</strong></p>
+<pre><code>全志目前的话只支持小cpu的gpio口唤醒系统，如果要唤醒系统，需要加入这两个步骤
+
+一：enable_gpio_wakeup_src(data-&gt;gpio_wlan_hostwake);
+二：request_irq的时候需要加入标志位 IRQF_NO_SUSPEND
+</code></pre><p>讲完使用的步骤，我们讲下GPIO的函数调用流程，顺便带出pinctrl</p>
+<pre><code>gpio_set_value
+    __gpio_set_value
+        gpiod_set_raw_value
+            _gpiod_set_raw_value
+                chip-&gt;set(chip, gpio_chip_hwgpio(desc), value);
+                    sunxi_pinctrl_gpio_set
+                        writel(regval, pctl-&gt;membase + reg); 
+</code></pre><p>从以上流程可知，GPIO的API是建立在pinctrl之上的接口，其他流程也类似，不在赘述，开始讲pinctrl</p>
+<h1><span id="pinctrl">pinctrl</span></h1><p>从上面的gpio的调用流程我们可以看到gpio类似于pinctrl的client或者consumer；但对于管脚，其不止有gpio的基本功能，输入输出；当gpio组合的时候，配合芯片的控制器，他可以作为IIC,SPI的控制引脚；</p>
+<h2><span id="pinctrl作用">pinctrl作用</span></h2><ol>
+<li>管理系统中所有的可以控制的pin,在系统初始化的时候，枚举所有可以控制的pin,并标识这些pin.</li>
+<li>管理这些pin的复用（Multiplexing），对于SOC而言，其引脚除了配置成普通的GPIO之外，若干个引脚还可以组成一个pin group,行程特定的功能。pin control subsystem需管理所有的pin group。</li>
+<li>配置这些pin的特性，例如使能或关闭引脚上的pull-up,pull-down电阻，配置引脚的driver strength；</li>
 </ol>
-<h1><span id="mtp-协议栈">MTP 协议栈</span></h1><ol>
-<li>Pyshical Layer(物理层)：物理层在MTP协议中用来传输数据。目前有三种物理层可供MTP使用。它们分别是USB:其主要特点是传输文件，同步媒体文件时速度快，而且可以变工作边充电，这是目前用的最多的一种方式；IP：基于IP的MTP(简称MTP/TP)将通过UPnp来匹配和发现设备。它是家庭网络中最理想的传输方式；Bluetooth:MTP/BT是最省电，同时速度最慢的一种传输方式，用处较少；</li>
-<li>传输层：MTP中，数据传输格式遵循PTP协议</li>
-<li>命令层：实现了MTP协议中的各种命令；</li>
-</ol>
-<p>MTP采用命令-应答方式来工作，(Initator发送命令给Responder处理，Responser反馈处理结果)，这种方式主要特点有：</p>
-<ol>
-<li>所有MTP命令均以Package(数据包)的方式在设备两端进行传递</li>
-<li>Initiator必须接收到前一条消息处理结果，无论是成功或者超时后，才能发送下一条消息</li>
-</ol>
+<h2><span id="pinctr的使用demo">pinctr的使用demo:</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">static int ir_tx_request_gpio(struct sunxi_ir_tx_data *ir_tx_data)     </span><br><span class="line">&#123;                                                                      </span><br><span class="line">        ir_tx_data-&gt;pctrl = devm_pinctrl_get(&amp;ir_tx_data-&gt;pdev-&gt;dev);  </span><br><span class="line">        if (IS_ERR(ir_tx_data-&gt;pctrl)) &#123;                               </span><br><span class="line">                IRTX_ERR(&quot;devm_pinctrl_get() failed!\n&quot;);              </span><br><span class="line">                return -1;                                             </span><br><span class="line">        &#125;                                                              </span><br><span class="line">                                                                       </span><br><span class="line">        return ir_tx_select_gpio_state(ir_tx_data-&gt;pctrl,              </span><br><span class="line">                        PINCTRL_STATE_DEFAULT);                        </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">static int ir_tx_select_gpio_state(struct pinctrl *pctrl, char *name)           </span><br><span class="line">&#123;                                                                               </span><br><span class="line">        int ret = 0;                                                            </span><br><span class="line">        struct pinctrl_state *pctrl_state = NULL;                               </span><br><span class="line">                                                                                </span><br><span class="line">        pctrl_state = pinctrl_lookup_state(pctrl, name);                        </span><br><span class="line">        if (IS_ERR(pctrl_state)) &#123;                                              </span><br><span class="line">                IRTX_ERR(&quot;IR_TX pinctrl_lookup_state(%s) failed! return %p \n&quot;, </span><br><span class="line">                                name, pctrl_state);                             </span><br><span class="line">                return -1;                                                      </span><br><span class="line">        &#125;                                                                       </span><br><span class="line">                                                                                </span><br><span class="line">        ret = pinctrl_select_state(pctrl, pctrl_state);                         </span><br><span class="line">        if (ret &lt; 0)                                                            </span><br><span class="line">                IRTX_ERR(&quot;IR_TX pinctrl_select_state(%s) failed! return %d \n&quot;, </span><br><span class="line">                                name, ret);                                     </span><br><span class="line">                                                                                </span><br><span class="line">        return ret;                                                             </span><br><span class="line">&#125;</span><br><span class="line">static int sunxi_ir_tx_remove(struct platform_device *pdev)              </span><br><span class="line">&#123;                                                                        </span><br><span class="line">        struct sunxi_ir_tx_data *ir_tx_data = platform_get_drvdata(pdev);</span><br><span class="line">                                                                   </span><br><span class="line">   		....                     </span><br><span class="line">        devm_pinctrl_put(ir_tx_data-&gt;pctrl);                             </span><br><span class="line">                                                                                                                  </span><br><span class="line">        ....                                                                     </span><br><span class="line">        return 0;                                                        </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2><span id="pinctrl-debug-方法">pinctrl debug 方法</span></h2><p><img src="/2018/02/25/pinctrl/sunxi_pinctrl/sunxi_pinctrl_debug.jpg" alt="pinctrl debug"></p>
+<p>#参考资料</p>
+<p><a href="http://www.wowotech.net/gpio_subsystem/pinctrl-and-gpio.html" target="_blank" rel="noopener">linux内核中的GPIO系统之（5）：gpio subsysem和pinctrl subsystem之间的耦合</a></p>
 
           
         
@@ -2283,7 +2341,7 @@ b.根据物理地址获取数据
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
   </nav>
 
 
@@ -2329,7 +2387,7 @@ b.根据物理地址获取数据
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-count">20</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>

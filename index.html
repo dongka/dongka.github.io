@@ -249,218 +249,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/30/display/rotation/rotation/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/09/30/display/rotation/rotation/" itemprop="url">Untitled</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-09-30T06:43:21+00:00">
-                2019-09-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1><span id="androidq更改默认屏幕方向">androidQ更改默认屏幕方向</span></h1><p>由于客户的选型需要，可能需要横屏竖用，或者竖屏横用；在P之前的android SDK中，谷歌并不支持相关的功能；所以需要原厂自行定制；在P上 MTK为统一刷GSI和不刷GSI方向的统一，向谷歌mainline提供了对应的补丁；之后在Q上谷歌又进行了相关的修改；使得安卓支持改变默认显示方向的功能也日趋稳定；当然也是会存在bug,如在android Q上就出现了开机动画和应用启动动画异常问题（已解决）；但为了统一后续android平台下的横屏竖用使用配置；全志平台androidQ横屏竖用也是依托这个补丁进行横屏竖用的实现；</p>
-<p>有兴趣的可以访问这个网站查看更多的信息：<a href="https://osdn.net/projects/android-x86/scm/git/frameworks-native/commits/7501ed66a05f530062925011d1342e8651216051" target="_blank" rel="noopener">GSI 支持横屏模式</a></p>
-<h1><span id="本文目的">本文目的</span></h1><p>一：梳理安卓TP,gsensor,surfaceflinger中rotation的系数之间的关系，客户配置地方；</p>
-<p>二：系统旋转监听以及应用旋转方向申请；</p>
-<p>三：现有显示框架支持横屏竖用原理；</p>
-<h1><span id="参数配置">参数配置</span></h1><h2><span id="dtbo中设置tp方向">dtbo中设置TP方向</span></h2><p>为了分离linux环境（dragonboard）和android环境的中TP的方向，使其不相互影响，为了使用android的新朝向，我们将TP方向更改的配置放到dtbo中；在android source并lunch对应的版型后，cbd即可到对应的路径；本文将以全志A50 A7版型为例讲解配置；</p>
-<p><img src="/2019/09/30/display/rotation/rotation/Users\Administrator\AppData\Roaming\Typora\typora-user-images\1565697980955.png" alt="1565697980955"></p>
-<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&amp;soc &#123;</span><br><span class="line">    dtbo_version = &lt;0x00000001&gt;;</span><br><span class="line">    dtbo&#123;</span><br><span class="line">        compatible = "allwinner,sunxi-dtbo";</span><br><span class="line">        dtbo_type = &lt;1&gt;;</span><br><span class="line">    &#125;;</span><br><span class="line"><span class="addition">+    ctp &#123;</span></span><br><span class="line"><span class="addition">+        ctp_screen_max_x = &lt;480&gt;;</span></span><br><span class="line"><span class="addition">+        ctp_screen_max_y = &lt;800&gt;;</span></span><br><span class="line"><span class="addition">+        ctp_revert_y_flag = &lt;1&gt;;</span></span><br><span class="line"><span class="addition">+        ctp_exchange_x_y_flag = &lt;0&gt;;</span></span><br><span class="line"><span class="addition">+    &#125;;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>参数解释：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ctp_screen_max_x 触摸板的x轴最大坐标</span><br><span class="line">ctp_screen_max_y 触摸板的y轴最大坐标</span><br><span class="line">ctp_revert_x_flag 是否需要翻转x坐标，需要则置1，反之置0</span><br><span class="line">ctp_revert_y_flag 是否需要翻转y坐标，需要则置1，反之置0</span><br><span class="line">ctp_exchange_x_y_flag 是否需要x轴y轴坐标对换</span><br></pre></td></tr></table></figure>
-<p>修改好需要重新编译和打包内核，在配置该参数的需注意检查驱动是否支持该方法；</p>
-<p><strong>非安全固件可以通过命令行修改参数进行验证</strong>，将default/env.cfg中将bootdelay改成3s,<strong>配合串口</strong>在uboot启动过程中按住enter键进入uboot命令行，用fdt 命令的修改验证；</p>
-<p><strong>步骤如下：</strong></p>
-<p><img src="/2019/09/30/display/rotation/rotation/fdt_ctp.png" alt="1569824097100"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">如当下需要修改ctp_screen_max_x,可按</span><br><span class="line">fdt set /soc/ctp ctp_screen_max_x &lt;0x01&gt;</span><br><span class="line">fdt list /soc/ctp 确认是否修改到</span><br><span class="line">fdt save //保存配置</span><br><span class="line">boot</span><br></pre></td></tr></table></figure>
-<h2><span id="方案目录下配置显示和sensor方向">方案目录下配置显示和sensor方向</span></h2><p><img src="/2019/09/30/display/rotation/rotation/Users\Administrator\AppData\Roaming\Typora\typora-user-images\1565698555002.png" alt="1565698555002"></p>
-<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="addition">+	# change SurfaceFlinger Orientation(0, 90, 180, 270)</span></span><br><span class="line"><span class="addition">+	SF_PRIMARY_DISPLAY_ORIENTATION := 90</span></span><br><span class="line"></span><br><span class="line"><span class="addition">+	#change minui Orientation</span></span><br><span class="line"><span class="addition">+	#ROTATION_NONE=0, ROTATION_RIGHT=90, ROTATION_DOWN=180, ROTATION_LEFT=270</span></span><br><span class="line"><span class="addition">+	PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \</span></span><br><span class="line">   		 ro.minui.default_rotation=ROTATION_RIGHT</span><br><span class="line"><span class="addition">+	#change Gsensor rotation(0, 90, 180. 270)</span></span><br><span class="line"><span class="addition">+	PRODUCT_PROPERTY_OVERRIDES += \</span></span><br><span class="line">    	ro.vendor.sf.rotation=270</span><br></pre></td></tr></table></figure>
-<h2><span id="camera方向配置">camera方向配置</span></h2><p>在有摄像头的方案下面还需调整自己的摄像头方向，提供的配置地方有：</p>
-<p>configs/camera.cfg</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">camera_orientation //可设置0，90，180，270</span><br></pre></td></tr></table></figure>
-<p>hawkview/sensor_list_cfg.ini</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sensor_hflip0  //水平反转</span><br><span class="line">sensor_vflip0  //垂直反转</span><br></pre></td></tr></table></figure>
-<p>客户可以adb remount,选择busybox vi到对应的文件下；先调整camera的朝向，在调整镜像；</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vendor/etc/camera.cfg</span><br><span class="line">vendor/etc/hawkview/sensor_list_cfg.ini</span><br></pre></td></tr></table></figure>
-<h2><span id="gsensor方向调整方法二">Gsensor方向调整方法二</span></h2><p>对于Gsensor还有一种改法与camera一样，在方案目录下面有相应的文件可以提供配置;方案商的话其实根据想要的屏幕朝向和sensor的摆放，配置这个文件会是一件更为简单和兼容性更好的操作；</p>
-<p>目录为config/gsensor.cfg,</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">gsensor_name = sc7660</span><br><span class="line">gsensor_direct_x = <span class="literal">false</span> <span class="comment">//x轴是否反向</span></span><br><span class="line">gsensor_direct_y = <span class="literal">false</span> <span class="comment">//y轴是否反向</span></span><br><span class="line">gsensor_direct_z = <span class="literal">false</span> <span class="comment">//z轴是否反向</span></span><br><span class="line">gsensor_xy_revert = <span class="literal">true</span> <span class="comment">//是否反转x,y轴</span></span><br></pre></td></tr></table></figure>
-<p><strong>gsensor坐标系：</strong></p>
-<p><img src="/2019/09/30/display/rotation/rotation/Users/Administrator/Desktop/study/display/%E6%A8%AA%E5%B1%8F%E7%AB%96%E7%94%A8%E5%AE%9E%E7%8E%B0/rotation/%E7%89%A9%E7%90%86%E6%A8%AA%E7%AB%96%E5%B1%8F%E5%9D%90%E6%A0%87.png" alt="1567043212576"></p>
-<p><strong>匹配规则：</strong></p>
-<p>安卓是用的右手坐标系，Z轴相对屏幕朝外，gsensor的数据是一个三维数组，values[0]对应的x轴的值，value[1]对应的y轴,value[2]对应的Z轴，将相对轴竖直朝上放置时候，以该轴为对应的值为正（约9.8左右），其他两轴对应为0为准；</p>
-<h2><span id="总结">总结</span></h2><p>对于Q平台上需要更改默认屏幕方向，为兼容多个设备，且统一后续平台谷歌方案配置需要配置的选项如上述所述配置Android显示方向，recovery显示方向，TP方向，gsensor，camera，以及bootlogo图片方向；</p>
-<p><strong>至此，若是只需要知道怎么配置的可以不看以下的章节；</strong></p>
-<h1><span id="input系统">Input系统</span></h1><h2><span id="linux-input简介">linux input简介</span></h2><h3><span id="软件框图">软件框图</span></h3><p><img src="/2019/09/30/display/rotation/rotation/1565673944332.png" alt="1565673944332"></p>
-<h3><span id="tp驱动流程">Tp驱动流程</span></h3><p>借着梳理这个事件上报流程，我们也可以将主要的架构和流程涵盖；</p>
-<p><strong>以TP gslx680为例：</strong></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span>  <span class="title">gsl_ts_probe</span><span class="params">(struct i2c_client *client,</span></span></span><br><span class="line"><span class="function"><span class="params">                         <span class="keyword">const</span> struct i2c_device_id *id)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">...</span><br><span class="line">   queue_work(gslX680_wq, &amp;glsX680_init_work);</span><br><span class="line">    	--&gt;glsX680_init_events	</span><br><span class="line">            ret = input_request_int(&amp;(config_info.input_type), gsl_ts_irq,</span><br><span class="line">            CTP_IRQ_MODE, ts_init);</span><br><span class="line"></span><br><span class="line">   gsl_ts_init_ts</span><br><span class="line">     --&gt;set_bit(ABS_MT_POSITION_X, input_device-&gt;absbit);</span><br><span class="line"> 		set_bit(ABS_MT_POSITION_Y, input_device-&gt;absbit);</span><br><span class="line">		set_bit(ABS_MT_TOUCH_MAJOR, input_device-&gt;absbit);</span><br><span class="line">    	set_bit(ABS_MT_WIDTH_MAJOR, input_device-&gt;absbit);</span><br><span class="line">		input_set_abs_params(input_device, ABS_MT_POSITION_X, <span class="number">0</span>,</span><br><span class="line">                         SCREEN_MAX_X, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    	input_set_abs_params(input_device, ABS_MT_POSITION_Y, <span class="number">0</span>,</span><br><span class="line">                         SCREEN_MAX_Y, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    	input_set_abs_params(input_device, ABS_MT_TOUCH_MAJOR, <span class="number">0</span>,</span><br><span class="line">                         PRESS_MAX, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    	input_set_abs_params(input_device, ABS_MT_WIDTH_MAJOR, <span class="number">0</span>, <span class="number">200</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    	设置TP支持的设备属性和参数</span><br><span class="line">        --&gt;  input_device = input_allocate_device();</span><br><span class="line">    		 c = input_register_device(input_device);</span><br><span class="line">    		 跟常见的platform总线模型一样，会将input_device加到input_device_list</span><br><span class="line">    		 在<span class="keyword">register</span>的时候通过match在input_handler_list中找到对应的handler</span><br><span class="line">             流程如下所示：</span><br><span class="line">             --&gt; input_attach_handler(dev, handler);</span><br><span class="line">    			  id = input_match_device(handler, dev);</span><br><span class="line">    			  error = handler-&gt;connect(handler, dev, id);</span><br><span class="line">    		这里就会调到：evdev.c中的event_connect</span><br><span class="line">    			--&gt;error = input_register_handle(&amp;evdev-&gt;handle);</span><br><span class="line">    		evdev基本上支持所有类型，所以这里TP将会与evdev通过handle进行连接</span><br><span class="line">...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">接下来就是中断处理流程，这里我们就能看出他的层级关系；  </span><br><span class="line">input driver  --&gt;input_dev</span><br><span class="line">gsl_ts_irq&#123;</span><br><span class="line">	queue_work(ts-&gt;wq, &amp;ts-&gt;work);</span><br><span class="line">		gsl_ts_xy_worker</span><br><span class="line">			process_gslX680_data</span><br><span class="line">				input_report_abs(ts-&gt;input, ABS_MT_TRACKING_ID, id);</span><br><span class="line">				input_report_abs(ts-&gt;input, ABS_MT_TOUCH_MAJOR, pressure);</span><br><span class="line">				input_report_abs(ts-&gt;input, ABS_MT_POSITION_X, x);</span><br><span class="line">				input_report_abs(ts-&gt;input, ABS_MT_POSITION_Y, y);</span><br><span class="line">				input_report_abs(ts-&gt;input, ABS_MT_WIDTH_MAJOR, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line">input core</span><br><span class="line">input_event(dev, EV_ABS, code, value);</span><br><span class="line">	input_handle_event(dev, type, code, value);</span><br><span class="line">		input_pass_values(dev, dev-&gt;vals, dev-&gt;num_vals);</span><br><span class="line">			count = input_to_handler(handle, vals, count);</span><br><span class="line">				handler-&gt;event(handle, v-&gt;type, v-&gt;code, v-&gt;value);</span><br><span class="line">evdev --&gt; input_handler</span><br><span class="line">evdev_event</span><br><span class="line">	evdev_events(handle, vals, <span class="number">1</span>);</span><br><span class="line">		evdev_pass_values(client, vals, count, ev_time);</span><br><span class="line">			__pass_event(client, &amp;event);</span><br><span class="line">			--&gt;kill_fasync(&amp;client-&gt;fasync, SIGIO, POLL_IN);</span><br><span class="line">			<span class="comment">//走到这里的时候epoll_wait dev/input/xxx的监听就能收到消息</span></span><br><span class="line">			wake_up_interruptible(&amp;evdev-&gt;wait);</span><br></pre></td></tr></table></figure>
-<p><strong>简而言之：input_dev在中断处理函数里面上报事件 -&gt; input_core找到对应的handler -&gt; input_handler:如edev通过___pass_event将事件上报给用户层；</strong></p>
-<h2><span id="androd-input流程">androd Input流程</span></h2><p><a href="https://blog.csdn.net/xingchenxuanfeng/article/details/79208005" target="_blank" rel="noopener">安卓接受事件之后的处理流程</a></p>
-<p><img src="/2019/09/30/display/rotation/rotation/Android_input.png" alt="android处理input事件处理流程"></p>
-<p><strong>流程简单介绍：</strong></p>
-<p><strong>一：APP setView建立inputChannel和window的连接</strong></p>
-<p>当一个应用程序有Activity能接受用户输入，他就要将自己的Window（ViewRoot）通过setView（)注册到Window Manager Service中；</p>
-<p>frameworks/base/core/java/android/view/ViewRootImpl.java</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setView</span><span class="params">(View view, WindowManager.LayoutParams attrs, View panelParentView)</span> </span>&#123;</span><br><span class="line">...</span><br><span class="line">    requestLayout();<span class="comment">//对控件树进行测量，布局，向WMS申请修改窗口属性以及重绘的所有工作</span></span><br><span class="line">    <span class="keyword">if</span> ((mWindowAttributes.inputFeatures</span><br><span class="line">        &amp; WindowManager.LayoutParams.INPUT_FEATURE_NO_INPUT_CHANNEL) == <span class="number">0</span>) &#123;</span><br><span class="line">   		 mInputChannel = <span class="keyword">new</span> InputChannel();</span><br><span class="line">	&#125;</span><br><span class="line">    <span class="comment">//服务端过程</span></span><br><span class="line">    res = mWindowSession.addToDisplay(mWindow, mSeq, mWindowAttributes,</span><br><span class="line">        getHostVisibility(), mDisplay.getDisplayId(), mTmpFrame,</span><br><span class="line">        mAttachInfo.mContentInsets, mAttachInfo.mStableInsets,</span><br><span class="line">        mAttachInfo.mOutsets, mAttachInfo.mDisplayCutout, mInputChannel,</span><br><span class="line">        mTempInsets);</span><br><span class="line">    --&gt; mService.addWindow</span><br><span class="line">        --&gt;openInputChannel</span><br><span class="line">        	InputChannel[] inputChannels = InputChannel.openInputChannelPair(name);</span><br><span class="line">    		mInputChannel = inputChannels[<span class="number">0</span>];</span><br><span class="line">			mClientChannel = inputChannels[<span class="number">1</span>];</span><br><span class="line">    		--&gt;mClientChannel.transferTo(outInputChannel);<span class="comment">//将socketPair的另外一个FD放在参数OutputChannel里，创建WindowInputEventRecevier用于接受InputDispatchor传来的事件；后者同样通过AddFd()将读端SocketFd加入到Looper中，这样一旦InputDispatchor发送Event,Looper就会立即醒来处理；</span></span><br><span class="line">    		--&gt;mWmService.mInputManager.registerInputChannel(mInputChannel, mClient.asBinder());<span class="comment">//调用到InputDispacher的RegisterInputChannel()方法；InputDispacher会通过addFd 将channel的fd加入到loop中，这样，只要某个Window在Socket的另一端写入数据，Looper就会马上从睡眠中醒来，进行处理；</span></span><br><span class="line"></span><br><span class="line">         mInputEventReceiver = <span class="keyword">new</span> WindowInputEventReceiver(mInputChannel,</span><br><span class="line">         Looper.myLooper());</span><br><span class="line">...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>建立Window和InputDispatch的联系；</strong></p>
-<p><strong>二：framework层的收集和分发</strong></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">framework/native/services/inputflinger/EventHub.cpp</span><br><span class="line">EventHub::EventHub(<span class="keyword">void</span>) : ｛</span><br><span class="line">	mEpollFd = epoll_create1(EPOLL_CLOEXEC);</span><br><span class="line">	mINotifyFd = inotify_init();</span><br><span class="line">	mInputWd = inotify_add_watch(mINotifyFd, DEVICE_PATH, IN_DELETE | IN_CREATE);</span><br><span class="line">	<span class="keyword">int</span> result = epoll_ctl(mEpollFd, EPOLL_CTL_ADD, mINotifyFd, &amp;eventItem);</span><br><span class="line">	result = fcntl(mWakeReadPipeFd, F_SETFL, O_NONBLOCK);</span><br><span class="line">	result = epoll_ctl(mEpollFd, EPOLL_CTL_ADD, mWakeReadPipeFd, &amp;eventItem);</span><br><span class="line">｝</span><br><span class="line"><span class="keyword">size_t</span> EventHub::getEvents(<span class="keyword">int</span> timeoutMillis, RawEvent* buffer, <span class="keyword">size_t</span> bufferSize) &#123;</span><br><span class="line">	<span class="keyword">for</span>(;;)&#123;</span><br><span class="line">	...</span><br><span class="line">	nRead = read(mWakeReadPipeFd, buffer, <span class="keyword">sizeof</span>(buffer));</span><br><span class="line">	<span class="keyword">int</span> pollResult = epoll_wait(mEpollFd, mPendingEventItems, EPOLL_MAX_EVENTS, timeoutMillis);</span><br><span class="line">	...</span><br><span class="line">	&#125;</span><br><span class="line">｝</span><br><span class="line">总结：Eventhub的作用是监听，读取/dev/input目录下产生的新事件，如节点的增删以及事件的上报，并封装成RawEvent结构体共InputReader使用。</span><br><span class="line">framework/native/services/inputflinger/InputReader.cpp</span><br><span class="line"><span class="keyword">void</span> InputReader::loopOnce() &#123;</span><br><span class="line"><span class="keyword">size_t</span> count = mEventHub-&gt;getEvents(timeoutMillis, mEventBuffer, EVENT_BUFFER_SIZE);</span><br><span class="line">	<span class="keyword">if</span> (count) &#123;</span><br><span class="line">    	processEventsLocked(mEventBuffer, count);</span><br><span class="line">    	--&gt;device-&gt;process(rawEvents, count);</span><br><span class="line">    		--&gt;mapper-&gt;process(rawEvent); <span class="comment">//将事件压入队列</span></span><br><span class="line">	&#125;</span><br><span class="line">	mQueuedListener-&gt;flush();<span class="comment">//将事件进行分发</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">void</span> TouchInputMapper::process(<span class="keyword">const</span> RawEvent* rawEvent) &#123;</span><br><span class="line">...</span><br><span class="line">	sync(rawEvent-&gt;when);</span><br><span class="line">	--&gt;processRawTouches(<span class="literal">false</span> <span class="comment">/*timeout*/</span>)</span><br><span class="line">		--&gt;cookAndDispatch(mCurrentRawState.when);</span><br><span class="line">			--&gt;dispatchTouches(when, policyFlags);</span><br><span class="line">				--&gt;	dispatchMotion(when, policyFlags, mSource,</span><br><span class="line">        	AMOTION_EVENT_ACTION_MOVE, <span class="number">0</span>, <span class="number">0</span>, metaState, buttonState,</span><br><span class="line">        	AMOTION_EVENT_EDGE_FLAG_NONE,</span><br><span class="line">        	mCurrentCookedState.deviceTimestamp,</span><br><span class="line">        	mCurrentCookedState.cookedPointerData.pointerProperties,</span><br><span class="line">        	mCurrentCookedState.cookedPointerData.pointerCoords,</span><br><span class="line">        	mCurrentCookedState.cookedPointerData.idToIndex,</span><br><span class="line">        	currentIdBits, <span class="number">-1</span>,</span><br><span class="line">        	mOrientedXPrecision, mOrientedYPrecision, mDownTime);</span><br><span class="line">        		--&gt;getListener()-&gt;notifyMotion(&amp;args);</span><br><span class="line">        		--&gt;mArgsQueue.push_back(<span class="keyword">new</span> NotifySwitchArgs(*args));</span><br><span class="line">...</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">void</span> QueuedInputListener::flush() &#123;</span><br><span class="line">	args-&gt;notify(mInnerListener);</span><br><span class="line">		--&gt;listener-&gt;notifyMotion(<span class="keyword">this</span>);<span class="comment">//这里的listen就是InputDispatcher了</span></span><br><span class="line">	 mArgsQueue.clear();</span><br><span class="line">&#125;</span><br><span class="line">总结：InputReader的就是循环的读取EventHub中的数据，然后通过InputDispatcher进行分发</span><br><span class="line"></span><br><span class="line">framework/native/services/inputflinger/InputDispatcher.cpp</span><br><span class="line"><span class="keyword">void</span> InputDispatcher::notifyMotion(<span class="keyword">const</span> NotifyMotionArgs* args) &#123;</span><br><span class="line">MotionEntry* newEntry = <span class="keyword">new</span> MotionEntry(args-&gt;sequenceNum, args-&gt;eventTime,</span><br><span class="line">        args-&gt;deviceId, args-&gt;source, args-&gt;displayId, policyFlags,</span><br><span class="line">        args-&gt;action, args-&gt;actionButton, args-&gt;flags,</span><br><span class="line">        args-&gt;metaState, args-&gt;buttonState, args-&gt;classification,</span><br><span class="line">        args-&gt;edgeFlags, args-&gt;xPrecision, args-&gt;yPrecision, args-&gt;downTime,</span><br><span class="line">        args-&gt;pointerCount, args-&gt;pointerProperties, args-&gt;pointerCoords, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">        needWake = enqueueInboundEventLocked(newEntry);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">bool</span> InputDispatcherThread::threadLoop() &#123;</span><br><span class="line">	mDispatcher-&gt;dispatchOnce();</span><br><span class="line">	--&gt;dispatchOnceInnerLocked(&amp;nextWakeupTime);</span><br><span class="line">		--&gt;done = dispatchMotionLocked(currentTime, typedEntry,</span><br><span class="line">        &amp;dropReason, nextWakeupTime);</span><br><span class="line">          --&gt;injectionResult = findTouchedWindowTargetsLocked(currentTime,</span><br><span class="line">        entry, inputTargets, nextWakeupTime, &amp;conflictingPointerActions);</span><br><span class="line">          --&gt;dispatchEventLocked(currentTime, entry, inputTargets);</span><br><span class="line">          	--&gt;getConnectionIndexLocked(inputTarget.inputChannel);<span class="comment">//这个inputChannel用于与window实例通信</span></span><br><span class="line">          	--&gt;prepareDispatchCycleLocked</span><br><span class="line">          		--&gt;enqueueDispatchEntriesLocked</span><br><span class="line">          			--&gt;startDispatchCycleLocked</span><br><span class="line">          				--&gt;publishMotionEvent</span><br><span class="line">          					--&gt;mChannel-&gt;sendMessage(&amp;msg)</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line">InputDispatcher的作用就是通过sendMessage进行跨进程通信，把msg发给对应的window</span><br><span class="line">如果是按键类型的时间，那么就会通过notifyKey的流程，然后传递给PhoneWindowManager这个读者可以自行梳理</span><br></pre></td></tr></table></figure>
-<p><strong>流程总结：</strong>内核将原始事件写入设备节点中，InputReader不断地通过Eventhub将原始事件取出来并翻译加工成android输入事件，然后交给InputDispacther.InputDispactcher根据WMS提供的窗口信息，将事件交给格式的窗口，窗口的ViewRootimpl对象再沿着控件树将事件派发给感兴趣的控件，控件对其接收到的时间做出响应，更新自己的画面，执行特定的动作；</p>
-<h1><span id="显示方向旋转">显示方向旋转</span></h1><p>Sensor的框架分为三个层次，客户层，服务层，HAL层，服务端负责从HAL层读取数据，并将数据写到管道中，客户端通过管道读取服务端数据；具体细节可以看这两份文档</p>
-<p><a href="http://kernel.meizu.com/android-sensor-framework.html" target="_blank" rel="noopener">Android Sensor Framework概览</a></p>
-<p><a href="https://www.cnblogs.com/lcw/p/3402770.html" target="_blank" rel="noopener">sensor框架Framework层解读</a></p>
-<p><strong>流程图：</strong></p>
-<p><img src="/2019/09/30/display/rotation/rotation/gsensor_flow.png" alt="1567068378839"></p>
-<h2><span id="自动旋转监听">自动旋转监听</span></h2><p>系统从SystemUI或者setting中获取到是否开启自动旋转；最终设置到mUserRotationMode和mUserRotation</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">systemUI:	</span><br><span class="line">./services/core/java/com/android/server/wm/DisplayRotation.java</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">freezeRotation</span><span class="params">(<span class="keyword">int</span> rotation)</span> </span>&#123;</span><br><span class="line">     rotation = (rotation == <span class="number">-1</span>) ? mDisplayContent.getRotation() : rotation;</span><br><span class="line">     setUserRotation(WindowManagerPolicy.USER_ROTATION_LOCKED, rotation);</span><br><span class="line"> &#125;</span><br><span class="line"> <span class="function"><span class="keyword">void</span> <span class="title">thawRotation</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    setUserRotation(WindowManagerPolicy.USER_ROTATION_FREE, mUserRotation);</span><br><span class="line">&#125;</span><br><span class="line">settings:</span><br><span class="line">updateSettings() &#123;</span><br><span class="line">    final <span class="keyword">int</span> userRotation = Settings.System.getIntForUser(resolver,</span><br><span class="line">        Settings.System.USER_ROTATION, Surface.ROTATION_0,</span><br><span class="line">        UserHandle.USER_CURRENT);</span><br><span class="line">     final <span class="keyword">int</span> userRotationMode = Settings.System.getIntForUser(resolver,</span><br><span class="line">         Settings.System.ACCELEROMETER_ROTATION, <span class="number">0</span>, UserHandle.USER_CURRENT) != <span class="number">0</span></span><br><span class="line">                 ? WindowManagerPolicy.USER_ROTATION_FREE</span><br><span class="line">                 : WindowManagerPolicy.USER_ROTATION_LOCKED;</span><br><span class="line">    updateOrientationListenerLw()</span><br><span class="line">        --&gt;mOrientationListener.enable(<span class="literal">true</span> <span class="comment">/* clearCurrentRotation */</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">services/core/java/com/android/server/policy/WindowOrientationListener.java</span><br><span class="line">一：注册监听</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">enable</span><span class="params">(boolean clearCurrentRotation)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (mSensor.getType() == Sensor.TYPE_ACCELEROMETER) &#123;</span><br><span class="line">    	mSensorManager.registerListener(</span><br><span class="line">            mOrientationJudge, mSensor, mRate, DEFAULT_BATCH_LATENCY, mHandler);</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">   		mSensorManager.registerListener(mOrientationJudge, mSensor, mRate, mHandler);</span><br><span class="line">	&#125;</span><br><span class="line">二：sensor有数据的时候就会发一个回调</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSensorChanged</span><span class="params">(SensorEvent event)</span> </span>&#123;</span><br><span class="line">	这里就会计算出一个proposedRotation，分发给需要的模块</span><br><span class="line">	 onProposedRotationChanged(proposedRotation);</span><br><span class="line">｝</span><br><span class="line">services/core/java/com/android/server/wm/DisplayRotation.java </span><br><span class="line">三：决策是否旋转和启动旋转动画流程</span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     <span class="comment">// Send interaction hint to improve redraw performance.</span></span><br><span class="line">     mService.mPowerManagerInternal.powerHint(PowerHint.LAUNCH, <span class="number">1</span>);</span><br><span class="line">     <span class="keyword">if</span> (isRotationChoicePossible(mCurrentAppOrientation)) &#123;</span><br><span class="line">         final boolean isValid = isValidRotationChoice(mRotation);</span><br><span class="line">         sendProposedRotationChangeToStatusBarInternal(mRotation, isValid);</span><br><span class="line">     &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">         mService.updateRotation(<span class="literal">false</span> <span class="comment">/* alwaysSendConfiguration */</span>,</span><br><span class="line">                 <span class="literal">false</span> <span class="comment">/* forceRelayout */</span>);</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
-<h2><span id="rotation和orientation区别">rotation和orientation区别</span></h2><p><strong>rotation:</strong>旋转方向是指界面（不是手机）相对于默认情况情况顺时针旋转的角度，平板一般默认横屏，而小屏幕设备默认竖屏；</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">frameworks/base/core/java/android/view/Surface.java</span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> final <span class="keyword">int</span> ROTATION_0 = <span class="number">0</span>;</span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> final <span class="keyword">int</span> ROTATION_90 = <span class="number">1</span>;</span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> final <span class="keyword">int</span> ROTATION_180 = <span class="number">2</span>;</span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> final <span class="keyword">int</span> ROTATION_270 = <span class="number">3</span>;</span><br></pre></td></tr></table></figure>
-<p><strong>orientation:</strong>分为两种情况，一个是ActivityInfo.java,另一个在Configuration.java.前者具体来说是ActivityInfo.screenOrientation,这个值用于记录App强制设定的方向或者旋转模式。具体代码如下：</p>
-<p><strong>rotation旋转的是物体坐标系，而orientation旋转的是世界坐标系，即观察视角；</strong></p>
-<h2><span id="应用申请旋转">应用申请旋转</span></h2><p>对于应用开发者而言可以通过调用如下api去申请屏幕朝向</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">core/java/android/app/Activity.java</span><br><span class="line">	setRequestedOrientation</span><br></pre></td></tr></table></figure>
-<p>获取命令如下：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dumpsys window | grep mCurrentAppOrientation</span><br></pre></td></tr></table></figure>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">frameworks/base/core/java/android/content/pm/ActivityInfo.java</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * The preferred screen orientation this activity would like to run in.</span></span><br><span class="line"><span class="comment"> * From the &#123;@link android.R.attr#screenOrientation&#125; attribute, one of</span></span><br><span class="line"><span class="comment"> * &#123;@link #SCREEN_ORIENTATION_UNSPECIFIED&#125;, -1；//未指定，默认值，由安卓选择合适方向，关闭系统旋转屏幕，就不会转动屏幕</span></span><br><span class="line"><span class="comment"> * &#123;@link #SCREEN_ORIENTATION_LANDSCAPE&#125;, 0//横屏</span></span><br><span class="line"><span class="comment"> * &#123;@link #SCREEN_ORIENTATION_PORTRAIT&#125;, 1//竖屏</span></span><br><span class="line"><span class="comment"> * &#123;@link #SCREEN_ORIENTATION_USER&#125;, 2//用户选择方向</span></span><br><span class="line"><span class="comment"> * &#123;@link #SCREEN_ORIENTATION_BEHIND&#125;, 3//继承Activity堆栈中当前Activity下面的那个Activity的方向</span></span><br><span class="line"><span class="comment"> * &#123;@link #SCREEN_ORIENTATION_SENSOR&#125;, 4//由物理感应器决定显示方向</span></span><br><span class="line"><span class="comment"> * &#123;@link #SCREEN_ORIENTATION_NOSENSOR&#125;, 5//忽略物理感应器</span></span><br><span class="line"><span class="comment"> * &#123;@link #SCREEN_ORIENTATION_SENSOR_LANDSCAPE&#125;, 6//锁定屏幕横屏，可以180旋转，相当于SCREEN_ORIENTATION_USER_LANDSCAPE并且打开自动旋转功能</span></span><br><span class="line"><span class="comment"> * &#123;@link #SCREEN_ORIENTATION_SENSOR_PORTRAIT&#125;,  7//锁定屏幕竖屏，可以180旋转</span></span><br><span class="line"><span class="comment"> * &#123;@link #SCREEN_ORIENTATION_REVERSE_LANDSCAPE&#125;, 8//强制横屏方向</span></span><br><span class="line"><span class="comment"> * &#123;@link #SCREEN_ORIENTATION_REVERSE_PORTRAIT&#125;, 9//竖屏方向转换</span></span><br><span class="line"><span class="comment"> * &#123;@link #SCREEN_ORIENTATION_FULL_SENSOR&#125;, 10//当手机底部朝上时，根据重力变换朝向，形成相对竖屏旋转180的效果</span></span><br><span class="line"><span class="comment"> * &#123;@link #SCREEN_ORIENTATION_USER_LANDSCAPE&#125;, 11//横屏显示，当打开自动旋转功能时，如果用户在横屏方向上调整方位，屏幕也会跟着变动</span></span><br><span class="line"><span class="comment"> * &#123;@link #SCREEN_ORIENTATION_USER_PORTRAIT&#125;, 12//竖屏显示</span></span><br><span class="line"><span class="comment"> * &#123;@link #SCREEN_ORIENTATION_FULL_USER&#125;, 13//相当于默认打开自动旋转功能</span></span><br><span class="line"><span class="comment"> * &#123;@link #SCREEN_ORIENTATION_LOCKED&#125;,14 //锁定屏幕方向</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
-<p>流程图如下所示：</p>
-<p><img src="/2019/09/30/display/rotation/rotation/setRequestOrientation.png" alt="setRequestOrientation"></p>
-<h1><span id="横屏竖用原理">横屏竖用原理</span></h1><h2><span id="参数设置流程介绍">参数设置流程介绍</span></h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">hardware/interface</span><br><span class="line">configstore/<span class="number">1.1</span>/<span class="keyword">default</span>/surfaceflinger.mk</span><br><span class="line">	LOCAL_CFLAGS += -DPRIMARY_DISPLAY_ORIENTATION=$(SF_PRIMARY_DISPLAY_ORIENTATION)</span><br><span class="line">configstore/<span class="number">1.1</span>/<span class="keyword">default</span>/SurfaceFlingerConfigs.cpp</span><br><span class="line">	Return&lt;<span class="keyword">void</span>&gt; SurfaceFlingerConfigs::primaryDisplayOrientation(</span><br><span class="line">    	...</span><br><span class="line">    	orientation = PRIMARY_DISPLAY_ORIENTATION;</span><br><span class="line">    	...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">services/surfaceflinger/SurfaceFlingerProperties.cpp</span><br><span class="line">SurfaceFlingerProperties::primary_display_orientation_values primary_display_orientation(</span><br><span class="line">        SurfaceFlingerProperties::primary_display_orientation_values defaultValue) &#123;</span><br><span class="line">    ...</span><br><span class="line">DisplayOrientation result =</span><br><span class="line">        getDisplayOrientation&lt;V1_1::ISurfaceFlingerConfigs,</span><br><span class="line">                              &amp;V1_1::ISurfaceFlingerConfigs::primaryDisplayOrientation&gt;(</span><br><span class="line">                configDefault);</span><br><span class="line">    <span class="keyword">return</span> SurfaceFlingerProperties::...</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">services/surfaceflinger/SurfaceFlinger.cpp</span><br><span class="line">	SurfaceFlinger::primaryDisplayOrientation = DisplayState::...</span><br><span class="line">    creationArgs.displayInstallOrientation = isInternalDisplay ? 			primaryDisplayOrientation : DisplayState::eOrientationDefault;</span><br></pre></td></tr></table></figure>
-<h2><span id="应用欺骗">应用欺骗</span></h2><p>在SurfaceFlinger中初始化<strong>primaryDisplayOrientation</strong>，当应用获取显示配置的时候getDisplayConfigs，此时的应用就能够获取到对应的竖屏配置了；</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">status_t</span> SurfaceFlinger::getDisplayConfigs(<span class="keyword">const</span> sp&lt;IBinder&gt;&amp; displayToken,</span><br><span class="line">                                           Vector&lt;DisplayInfo&gt;* configs) &#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">if</span> (displayId == getInternalDisplayIdLocked() &amp;&amp;</span><br><span class="line">    primaryDisplayOrientation &amp; DisplayState::eOrientationSwapMask) &#123;</span><br><span class="line">    <span class="built_in">std</span>::swap(info.w, info.h);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2><span id="显示欺骗">显示欺骗</span></h2><p>在DisplayDevice中就会初始化<strong>mDisplayInstallOrientation</strong>,在设置矩阵的时候oritentationToTransform就会被篡改；</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> DisplayDevice::setProjection(<span class="keyword">int</span> orientation,</span><br><span class="line">        <span class="keyword">const</span> Rect&amp; newViewport, <span class="keyword">const</span> Rect&amp; newFrame) &#123;</span><br><span class="line">    ...</span><br><span class="line">     <span class="keyword">if</span> (isPrimary()) &#123;</span><br><span class="line">     DisplayDevice::orientationToTransfrom(</span><br><span class="line">             (orientation + mDisplayInstallOrientation) % (DisplayState::eOrientation270 + <span class="number">1</span>),</span><br><span class="line">             w, h, &amp;R);</span><br><span class="line">     ...</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
-<p>这样给到GPU的Transform就会被欺骗带有一个角度；</p>
-<p><img src="/2019/09/30/display/rotation/rotation/bufferTransform.png" alt="1567234573802"></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">system/core/libsystem/include/system/graphics-base-v1<span class="number">.0</span>.h</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">enum</span> &#123;</span><br><span class="line">    HAL_TRANSFORM_FLIP_H = <span class="number">1</span>,   <span class="comment">// (1 &lt;&lt; 0)</span></span><br><span class="line">    HAL_TRANSFORM_FLIP_V = <span class="number">2</span>,   <span class="comment">// (1 &lt;&lt; 1)</span></span><br><span class="line">    HAL_TRANSFORM_ROT_90 = <span class="number">4</span>,   <span class="comment">// (1 &lt;&lt; 2)</span></span><br><span class="line">    HAL_TRANSFORM_ROT_180 = <span class="number">3</span>,  <span class="comment">// (FLIP_H | FLIP_V)</span></span><br><span class="line">    HAL_TRANSFORM_ROT_270 = <span class="number">7</span>,  <span class="comment">// ((FLIP_H | FLIP_V) | ROT_90)</span></span><br><span class="line">&#125; <span class="keyword">android_transform_t</span>;</span><br><span class="line"></span><br><span class="line">include/gui/LayerState.h</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">DisplayState</span> &#123;</span></span><br><span class="line">    <span class="keyword">enum</span> &#123;</span><br><span class="line">        eOrientationDefault = <span class="number">0</span>,</span><br><span class="line">        eOrientation90 = <span class="number">1</span>,</span><br><span class="line">        eOrientation180 = <span class="number">2</span>,</span><br><span class="line">        eOrientation270 = <span class="number">3</span>,</span><br><span class="line">        eOrientationUnchanged = <span class="number">4</span>,</span><br><span class="line">        eOrientationSwapMask = <span class="number">0x01</span></span><br><span class="line">    &#125;;</span><br></pre></td></tr></table></figure>
-<p>这样就实现了从应用到显示横屏竖用的欺骗流程</p>
-<h1><span id="其他">其他</span></h1><h2><span id="常见命令">常见命令</span></h2><h3><span id="模拟输入事件">模拟输入事件</span></h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1. 模拟文本 input text &quot;hello,word&quot;</span><br><span class="line">2. 模拟按键 input keyevent POWER</span><br><span class="line">3. 模拟滑动 input swipe 0 20 300 500 </span><br><span class="line">4. 模拟屏幕轻触：input tap 100 400</span><br><span class="line">5. 获取输入事件的总类：getevent -p</span><br><span class="line">6. input keyevent --longpress POWER</span><br></pre></td></tr></table></figure>
-<h3><span id="旋转事件">旋转事件</span></h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">settings put system accelerometer_rotation 0 //关闭自动旋转</span><br><span class="line">settings put system user_rotation 0</span><br><span class="line">settings put system user_rotation 3</span><br></pre></td></tr></table></figure>
-<h3><span id="安卓触点显示">安卓触点显示</span></h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">settings put system show_touches 1</span><br><span class="line">settings put system pointer_location 1</span><br></pre></td></tr></table></figure>
-<h3><span id="传感器">传感器</span></h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">可以利用查看目前sensor上报的事件值</span><br><span class="line">dumpsys sensorservice | grep wall</span><br></pre></td></tr></table></figure>
-<p><img src="/2019/09/30/display/rotation/rotation/sensor_data.png" alt="1566995553990"></p>
-<h1><span id="参考资料">参考资料</span></h1><p><a href="https://zhuanlan.zhihu.com/p/31210271" target="_blank" rel="noopener">一次触摸，Android到底干了啥</a></p>
-<p><a href="http://benzblog.site/2017/06/19/all-about-rotations/" target="_blank" rel="noopener">Android屏幕旋转源码探索及应用实践</a></p>
-<p><a href="https://www.twblogs.net/a/5c37805fbd9eee35b21d5f5a/zh-cn" target="_blank" rel="noopener">Android P图形显示系统</a></p>
-<p><a href="https://www.cnblogs.com/samchen2009/p/3368158.html" target="_blank" rel="noopener">图解Android-AndroidGUI 系统（5）-Android的Event Input System</a></p>
-<p><a href="https://juejin.im/post/5b6948086fb9a04fb87771fb" target="_blank" rel="noopener">Android硬件加速（二）-RenderThread与OpenGL GPU渲染</a></p>
-<p><a href="http://gityuan.com/2015/09/06/android-anaimator-4/" target="_blank" rel="noopener">源码解读Android属性动画</a></p>
-<p><a href="http://wiki.jikexueyuan.com/project/android-animation/1.html" target="_blank" rel="noopener">动画详解</a></p>
-<p><a href="http://wiki.jikexueyuan.com/project/deep-android-v1/surface.html" target="_blank" rel="noopener">深入理解surface</a></p>
-<p><a href="https://blog.csdn.net/yanbober/article/details/46128379" target="_blank" rel="noopener">应用绘制流程</a></p>
-<p><a href="https://developer.android.com/reference/android/R.attr.html#screenOrientation" target="_blank" rel="noopener">screenOrientation参数解析</a></p>
-<p><a href="https://blog.csdn.net/jinzhuojun/article/details/50085491" target="_blank" rel="noopener">Android中的转屏流程</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/30/display/rotation/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -3009,11 +2797,229 @@ venus-a3:/ # settings list system | grep  next
 
 
     
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/07/python/spider/spider_summary/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/07/python/spider/spider_summary/" itemprop="url">爬虫介绍</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-07T07:57:41+00:00">
+                2018-10-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spider/" itemprop="url" rel="index">
+                    <span itemprop="name">spider</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1><span id="大数据时代-数据获取方式">“大数据时代” 数据获取方式</span></h1><ol>
+<li><p>企业生产的用户数据<br><a href="https://tbi.tencent.com/" target="_blank" rel="noopener">腾讯指数</a> <a href="https://index.baidu.com/" target="_blank" rel="noopener">百度指数</a> <a href="https://index.1688.com/" target="_blank" rel="noopener">阿里指数</a> <a href="https://data.weibo.com/index" target="_blank" rel="noopener">微博指数</a></p>
+</li>
+<li><p>数据管理咨询公司<br><a href="https://www.iresearch.com.cn/" target="_blank" rel="noopener">艾瑞咨询</a> <a href="http://mckinseychina.com/" target="_blank" rel="noopener">麦肯锡</a></p>
+</li>
+<li><p>政府/机构提供的公开数据<br><a href="http://data.stats.gov.cn/" target="_blank" rel="noopener">国家数据</a> <a href="https://www.nasdaq.com/" target="_blank" rel="noopener">纳斯达克股票数据</a></p>
+</li>
+<li><p>第三方数据平台购买数据<br><a href="http://www.datatang.com/" target="_blank" rel="noopener">数据堂</a> <a href="http://www.gbdex.com/" target="_blank" rel="noopener">贵阳大数据交易所</a></p>
+</li>
+<li><p>爬虫爬取数据</p>
+</li>
+</ol>
+<h1><span id="爬虫介绍">爬虫介绍</span></h1><p>爬虫按照场景分为两种，通用爬虫和聚焦爬虫</p>
+<h2><span id="通用爬虫">通用爬虫</span></h2><hr>
+<p>通用爬虫即搜索引擎用的爬虫系统，如百度，谷歌</p>
+<p>1.尽可能把互联网上所有的网页下载下来，放到本地服务器里形成备份，再对这些网页做相关的处理（提取关键字，去掉广告），最后提供一个用户检索的窗口；</p>
+<p>2.抓取流程</p>
+<pre><code>首先选取一部分已有的URL,把这些URL放到爬取队列；
+
+从队列里取出这些URL，然后解析DNS得到主机IP;然后去这个IP对应的服务器里下载HTML页面，保存到搜索引擎对应的数据；之后把这个爬过的URL放入已爬取队列。
+
+分析网页内容，找出网页里其他的URL连接，继续执行第二步，直到爬取条件结束；
+</code></pre><p>3.搜索引擎如何获取一个新网站的URL</p>
+<pre><code>1.主动向搜索引擎提交网址： [百度搜索资源平台](https://ziyuan.baidu.com/)
+
+
+2.在其他网站里设置外链
+
+
+3.搜索引擎会和DNS服务商进行合作，可以快速收录新的网站
+</code></pre><p>4.通用爬虫并不是万物皆可爬，它也需要遵守规则：</p>
+<pre><code>Robots协议： 协议会指明通用爬虫可以爬取网页的权限
+
+Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大型的搜索引擎爬虫才会遵守，个人爬虫可以不管；
+</code></pre><p>5.通用爬虫工作流程:  爬去网页 –&gt; 存储数据 –&gt;内容处理–&gt;提供检索/排名服务<br>6.收索引擎排名</p>
+<pre><code>1.PageRank(流量越高，越值钱)
+
+2.竞价排名,谁给钱多，谁排名就高
+</code></pre><p>7.通用爬虫的缺点：</p>
+<ul>
+<li><p>只能提供文本信息，但不能提供多媒体文件（音乐，视频）</p>
+</li>
+<li><p>提供的结果千篇一律，不能针对不同背景领域的人提供不同的搜索结果</p>
+</li>
+<li><p>不能理解人类语义</p>
+</li>
+</ul>
+<h2><span id="聚焦爬虫">聚焦爬虫</span></h2><hr>
+<p>聚焦爬虫指的就是程序员写的针对某些内容的爬虫</p>
+<h3><span id="网页三大特征">网页三大特征</span></h3><ol>
+<li><p>每个网页都有自己的URL(同一资源定位符)来进行定位</p>
+</li>
+<li><p>网页都是用HTML(超文本标记语言)来描述页面信息</p>
+</li>
+<li><p>网页都使用HTTP/HTTPS(超文本传输协议)来传输HTML数据</p>
+</li>
+</ol>
+<h3><span id="爬虫的思路">爬虫的思路</span></h3><ol>
+<li>首先确定爬取的网页URL地址</li>
+<li>通过HTTP/HTTP协议来获取对应的HTML页面</li>
+<li>提取HTML页面有用的数据,如果是页面的其他URL,那就继续执行第二步</li>
+</ol>
+<p>常见步骤：</p>
+<pre><code>- HTTP请求的处理，urllib,urllib2,requests,处理后的请求可以模拟浏览器请求，获取服务器响应的文件
+
+- 通过动态页面采集： Selenium+PhantomJS(无界面)：模拟真实浏览器加载js,ajax等非静态页面数据    
+
+- Tesseract: 机器学习库，机器图像识别系统，可以处理简单验证码，复杂的验证码可以通过手动输入
+- 保存数据     re,xpath,BeautifulSoup4(bs4),jsonpath,pyquery等 使用某种描述性一样来给我们需要提取的数据定义一个匹配规则，符合这个规则的数据就会被匹配，如果是需要的数据，就保存起来
+</code></pre><h3><span id="爬虫框架">爬虫框架</span></h3><p><strong>Scrapy,Pyspider</strong></p>
+<pre><code>高定制性高性能（异步网络框架twisted）,所以数据下载熟读非常快，提供了数据下载，数据存储，数据下载，提取规则
+</code></pre><p><strong>分布式策略</strong></p>
+<pre><code>scrapy redis，在scrapy的基础上添加了以redis数据库为核心的一套组件,让scrapy框架支持分布式的功能，主要是Redis里做指纹去重，请求分配，数据临时存储
+</code></pre><h1><span id="结语">结语</span></h1><p><strong>爬虫 反爬虫 反反爬虫之间的斗争</strong></p>
+<pre><code>其实爬虫做到最后，最头疼的不是负杂的页面，也不是晦涩的数据，而是网站另外一头的运维人员
+
+反爬虫： User Agent,代理，验证码，动态数据加载，加密数据
+</code></pre>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -3059,7 +3065,7 @@ venus-a3:/ # settings list system | grep  next
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-count">20</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
