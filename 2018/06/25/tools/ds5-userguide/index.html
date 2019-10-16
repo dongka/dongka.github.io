@@ -79,13 +79,13 @@
 
 
 
-<meta name="description" content="一. DS5 与 DSTREAM 1. DS5 是一个软件开发工具 2. DSTREAM 是一个硬件仿真工具   二. 安装DS5 三. DS5的使用 1.新建debug control 2.建立连接 3.load vmlinux 4.查看logbuf 5.load 源码单步调试   四：csat的使用 1.cast:CoreSight Access Tool(CSAT) 2.CSAT &amp;am">
+<meta name="description" content="一. DS5 与 DSTREAM 1. DS5 是一个软件开发工具 2. DSTREAM 是一个硬件仿真工具   二. 安装DS5 三. DS5的使用 1.新建debug control 2.建立连接 3.load vmlinux 4.查看logbuf 5.load 源码单步调试   四：csat的使用 1.csat:CoreSight Access Tool(CSAT) 2.CSAT &amp;am">
 <meta name="keywords" content="ds5介绍">
 <meta property="og:type" content="article">
 <meta property="og:title" content="DS5相关介绍">
 <meta property="og:url" content="http://yoursite.com/2018/06/25/tools/ds5-userguide/index.html">
 <meta property="og:site_name" content="知识总结">
-<meta property="og:description" content="一. DS5 与 DSTREAM 1. DS5 是一个软件开发工具 2. DSTREAM 是一个硬件仿真工具   二. 安装DS5 三. DS5的使用 1.新建debug control 2.建立连接 3.load vmlinux 4.查看logbuf 5.load 源码单步调试   四：csat的使用 1.cast:CoreSight Access Tool(CSAT) 2.CSAT &amp;am">
+<meta property="og:description" content="一. DS5 与 DSTREAM 1. DS5 是一个软件开发工具 2. DSTREAM 是一个硬件仿真工具   二. 安装DS5 三. DS5的使用 1.新建debug control 2.建立连接 3.load vmlinux 4.查看logbuf 5.load 源码单步调试   四：csat的使用 1.csat:CoreSight Access Tool(CSAT) 2.CSAT &amp;am">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2018/06/25/tools/ds5-userguide/ds5/ds5.png">
 <meta property="og:image" content="http://yoursite.com/2018/06/25/tools/ds5-userguide/ds5/dstream.png">
@@ -95,10 +95,10 @@
 <meta property="og:image" content="http://yoursite.com/2018/06/25/tools/ds5-userguide/ds5/logbuf.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/06/25/tools/ds5-userguide/ds5/logbuf_arm32.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/06/25/tools/ds5-userguide/ds5/load_code.jpg">
-<meta property="og:updated_time" content="2019-10-16T02:30:29.455Z">
+<meta property="og:updated_time" content="2019-10-16T02:31:46.304Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="DS5相关介绍">
-<meta name="twitter:description" content="一. DS5 与 DSTREAM 1. DS5 是一个软件开发工具 2. DSTREAM 是一个硬件仿真工具   二. 安装DS5 三. DS5的使用 1.新建debug control 2.建立连接 3.load vmlinux 4.查看logbuf 5.load 源码单步调试   四：csat的使用 1.cast:CoreSight Access Tool(CSAT) 2.CSAT &amp;am">
+<meta name="twitter:description" content="一. DS5 与 DSTREAM 1. DS5 是一个软件开发工具 2. DSTREAM 是一个硬件仿真工具   二. 安装DS5 三. DS5的使用 1.新建debug control 2.建立连接 3.load vmlinux 4.查看logbuf 5.load 源码单步调试   四：csat的使用 1.csat:CoreSight Access Tool(CSAT) 2.CSAT &amp;am">
 <meta name="twitter:image" content="http://yoursite.com/2018/06/25/tools/ds5-userguide/ds5/ds5.png">
 
 
@@ -368,7 +368,7 @@
 </ul>
 </li>
 <li><a href="#四csat的使用">四：csat的使用</a><ul>
-<li><a href="#1castcoresight-access-toolcsat">1.cast:CoreSight Access Tool(CSAT)</a></li>
+<li><a href="#1csatcoresight-access-toolcsat">1.csat:CoreSight Access Tool(CSAT)</a></li>
 <li><a href="#2csat-ds-5-diff">2.CSAT &amp; DS-5 diff</a></li>
 <li><a href="#3csat的命令">3.CSAT的命令</a></li>
 </ul>
@@ -388,7 +388,7 @@
 <h2><span id="3load-vmlinux">3.load vmlinux</span></h2><p>   当建立连接后一般都是一些汇编语言，这时候需要将vmlinux load进DS5方便debug<br><img src="/2018/06/25/tools/ds5-userguide/ds5/load.png" alt="load"></p>
 <h2><span id="4查看logbuf">4.查看logbuf</span></h2><p>   logbuf的大小由.config中的CONIFG_LOG_BUF_SHIFT决定，在init/Kconfig中有对应的说明<br>   如何确定log_buf的地址：<br>   目前在arm64中log_buf的地址对应的是system.map中__log_buf对应的地址；<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf.jpg" alt="load"><br>   arm32对应的地址为system.map的log_buf对应地址的地址，需要ds5找到映射位置后在通过此地址去查看log_buf中的内容：<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf_arm32.jpg" alt="load"></p>
 <h2><span id="5load-源码单步调试">5.load 源码单步调试</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/load_code.jpg" alt="load"></p>
-<h1><span id="四csat的使用">四：csat的使用</span></h1><h2><span id="1castcoresight-access-toolcsat">1.cast:CoreSight Access Tool(CSAT)</span></h2><p>  DS-5的命令行工具，处理器挂住了，通过DS-5无法连接上，只能用CAST连接上，但是CSAT无法访问到处理器内部的寄存器；<br>一般访问步骤：<br>    读寄存器,如果不ok,说明总线挂了；<br>    读dram,如果dram不ok,说明mbus挂了；<br>    读PC,如果PC读取不ok,说明CPU挂了</p>
+<h1><span id="四csat的使用">四：csat的使用</span></h1><h2><span id="1csatcoresight-access-toolcsat">1.csat:CoreSight Access Tool(CSAT)</span></h2><p>  DS-5的命令行工具，处理器挂住了，通过DS-5无法连接上，只能用CSAT连接上，但是CSAT无法访问到处理器内部的寄存器；<br>一般访问步骤：<br>    读寄存器,如果不ok,说明总线挂了；<br>    读dram,如果dram不ok,说明mbus挂了；<br>    读PC,如果PC读取不ok,说明CPU挂了</p>
 <h2><span id="2csat-amp-ds-5-diff">2.CSAT &amp; DS-5 diff</span></h2><p>  CSAT:通过APB总线连接，CPU挂死之后还能连接上，不能访问到CPU内部的寄存器<br>  DS5：通过CPU连接，CPU挂死之后无法连接上，能够访问到CPU内部的寄存器</p>
 <h2><span id="3csat的命令">3.CSAT的命令</span></h2><ol>
 <li>打开DS5的命令行；</li>
@@ -601,7 +601,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">一. DS5 与 DSTREAM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.</span> <span class="nav-text">1. DS5 是一个软件开发工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.2.</span> <span class="nav-text">2. DSTREAM 是一个硬件仿真工具</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">二. 安装DS5</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">三. DS5的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.</span> <span class="nav-text">1.新建debug control</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.2.</span> <span class="nav-text">2.建立连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.3.</span> <span class="nav-text">3.load vmlinux</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.4.</span> <span class="nav-text">4.查看logbuf</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.5.</span> <span class="nav-text">5.load 源码单步调试</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">四：csat的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.1.</span> <span class="nav-text">1.cast:CoreSight Access Tool(CSAT)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.2.</span> <span class="nav-text">2.CSAT &amp; DS-5 diff</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.3.</span> <span class="nav-text">3.CSAT的命令</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">一. DS5 与 DSTREAM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.</span> <span class="nav-text">1. DS5 是一个软件开发工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.2.</span> <span class="nav-text">2. DSTREAM 是一个硬件仿真工具</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">二. 安装DS5</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">三. DS5的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.</span> <span class="nav-text">1.新建debug control</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.2.</span> <span class="nav-text">2.建立连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.3.</span> <span class="nav-text">3.load vmlinux</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.4.</span> <span class="nav-text">4.查看logbuf</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.5.</span> <span class="nav-text">5.load 源码单步调试</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">四：csat的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.1.</span> <span class="nav-text">1.csat:CoreSight Access Tool(CSAT)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.2.</span> <span class="nav-text">2.CSAT &amp; DS-5 diff</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.3.</span> <span class="nav-text">3.CSAT的命令</span></a></li></ol></li></ol></div>
             
 
           </div>
