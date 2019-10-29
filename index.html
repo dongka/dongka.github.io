@@ -1907,10 +1907,12 @@ schedule_work -&gt; queue_work -&gt; queue_work_on -&gt;
                 //在设备中如果通过device_enable_async_suspend设置过，async_schedule使设备走异步的休眠唤醒流程；
                 --&gt;__device_suspend(dev, pm_transition, false);
                         dpm_watchdog_set//设置超时watchdog，若休眠时间过长，则打印打钱的设置和函数栈默认超时时间为120s
+
                 --&gt;    dpm_run_callback(callback, dev, state, info);    
                         由于设备模型有bus、driver、device等多个层级，而suspend接口可能由任意一个层级实现。这里的优先顺序
                         是指，只要优先级高的层级注册了suspend，就会优先使用它，而不会使用优先级低的prepare。优先顺序为：dev-&gt;pm_domain-&gt;ops、dev-&gt;type-&gt;pm、dev-&gt;class-&gt;pm、dev-&gt;bus-&gt;pm、dev-&gt;driver-&gt;pm（这个优先顺序同样适用于其它callbacks）。 
-                --&gt; async_synchronize_full （等待所有异步动作都做完)                      
+                echo 1 &gt; /sys/power/pm_print_times //在每个设备发起休眠唤醒流程的时候就能打印出来
+                --&gt; async_synchronize_full （等待所有异步动作都做完) 
 </code></pre><h1><span id="platform关闭不需要唤醒的中断">platform（关闭不需要唤醒的中断）</span></h1><pre><code>suspend_enter(state, &amp;wakeup);
     --&gt;platform_suspend_prepare(state);        
        dpm_suspend_late(pmsg_suspend);
@@ -1932,8 +1934,9 @@ schedule_work -&gt; queue_work -&gt; queue_work_on -&gt;
             _cpu_down(cpu, 1, cpuhp_offline);
 </code></pre><h1><span id="core关闭cpu中断通知arisc走休眠处理流程">core(关闭cpu中断，通知arisc走休眠处理流程)</span></h1><pre><code>arch_suspend_disable_irqs(); //此时关闭的是irq controller和cpu的联系，在这个时候中断便不能唤醒cpu了;
      local_irq_disable();
-syscore_suspend(); 
-suspend_ops-&gt;enter(state);    
+syscore_suspend();//主要调用sched_clock_suspend,timekeeping_suspend,irq_gc_suspend,fw_suspend,cpu_pm_suspend
+          //echo Y &gt; /sys/module/kernel/parameters/initcall_debug 通过这个命令可以看到相关的调用
+    suspend_ops-&gt;enter(state);    
         sunxi_suspend_enter//向小cpus传递电源相关参数
             arm_cpuidle_suspend
                  cpuidle_ops[cpu].suspend(index)
@@ -1981,7 +1984,6 @@ enable_irq_wake是新方法。
 然后修改dpm_suspend设备的休眠流程，让其逐一进入休眠后退出，观察是哪个设备休眠唤醒后系统异常；
 其他处于内核阶段的类似；
 
-echo 1 &gt; /sys/power/pm_print_times //在每个设备发起休眠唤醒流程的时候就能打印出来
 echo N &gt; /sys/module/printk/parameters/console_suspend //休眠的时候保持终端打开    
 如果没有异常，那么可以怀疑是否由于cpus中dram进入自刷新后异常导致；或者系统电上下电导致；或者时钟频率不稳导致；    
 在cpus中挂死，即走到arisc的休眠流程中,表现为串口log处于深度休眠，且无任何异常打印；
