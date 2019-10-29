@@ -89,7 +89,7 @@
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2018/12/13/standby/kernel_suspend/信号响应时机.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/12/13/standby/kernel_suspend/suspend_resume_trace.jpg">
-<meta property="og:updated_time" content="2019-09-05T08:08:25.709Z">
+<meta property="og:updated_time" content="2019-10-29T01:49:41.203Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="内核的休眠流程">
 <meta name="twitter:description" content="内核休眠流程当安卓合适的时机(wakeup_count = save_count &amp;amp;&amp;amp; inpr == 0),与内核一致，在没有wakeup事件的时候，走进一步的流程，发echo mem &amp;gt; /sys/power/state命令后，内核开始处理休眠流程 ./kernel/power/main.c  state_store     -&amp;gt;pm_suspend">
@@ -490,6 +490,7 @@ schedule_work -&gt; queue_work -&gt; queue_work_on -&gt;
                 --&gt;    dpm_run_callback(callback, dev, state, info);    
                         由于设备模型有bus、driver、device等多个层级，而suspend接口可能由任意一个层级实现。这里的优先顺序
                         是指，只要优先级高的层级注册了suspend，就会优先使用它，而不会使用优先级低的prepare。优先顺序为：dev-&gt;pm_domain-&gt;ops、dev-&gt;type-&gt;pm、dev-&gt;class-&gt;pm、dev-&gt;bus-&gt;pm、dev-&gt;driver-&gt;pm（这个优先顺序同样适用于其它callbacks）。 
+                --&gt; async_synchronize_full （等待所有异步动作都做完)                      
 </code></pre><h1><span id="platform关闭不需要唤醒的中断">platform（关闭不需要唤醒的中断）</span></h1><pre><code>suspend_enter(state, &amp;wakeup);
     --&gt;platform_suspend_prepare(state);        
        dpm_suspend_late(pmsg_suspend);
@@ -630,8 +631,8 @@ cat /proc/wakelocks
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/12/13/standby/android_standby/" rel="next" title="安卓休眠流程">
-                <i class="fa fa-chevron-left"></i> 安卓休眠流程
+              <a href="/2018/11/17/cpu/arm体系架构的发展/" rel="next" title="ARM体系架构概述">
+                <i class="fa fa-chevron-left"></i> ARM体系架构概述
               </a>
             
           </div>
@@ -640,8 +641,8 @@ cat /proc/wakelocks
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/02/27/display/display_hardware/" rel="prev" title="显示硬件篇">
-                显示硬件篇 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/12/13/standby/android_standby/" rel="prev" title="安卓休眠流程">
+                安卓休眠流程 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
