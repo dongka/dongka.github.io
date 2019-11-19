@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="知识总结">
 <meta property="og:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-08-30T03:39:54.443Z">
+<meta property="og:updated_time" content="2019-11-19T15:53:29.803Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓休眠流程">
 <meta name="twitter:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
@@ -539,7 +539,15 @@ handleMessage(Message msg)
    --&gt;updatePowerState();
       --&gt;animateScreenStateChange
         --&gt;setScreenState
-            --&gt;mWindowManagerPolicy.screenTurningOff(mPendingScreenOffUnblocker)
+        --&gt;mWindowManagerPolicy.screenTurningOff(mPendingScreenOffUnblocker)
+        --&gt;updateScreenOffSleepToken
+        --&gt;acquireSleepToken
+        --&gt;updateSleepIfNeededLocked
+        --&gt;goingToSleepLocked
+        --&gt;checkReadyForSleepLocked
+        --&gt;putStacksToSleepLocked
+        --&gt;goToSleepIfPossible
+        --&gt;startPausingLocked
 </code></pre><p>函数作用：决策屏幕的量灭状态</p>
 <pre><code>如果当前是WAKEFULNESS_ASLEEP状态，直接设置屏幕为POLICY_OFF
 
@@ -698,6 +706,7 @@ venus-a3:/ # settings list system | grep  next
 <p><a href="https://blog.csdn.net/fu_kevin0606/article/details/54408094" target="_blank" rel="noopener">Android7.0 PowerManagerService亮灭屏分析(一)</a></p>
 <p><a href="https://blog.csdn.net/ysh06201418/article/details/41849191" target="_blank" rel="noopener">wakelock介绍</a></p>
 <p><a href="https://jasper-1024.github.io/2017/08/19/linux%E7%AC%94%E8%AE%B0%E2%80%94rtc%E5%AD%90%E7%B3%BB%E7%BB%9F/" target="_blank" rel="noopener">linux笔记–rtc子系统</a></p>
+<p><a href="http://ddrv.cn/a/102265" target="_blank" rel="noopener">Android7.0亮屏流程分析</a></p>
 
       
     </div>
