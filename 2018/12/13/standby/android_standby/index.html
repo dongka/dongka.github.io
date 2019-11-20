@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="知识总结">
 <meta property="og:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-11-20T01:49:27.756Z">
+<meta property="og:updated_time" content="2019-11-20T08:08:20.987Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="安卓休眠流程">
 <meta name="twitter:description" content="安卓电源状态首先安卓将电源分为以下几种情况： 1.sleep：休眠 从代码看，安卓将系统的休眠原因分为以下几种： goToSleepNoUpdateLocked     GO_TO_SLEEP_REASON_DEVICE_ADMIN//Going to sleep due to device administration policy      GO_TO_SLEEP_REASON_TIMEOUT">
@@ -552,6 +552,15 @@ handleMessage(Message msg)
         --&gt;schedulePauseAcvity --&gt; sendMessage
         --&gt;handleMessage --&gt;handlePauseActivity--&gt;performPauseActivity--&gt;performPauseActivityIfNeed
         --&gt;callActivityOnPause --&gt;activity.performPause--&gt; onPause
+        唤醒的时候应用resume的流程
+        ActivityStackSupervisor.java
+        SleepTokenImpl.release
+        --&gt;removeSleepTokenLocked
+        --&gt;updateSleepIfNeededLocked
+        --&gt;applySleepTokensLocked
+        --&gt;resumeFocusedStackTopActivityLocked
+        --&gt;resumeTopActivityUncheckedLocked
+        --&gt;resumeTopActivityInnerLocked
 </code></pre><p>函数作用：决策屏幕的量灭状态</p>
 <pre><code>如果当前是WAKEFULNESS_ASLEEP状态，直接设置屏幕为POLICY_OFF
 

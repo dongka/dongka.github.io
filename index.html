@@ -2376,6 +2376,15 @@ handleMessage(Message msg)
         --&gt;schedulePauseAcvity --&gt; sendMessage
         --&gt;handleMessage --&gt;handlePauseActivity--&gt;performPauseActivity--&gt;performPauseActivityIfNeed
         --&gt;callActivityOnPause --&gt;activity.performPause--&gt; onPause
+        唤醒的时候应用resume的流程
+        ActivityStackSupervisor.java
+        SleepTokenImpl.release
+        --&gt;removeSleepTokenLocked
+        --&gt;updateSleepIfNeededLocked
+        --&gt;applySleepTokensLocked
+        --&gt;resumeFocusedStackTopActivityLocked
+        --&gt;resumeTopActivityUncheckedLocked
+        --&gt;resumeTopActivityInnerLocked
 </code></pre><p>函数作用：决策屏幕的量灭状态</p>
 <pre><code>如果当前是WAKEFULNESS_ASLEEP状态，直接设置屏幕为POLICY_OFF
 
