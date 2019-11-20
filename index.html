@@ -2364,6 +2364,7 @@ handleMessage(Message msg)
       --&gt;animateScreenStateChange
         --&gt;setScreenState
         --&gt;mWindowManagerPolicy.screenTurningOff(mPendingScreenOffUnblocker)
+        在灭屏的同时还发起了activity的pause流程
         --&gt;updateScreenOffSleepToken
         --&gt;acquireSleepToken
         --&gt;updateSleepIfNeededLocked
@@ -2372,6 +2373,9 @@ handleMessage(Message msg)
         --&gt;putStacksToSleepLocked
         --&gt;goToSleepIfPossible
         --&gt;startPausingLocked
+        --&gt;schedulePauseAcvity --&gt; sendMessage
+        --&gt;handleMessage --&gt;handlePauseActivity--&gt;performPauseActivity--&gt;performPauseActivityIfNeed
+        --&gt;callActivityOnPause --&gt;activity.performPause--&gt; onPause
 </code></pre><p>函数作用：决策屏幕的量灭状态</p>
 <pre><code>如果当前是WAKEFULNESS_ASLEEP状态，直接设置屏幕为POLICY_OFF
 
