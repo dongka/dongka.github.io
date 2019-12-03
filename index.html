@@ -2540,7 +2540,8 @@ echo 0取消
 查看闹钟应用设置闹钟：
 venus-a3:/ # settings list system | grep  next
        next_alarm_formatted=Wed 11:50 AM
-</code></pre><h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cnblogs.com/dyufei/p/8018016.html" target="_blank" rel="noopener">Android7.0 PowerManagerService 之亮灭屏（二） PMS 电源状态管理updatePowerStateLocked（）</a></p>
+</code></pre><p><strong>怎么捕捉休眠唤醒的systrace</strong><br>    休眠前<br>    atrace –async_start -b 8192 -o /data/trace2.dat gfx view wm am power<br>    唤醒后<br>    atrace –async_stop -b 8192 -o /data/trace2.dat gfx view wm am power</p>
+<h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cnblogs.com/dyufei/p/8018016.html" target="_blank" rel="noopener">Android7.0 PowerManagerService 之亮灭屏（二） PMS 电源状态管理updatePowerStateLocked（）</a></p>
 <p><a href="https://www.jianshu.com/p/b40e1b61e6d2" target="_blank" rel="noopener">Android 保持屏幕常亮的几种方法</a></p>
 <p><a href="https://blog.csdn.net/Gaugamela/article/details/52838654" target="_blank" rel="noopener">Android7.0 PowerManagerService(3)核心函数updatePowerStateLocked的主要流程</a></p>
 <p><a href="https://blog.csdn.net/fu_kevin0606/article/details/54408094" target="_blank" rel="noopener">Android7.0 PowerManagerService亮灭屏分析(一)</a></p>
