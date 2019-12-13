@@ -87,17 +87,17 @@
 <meta property="og:site_name" content="知识总结">
 <meta property="og:description" content="opengl流程在OpenGL中，任何事物都在3D空间中，而屏幕和窗口确实2D像素组，这导致OpenGL大部分的工作都是关于把3D坐标转变为适应屏幕的2D像素；3D转成2D坐标的处理过程是OpenGl的图形渲染管线（Graphic Pipeline,大多译为管线，实际上指的是一堆原始图形数据途径一个输送管道，期间经过各种变化处理最终出现在屏幕的过程）管理的；图形渲染管线可以划分为两个主要部分，第一">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://yoursite.com/2019/12/13/opengl/openg1_1/Users/key/Desktop/study/display/opengl/render_pipeline.png">
+<meta property="og:image" content="http://yoursite.com/2019/12/13/opengl/openg1_1/render_pipeline.png">
 <meta property="og:image" content="http://yoursite.com/2019/12/13/opengl/openg1_1/pipe_line图示.png">
 <meta property="og:image" content="http://yoursite.com/2019/12/13/opengl/openg1_1/demo.png">
 <meta property="og:image" content="http://yoursite.com/2019/12/13/opengl/openg1_1/Users/key/Desktop/study/display/opengl/矩阵变换.png">
 <meta property="og:image" content="http://yoursite.com/2019/12/13/opengl/openg1_1/shader.png">
 <meta property="og:image" content="http://yoursite.com/2019/12/13/opengl/openg1_1/shader_demo.png">
-<meta property="og:updated_time" content="2019-12-13T01:46:34.514Z">
+<meta property="og:updated_time" content="2019-12-13T01:51:43.831Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="opengl学习总结">
 <meta name="twitter:description" content="opengl流程在OpenGL中，任何事物都在3D空间中，而屏幕和窗口确实2D像素组，这导致OpenGL大部分的工作都是关于把3D坐标转变为适应屏幕的2D像素；3D转成2D坐标的处理过程是OpenGl的图形渲染管线（Graphic Pipeline,大多译为管线，实际上指的是一堆原始图形数据途径一个输送管道，期间经过各种变化处理最终出现在屏幕的过程）管理的；图形渲染管线可以划分为两个主要部分，第一">
-<meta name="twitter:image" content="http://yoursite.com/2019/12/13/opengl/openg1_1/Users/key/Desktop/study/display/opengl/render_pipeline.png">
+<meta name="twitter:image" content="http://yoursite.com/2019/12/13/opengl/openg1_1/render_pipeline.png">
 
 
 
@@ -352,7 +352,7 @@
         <h1><span id="opengl流程">opengl流程</span></h1><p>在OpenGL中，任何事物都在3D空间中，而屏幕和窗口确实2D像素组，这导致OpenGL大部分的工作都是关于把3D坐标转变为适应屏幕的2D像素；3D转成2D坐标的处理过程是OpenGl的图形渲染管线（Graphic Pipeline,大多译为管线，实际上指的是一堆原始图形数据途径一个输送管道，期间经过各种变化处理最终出现在屏幕的过程）管理的；图形渲染管线可以划分为两个主要部分，第一部分把你3D的坐标转换成2D坐标；第二部分是把2D坐标转变成实际的有颜色的像素；</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2D坐标和像素不同，2D坐标精确表示一个点在2D空间中的位置，而2D像素是这个点的近似值，2D像素受到屏幕/窗口分辨率的限制</span><br></pre></td></tr></table></figure>
 <p>openGL首先接收用户提供的几何数据（顶点和几何图元），并且将它输入到一系列着色器阶段中进行处理，包括：顶点着色（vertex shader ），细分着色，以及最后的几何着色，然后被送入光栅化单元（resterizer）光栅化单元负责对所有剪切区域（clipping region）内的图元生成片元数据，然后对每个生成的片元都执行一个片元着色器；</p>
-<p><img src="/2019/12/13/opengl/openg1_1/Users/key/Desktop/study/display/opengl/render_pipeline.png" alt="1561280730893"></p>
+<p><img src="/2019/12/13/opengl/openg1_1/render_pipeline.png" alt="1561280730893"></p>
 <p>下面有个更清晰容易理解的图~</p>
 <p><img src="/2019/12/13/opengl/openg1_1/pipe_line图示.png" alt=""></p>
 <p><strong>顶点着色器（Vertex Shader</strong>）,它把一个单独的顶点（Vertex）作为输入，顶点着色器主要的目的是把3D坐标转为另一种3D坐标,同时顶点着色器允许我们对顶点属性进行一些基本处理；<strong>如：顶点变换，法向量变化和单位化，生成相应的纹理坐标，纹理坐标变换，雾坐标，光照计算；</strong> 当需要计算顶点在屏幕上的位置，就会涉及到<strong>矩阵变换</strong></p>
