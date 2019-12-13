@@ -249,6 +249,250 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/17/cpu/arm体系架构的发展/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/17/cpu/arm体系架构的发展/" itemprop="url">ARM体系架构概述</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-11-17T14:54:00+00:00">
+                2018-11-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index">
+                    <span itemprop="name">cpu</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1><span id="arm体系架构的发展">ARM体系架构的发展</span></h1><p>本文将从以下几点去展开介绍arm体系架构的发展：</p>
+<ol>
+<li>指令集架构</li>
+<li>arm公司的发展历史以及授权模式</li>
+<li>arm的体系架构 </li>
+</ol>
+<h1><span id="arm公司的发展历史">arm公司的发展历史</span></h1><p>arm的发展历程在此文章讲的非常详细，故不再赘述<a href="http://www.eefocus.com/mcu-dsp/409079/r0" target="_blank" rel="noopener">一文带你了解ARM的发展历程</a></p>
+<h2><span id="arm授权模式">arm授权模式</span></h2><p>在传统PC领域，半导体有两种路子可以走，一种是Intel这种，<strong>从头到尾一条龙，架构和芯片设计，生产一律不靠任何人</strong>； 这样做需要极其雄厚，全方位的实力做保障，得有钱，有人，有技术，在半导体技术日益复杂的今天，能这么做屈指可数；好处就是利润率比较高，想卖多少钱就多少；当然技术上得做到领先甚至于垄断的地位优势才比较明显；</p>
+<p>另外一种则无工厂模式（Fabless）,<strong>NVIDIA,AMD,这类企业都是自己设计芯片，制造交给代工厂，比如台积电，联电，GlobalFoundries,三星电子</strong>。好处很明显，负担轻，但是在半导体这种工艺在功耗与性能中扮演重要角色的行业，你设计出来的是否能设计出来，怎么设计出来，很大程度看代工厂的能耐；幸好这些代工厂也十分给力，不断的逼近物理极限；使得AMD最近也能慢慢的赶上挤牙膏的Intel;</p>
+<p>arm就不一样了，它不制造，不销售芯片，只是自己设计IP,包括指令集，微处理器，GPU,总线，然后谁要的话就买arm的授权；授权模式分为此三种：</p>
+<h3><span id="处理器授权">处理器授权</span></h3><p>ARM设计好一颗CPU或者GPU，armv7架构对应的IP为Cortex-A5/A7/A9/A12/A15/A17这几个核心架构，对应armv8-A就有Cortext-A35/A53/A57/A72/A73;ARMv8.2A指令集：Cortext-A55/A75;然后授权卖给伙伴，买下它们后，只能按照图纸实现，能发挥的不多，如何实现就比较随便，如配置哪些模块，几个核心，多少缓存，多高频率，什么工艺，谁来代工等等；</p>
+<p>如果想优化，但是技术有限，那么可以买arm的处理器优化包/物理IP包授权（POP）<br>如果只是想更快速搞出产品，那么更干脆了，arm已经帮你制定好代工厂处理器类型和工艺了；<br>代表商家有联发科，展讯，联芯，全志，瑞芯微，炬力等；这些设计公司获得的是软核或者这点硬核授权，通过购买的CPU核，与GPU核，以及通过一定的流程，集成出SOC；</p>
+<p>购买处理器授权的本质上就大同小异了，可以做出差异化的只能在一些IP上做出差异化；</p>
+<h3><span id="架构指令授权">架构/指令授权</span></h3><p>这种授权方式价格比较贵，为防止碎片化的情况出现还有可能处于技术上的保护，arm禁止对指令集进行修改或者添加，但其他公司是否确切遵守了，这个就不得而知了；总之这种授权需要具有非常强的技术实力，也不过15家，如我们熟知的高通，苹果，三星，华为等公司；</p>
+<p>除了版税，那些购买了arm IP授权的，还需要为每一个芯片支付版税；</p>
+<p>在这里有些问题就应该提出来思考了，为什么都是arm的指令集，苹果的芯片却可以吊打现在的Android厂商的芯片呢？评价CPU性能指标在以下几个方面：</p>
+<p>一：指令集宽度（ISSUE）6</p>
+<p>二：乱序指令执行缓冲区（Recorder Buffer）（192）</p>
+<p>三：内存加载延迟（Load Latency）:4</p>
+<p>四：分支预测错误代价（Misprediction Penalty）:16(一般介于14~19)</p>
+<p>不得不说，<strong>苹果很早就开始布局CPU的设计之路，具有极强的芯片设计能力</strong>，在厂家都是基于arm的公版进行设计，苹果就已经通过购买arm指令集，然后进行自己的CPU设计，在14年的时候A7处理器，作为第一个ARM 64位CPU商用，而且将指令集宽度位6，作为对比arm目前的指令集为3；由于封闭式的开发，不像高通，需要考虑各个厂家的需求和成本，<strong>苹果有更高的溢价能力，可以用面积去换取性能与功耗，并根据自己的系统去做定制化</strong>；</p>
+<h1><span id="指令集架构isa">指令集架构（ISA）</span></h1><p>CPU执行计算任务时都需要遵从一定的规范，程序在被执行时都需要先翻译成CPU可以理解的语言。这种规范就是指令集<strong>（ISA，Intruction Set Architecrure）;</strong></p>
+<p>例如以下的机器码：1110 0001 1010 0000 0010 0000 0000 0001</p>
+<p>比如有个CPU定位1110 0001就是ADD指令，1010 0000对应的是存储数据的寄存器R2；0010 0000对应的寄存器R0;<br>0000 0001对应是寄存器R1,故意思可以是ADD R2 R0 R1,将R0,R1的值加起来放到R2；指令集就是定义一套约定俗成的CPU运行规则，对于编程人员，面对的汇编指令；而对于CPU来说，就是怎么去理解这段二进制码，不同的CPU对这段二进制代码不同，故就有了不同的指令集架构； </p>
+<p>指令集一般分为两种：<strong>精简指令集</strong>（RISC:reduced instruction set computer)和<strong>复杂指令集</strong>（CISC：Complex Instrution Set Computer）,以洗衣机洗衣服为例，RISC架构为，加水-&gt;漂洗-&gt;风干；而复杂指令集则可以发出洗衣服的指令，从而让洗衣机自动帮忙做这一整套的流程；CISC可以通过一条复杂的指令来完成许多事情，性能在处理复杂的任务时，会比RISC更为高效；但随之而来的是面积和功耗的提升；基于2/8理论，程序大部分时间（80%）都是在做重复而简单的事情；所以RISC架构就应运而生，更为精简的指令，将任务更多的放在了编译器这块，通过复杂的指令转化成简单指令的组合，在一定程度上增加了代码量，但使其大部分场合能比CISC取得更小的面积和功耗；</p>
+<p>采用精简指令集的微处理，常见为ARM,MIPS，Power Architecture(包括PowerPC,PowerXCell),SPARC，RISC-V等而采用CISC则为X86和AMD</p>
+<p>至于arm为代表RISC架构与以X86为代表的CISC之间的优劣比较还有是否存在替代一说，笔者认为，不会，而且从目前的发展来看，已经出现了你中有我，我中有你的局面；<br><a href="https://www.zhihu.com/question/20783321" target="_blank" rel="noopener">更进一步的探讨可以看下知乎上关于精简指令集与负杂指令集的讨论</a>,我也很赞同其中一个答主的观点，这已经不是个技术问题了，而是一个商业的问题</p>
+<p>总结完RISC和CISC之间的关系，再讲讲基于RISC阵营里面的ARM和最近比较火热的RISC-V，arm大家都熟悉，而RISC-V又是个什么东西呢？</p>
+<p>RISC-V是加州大学伯克利分校的开源指令集，由计算机架构的宗师级任务David Patterson领衔打造，通过将核心指令集以及<br>关键IP开源，意图改变半导体生态；详细的可以看这篇文档；<a href="http://www.semiinsights.com/s/electronic_components/23/30744.shtml" target="_blank" rel="noopener">名家专栏丨一文看懂RISC-V</a></p>
+<p>总结如下：RISC-V具有以下优点：1.可模块化配置的指令集。 2.支持可扩展的指令集 3.一套指令集支持所有架构，基本指令集仅40余条指令，以此为共用基础，加上其他常用模块子集指令总指令集也仅几十条 4.硬件设计和编译器非常简单</p>
+<p>笔者认为，RISC-V目前作为一个像linux看齐的硬件开源组织，linux之所以能健康长足发展，在于社区成千上万的内核爱好者的不断贡献，使得linux能够蓬勃发展；而硬件则不同，在这动辄上百万的流片费的无数摆在硬件设计者面前的坎，是否会有公司或者团体愿意将自己用血与泪验证的IP，贡献到社区，如果没有做到这一点，即将面临由于厂家扩展指令不同的碎片化问题解决，还有RISC-V后面的长足发展，将付之空谈；这样RISC-V架构只能作为几个大厂找到的低廉的替代arm方案的选择，而无法真正做到普惠；</p>
+<h1><span id="arm的体系架构">arm的体系架构</span></h1><table>
+<thead>
+<tr>
+<th>时间</th>
+<th>架构</th>
+<th>主要更新</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1985</td>
+<td>ARMv1</td>
+<td>只有26位的寻值空间，没有用于商业产品</td>
+</tr>
+<tr>
+<td>1986</td>
+<td>ARMv2</td>
+<td>首颗量产的ARM处理器，包括32位乘法指令和协处理器指令</td>
+</tr>
+<tr>
+<td>1990</td>
+<td>ARMv3</td>
+<td>具有片上高速缓存，MMU和写缓冲，寻址空间增大到32位</td>
+</tr>
+<tr>
+<td>1993</td>
+<td>ARMv4</td>
+<td>ARM7，ARM8，ARM9和Strong ARM采用这种架构。增加了16 Thumb指令集</td>
+</tr>
+<tr>
+<td>1998</td>
+<td>ARMv5</td>
+<td>ARM7(EJ),ARM9(E),ARM10(E)和Xscale采用这种了该架构，改进了ARM/Thumb状态之间的切换效率，此外还引入DSP指令和支持JAVA</td>
+</tr>
+<tr>
+<td>2001</td>
+<td>ARMv6</td>
+<td>ARM11,强化了图形处理性能，通过追加有效进行多媒体处理的SIMD将语音及图像的处理功能大大提高。此外ARM在这个系列中引入混合16位/32位的Thumb-2指令集</td>
+</tr>
+<tr>
+<td>2004</td>
+<td>ARMv7</td>
+<td>Cortex-M3/4/7,Cortex-R4/5/6/7,Cortex-A8/9都是基于该架构，该架构包括NEON技术扩展，可将DSP和媒体处理吞吐量高达400%，并提供改进的浮点支持以满足下一代3D图形和游戏以及传统嵌入式控制应用的需要</td>
+</tr>
+<tr>
+<td>2007</td>
+<td>ARMv6-M</td>
+<td>专门为低成本，高性能的设备而设计，Cortex-M0/1即采用该架构</td>
+</tr>
+<tr>
+<td>2011</td>
+<td>ARMv8</td>
+<td>Cortex-A32/35/53/57/72/73采用此架构，第一款支持64位的处理器架构</td>
+</tr>
+</tbody>
+</table>
+<h2><span id="arm架构发展图">ARM架构发展图：</span></h2><p><img src="/2018/11/17/cpu/arm体系架构的发展/arm_develop.png" alt="Arm架构发展"></p>
+<h2><span id="arm体系的cpu工作模式">arm体系的CPU工作模式：</span></h2><p>1.用户模式(usr):正常的程序执行状态<br>2.快速中断模式（fiq）:用于支持高速数据传输或者通道处理<br>3.中断模式（irq）:用于普通中断处理<br>4.管理模式（svc）:操作系统使用的保护模式<br>5.系统模式（sys）:运行具有特权的操作系统的任务；<br>6.数据访问终止模式（abt）:数据或指令与预取终止时进入该模式<br>7.未定义指令终止模式（und）:未定义的指令执行时进入该模式；</p>
+<p>linux如何从用户态进入内核态<br>分为两种：主动式和被动式、</p>
+<p>1.主动式：就是linux用户在（ARM在用户模式下）工作，通过发起用户态程序发起命令请求，ARM响应进入特权模式进而Linux切入内核态，就是系统调用；系统调用可被堪称一个内核与用户空间程序交互的接口；把用户进程的请求传达 给内核，待内核把请求处理完毕后再将处理结果送回给用户空间；<br>系统调用的主要用途：</p>
+<p>一：控制硬件-系统调用往往作为硬件资源和用户空间的抽象接口，比如读写文件用到的write/read调用</p>
+<p>二：设置系统状态或读取内核数据；</p>
+<p>2.被动式：就是Linux在用户态（ARM在用户模式）工作，没有主动发起请求，而被动地进入内核态，包括硬件中断和程序异常；</p>
+<p>参考资料：</p>
+<p><a href="http://www.10tiao.com/html/523/201708/2458284920/1.html" target="_blank" rel="noopener">arm汇编基础教程</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/36372153" target="_blank" rel="noopener">给开源架构泼泼冷水</a></p>
+<p><a href="https://www.techbang.com/posts/10678-fully-understand-arm-processors-cisc-and-risc-are-what-history-structure-a-see-through-the-computer-96-issues-cover-story-the-king?comment_page=2&amp;page=1" target="_blank" rel="noopener">完全看懂ARM处理器:RISC与CISC是什么？历史，架构一次性看透</a></p>
+<p><a href="http://www.wowotech.net/armv8a_arch/armv8-a_overview.html" target="_blank" rel="noopener">ARMv8-a</a></p>
+<p><a href="https://www.veryarm.com/1164.html" target="_blank" rel="noopener">ARM介绍1：发展史</a><br><a href="https://www.veryarm.com/1170.html" target="_blank" rel="noopener">ARM介绍2：授权模式</a></p>
+<p><a href="http://wiki.csie.ncku.edu.tw/embedded/ARMv8" target="_blank" rel="noopener">ARMV8</a></p>
+<p><a href="https://www.ednchina.com/news/20170421apple.html" target="_blank" rel="noopener">从arm到三星，苹果是如何走向自研芯片的</a></p>
+<p><a href="http://technews.tw/2017/12/13/why-apple-soc-so-dope/" target="_blank" rel="noopener">一样是ARM架构，为何苹果处理器效能就是压下其他人</a><br><a href="https://www.cnblogs.com/douzi2/p/5112743.html" target="_blank" rel="noopener">浅析arm的异常，中断和arm工作模式的联系</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/07/python/spider/spider_summary/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2122,163 +2366,6 @@ b.根据物理地址获取数据
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-mtp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/17/memory/memory-mtp/" itemprop="url">内存管理（二）mtp拷贝流程</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-17T00:07:09+00:00">
-                2018-06-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/内存管理/" itemprop="url" rel="index">
-                    <span itemprop="name">内存管理</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2><span id="背景知识介绍">背景知识介绍</span></h2><p>android 从3.0开始集成MTP功能，主要原因有三个：<br>1.手机要支持UMS的话，必须要有一个sd卡，因为sd卡往往采用Windows支持的分区格式。如果想把内部存储空间通过UMS挂载到Windows上，则内部存储空间需采用特定的分区格式。这对某些手机而言根本不可行。因为内部存储空间本身可能就是一个设备，它们采用统一的分区格式。不能因为需要使用UMS，而再增加一块特定的分区格式的存储设备。<br>2.UMS挂载到PC后，PC操作系统拥有绝对的控制权。此时，Android系统无法操作这些设备。<br>3.window所占市场份额较大，故即使linux，MacOS支持力度不够，Android也要集成的；<br>MTP的主要缺点：<br>1.传输大文件的速度较慢 ??<br>2.MTP不能直接修改文件本身，只能先拷贝到本地修改，完毕后再拷贝回去</p>
-<h2><span id="mtp协议介绍">MTP协议介绍</span></h2><p>MTP使用者包括两个部分，分别为Initiator和Resoponder</p>
-<ol>
-<li>Initiator:主要是指USB Host,例如PC机，笔记本等，协议规定所有的MTP操作只能由Initator发起</li>
-<li>Responder:一般是诸如数码相机，智能手机等存储媒体文件的设备，Responder在MTP中的作用就是处理Initator发起的请求。同时，它还会根据自身状态的变化发送Event以通知Initator.</li>
-</ol>
-<h1><span id="mtp-协议栈">MTP 协议栈</span></h1><ol>
-<li>Pyshical Layer(物理层)：物理层在MTP协议中用来传输数据。目前有三种物理层可供MTP使用。它们分别是USB:其主要特点是传输文件，同步媒体文件时速度快，而且可以变工作边充电，这是目前用的最多的一种方式；IP：基于IP的MTP(简称MTP/TP)将通过UPnp来匹配和发现设备。它是家庭网络中最理想的传输方式；Bluetooth:MTP/BT是最省电，同时速度最慢的一种传输方式，用处较少；</li>
-<li>传输层：MTP中，数据传输格式遵循PTP协议</li>
-<li>命令层：实现了MTP协议中的各种命令；</li>
-</ol>
-<p>MTP采用命令-应答方式来工作，(Initator发送命令给Responder处理，Responser反馈处理结果)，这种方式主要特点有：</p>
-<ol>
-<li>所有MTP命令均以Package(数据包)的方式在设备两端进行传递</li>
-<li>Initiator必须接收到前一条消息处理结果，无论是成功或者超时后，才能发送下一条消息</li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2329,7 +2416,7 @@ b.根据物理地址获取数据
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-count">22</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -2351,7 +2438,7 @@ b.根据物理地址获取数据
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-count">14</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

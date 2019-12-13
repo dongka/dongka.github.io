@@ -249,7 +249,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/13/opengl/openg1_1/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/18/display/MutiDisplay/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dongka">
@@ -268,7 +268,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/12/13/opengl/openg1_1/" itemprop="url">opengl学习总结</a></h1>
+                <a class="post-title-link" href="/2019/11/18/display/MutiDisplay/" itemprop="url">双屏异显异触流程</a></h1>
         
 
         <div class="post-meta">
@@ -280,8 +280,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-12-13T00:07:09+00:00">
-                2019-12-13
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-11-18T00:07:09+00:00">
+                2019-11-18
               </time>
             
 
@@ -303,8 +303,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/opengl/" itemprop="url" rel="index">
-                    <span itemprop="name">opengl</span>
+                  <a href="/categories/display/" itemprop="url" rel="index">
+                    <span itemprop="name">display</span>
                   </a>
                 </span>
 
@@ -342,87 +342,55 @@
       
         
           
-            <h1><span id="opengl流程">opengl流程</span></h1><p>在OpenGL中，任何事物都在3D空间中，而屏幕和窗口确实2D像素组，这导致OpenGL大部分的工作都是关于把3D坐标转变为适应屏幕的2D像素；3D转成2D坐标的处理过程是OpenGl的图形渲染管线（Graphic Pipeline,大多译为管线，实际上指的是一堆原始图形数据途径一个输送管道，期间经过各种变化处理最终出现在屏幕的过程）管理的；图形渲染管线可以划分为两个主要部分，第一部分把你3D的坐标转换成2D坐标；第二部分是把2D坐标转变成实际的有颜色的像素；</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2D坐标和像素不同，2D坐标精确表示一个点在2D空间中的位置，而2D像素是这个点的近似值，2D像素受到屏幕/窗口分辨率的限制</span><br></pre></td></tr></table></figure>
-<p>openGL首先接收用户提供的几何数据（顶点和几何图元），并且将它输入到一系列着色器阶段中进行处理，包括：顶点着色（vertex shader ），细分着色，以及最后的几何着色，然后被送入光栅化单元（resterizer）光栅化单元负责对所有剪切区域（clipping region）内的图元生成片元数据，然后对每个生成的片元都执行一个片元着色器；</p>
-<p><img src="/2019/12/13/opengl/openg1_1/render_pipeline.png" alt="1561280730893"></p>
-<p>下面有个更清晰容易理解的图~</p>
-<p><img src="/2019/12/13/opengl/openg1_1/pipe_line图示.png" alt=""></p>
-<p><strong>顶点着色器（Vertex Shader</strong>）,它把一个单独的顶点（Vertex）作为输入，顶点着色器主要的目的是把3D坐标转为另一种3D坐标,同时顶点着色器允许我们对顶点属性进行一些基本处理；<strong>如：顶点变换，法向量变化和单位化，生成相应的纹理坐标，纹理坐标变换，雾坐标，光照计算；</strong> 当需要计算顶点在屏幕上的位置，就会涉及到<strong>矩阵变换</strong></p>
-<p><strong>图元装配（Primitive Assembly</strong>）阶段将顶点着色器输出的所有顶点作为输入（r如果是GL_POINTS,那么就是一个顶点），并所有的点装配成指定的图形，如上图就是一个三角形；</p>
-<p><strong>几何着色器（Geometry Shader）</strong>几何图形把图元形式的一系列顶点的集合作为输入，它可以通过产生新的顶点构造出新的图元来生成其他形状；<strong>这个着色阶段是可选</strong></p>
-<p>之后就会传入<strong>光栅化阶段（Rasterization Stage</strong>）,这里它会把图元映射为最终屏幕上相应的像素，生成供片段着色器（Fragment Shader）使用的片段（Fragment）.在这之前还会线做下<strong>裁切（Cliping）</strong>会丢弃超出视图以外的所有像素，用来提升效率；</p>
-<p><strong>片段着色器</strong>的主要目的是计算一个像素的最终颜色，这也是OpenGL高级效果产生的地方。通常，片段着色器包含3D场景的数据（比如光照，阴影，光的颜色等等），这些数据可以用来计算最终像素的颜色；片元着色器的作用有：<strong>雾；提取纹理单元，用于纹理贴图；颜色混合</strong>，等</p>
-<p>最后的测试和混合简单而言是根据Zorder和Alpha值进行的图形合成过程；</p>
-<p>先有个大概流程的印像，接下来我们会通过一些例子慢慢将流程梳理清楚；先从opengl的基本库开始讲起；</p>
-<h1><span id="opengl相关库">Opengl相关库</span></h1><p>opengl基本函数库用来描述图元（graphics output promitive），属性（attribute），几何变换(geometric transformation)，观察变换（viewing transform）和进行其他的操作；由于OpenGl被设计成硬件无关型，因此输入和输出函数等许多操作均不包括在其基础库中；而是放在OpenGl开发的辅助库中；</p>
-<p><strong>Opengl基本库(也称OpenGL核心库)：</strong>常见有gl开头的这些函数的写法glBegin, glClear, glCopyPixels, glPolygonMode；变量中GL_2D,GL_RGB,GL_CCW;GL_POLYGON,GL_AMBIENT_AND_DIFFUSE;</p>
-<p><strong>相关库：</strong>OpenGL实用函数（openGL Utility,GLU）提供了一些例程，<strong>可以设置观察和投影矩阵，利用线条和多边形近似法来描述复杂对象</strong>，使用线性近似法显示二次曲线和样条曲线，处理表面绘制操作，以及完成其他复杂任务。每一个OpenGL实现中都包括了<strong>GLU库，所有的函数名都用glu开头</strong>。窗口显示系统，opengl实用函数工具包（OpenGL Utility Toolkit,GLUT）<strong>提供了与任意屏幕窗口系统进行交互的函数库</strong>。<strong>GLUT库函数以glut为前缀</strong>，该库也包含了描述与绘制二次和样条曲线及曲面的方法；</p>
-<p>说这么多，先来个demo~</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;GL/GLUT.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	glClearColor(<span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>);<span class="comment">//使用RGB颜色值将显示窗口的背景颜色设定为白色，参数解析前面为RGB,最后为alpha值</span></span><br><span class="line"></span><br><span class="line">	glMatrixMode(GL_PROJECTION);<span class="comment">//设置投影矩阵，</span></span><br><span class="line">	gluOrtho2D(<span class="number">0.0</span>, <span class="number">200.0</span>, <span class="number">0.0</span>, <span class="number">150.0</span>);<span class="comment">//正交投影见过世界坐标系二维矩阵区域的内容映射到屏幕上，区域的x的坐标值从0.0到200，y坐标从0到150.只要再该矩形内定义的对象，都会出现在显示窗口</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">lineSegment</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	glClear(GL_COLOR_BUFFER_BIT);<span class="comment">//用来指定它是颜色缓存中的位值</span></span><br><span class="line"></span><br><span class="line">	glColor3f(<span class="number">0.0</span>, <span class="number">0.4</span>, <span class="number">0.2</span>);<span class="comment">//设置线段的颜色</span></span><br><span class="line">	glBegin(GL_LINES);</span><br><span class="line">		glVertex2i(<span class="number">180</span>, <span class="number">15</span>);</span><br><span class="line">		glVertex2i(<span class="number">10</span>, <span class="number">145</span>);</span><br><span class="line">	glEnd();</span><br><span class="line"></span><br><span class="line">	glFlush();</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>** argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	glutInit(&amp;argc, argv); <span class="comment">//初始化glut.该函数也能处理命令行参数</span></span><br><span class="line">	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB); <span class="comment">//指定显示窗口使用单个缓存和用RGB的颜色模型旋转颜色</span></span><br><span class="line">	glutInitWindowPosition(<span class="number">50</span>, <span class="number">100</span>);<span class="comment">//窗口显示的地方在在显示器的左上角向右50，向下100像素开始显示</span></span><br><span class="line">	glutInitWindowSize(<span class="number">400</span>, <span class="number">300</span>);<span class="comment">//设定显示窗口的初始宽度和高度的像素数</span></span><br><span class="line">	glutCreateWindow(<span class="string">"An Example"</span>); <span class="comment">//窗口创建的时候给个标题</span></span><br><span class="line">	init();</span><br><span class="line">	glutDisplayFunc(lineSegment);<span class="comment">//显示lineSegment线段</span></span><br><span class="line">	glutMainLoop();<span class="comment">//激活已创建的窗口和图形显示的内容</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>显示效果如下：</p>
-<p><img src="/2019/12/13/opengl/openg1_1/demo.png" alt="demo"></p>
-<p>通过这个demo我们大致了解到opengl的大致使用步骤</p>
-<ol>
-<li>初始化物体渲染所对应的状态。</li>
-<li>设置需要渲染的物体</li>
-</ol>
-<p>接着demo下面我们引入几个概念：</p>
-<h1><span id="mvp">MVP</span></h1><p>demo中的init函数中glMatrixMode(GL_PROJECTION);//设置投影矩阵，这个涉及到了投影矩阵，对于opengl常见的就是要进行矩阵变换；我们这里稍微带下</p>
-<p><img src="/2019/12/13/opengl/openg1_1/矩阵变换.png" alt="矩阵变换"></p>
-<ol>
-<li>红色坐标系位模型坐标系，指定了模型各个点的位置，每个点是(x,y,z)组成的数组；由于后面的矩阵都是4*4，所以在后面补上1；</li>
-<li>模型变换，将模型坐标转化成世界坐标，把物体在世界坐标系的位置拆分成旋转，平移，缩放的表达式；</li>
-<li>视图变换：指定一个相机的位置和角度，然后去观察世界坐标系下的物体；</li>
-<li>投影变换：把前面三位空间的坐标系投影到二维屏幕的坐标系，除了屏幕的横纵坐标，另外一个维度就是垂直屏幕方向的坐标，就是之后可以写入深度缓冲区的值。将三维坐标转换到二维屏幕，主要分为正交投影和透视投影，都是用相似三角形算比例；</li>
-<li>视口变换，这里只是一个非常简单的XoY平面上的缩放；它决定了最终渲染到平面的哪一块，所以用之前的缩放同样的处理就能得到相应矩阵；这里相当于我们经常在ui中遇到的缩放因子；</li>
-</ol>
-<p>于是乎：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">变换后的坐标=视口矩阵 * 投影矩阵（P） * 视图矩阵(V) * 模型矩阵(M) * 模型点坐标</span><br></pre></td></tr></table></figure>
-<p>对应的VR里面左右眼的矩阵模型公式：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">leftEyeMvp = projectMatrix*projRot(投影矩阵) * mHeadOrient*mleftEye（视口矩阵） * mode（模型点）</span><br></pre></td></tr></table></figure>
-<p>通过这个矩阵我们就能从三维空间映射到我们的屏幕上，由于左右眼的视口矩阵不同产生的视觉差，让我们又产生了3d的效果；</p>
-<p>这里有两个工具可以更好的理解这一概念：</p>
-<p><strong>MODELVIEW</strong></p>
-<p><a href="http://www.songho.ca/opengl/files/matrixModelView.zip" target="_blank" rel="noopener">http://www.songho.ca/opengl/files/matrixModelView.zip</a></p>
-<p><strong>PROJECTION</strong></p>
-<p><a href="http://www.songho.ca/opengl/files/matrixProjection.zip" target="_blank" rel="noopener">http://www.songho.ca/opengl/files/matrixProjection.zip</a></p>
-<p>知道了矩阵变换后；我们还会经常遇到着色器这个名字；那这个是什么呢？</p>
-<h1><span id="着色器">着色器</span></h1><p>着色器（Shader）是运行在GPU上的小程序，这些小程序为图形渲染管线的某个特定部分而运行；在openGL中着色器就相当于画笔，而顶点vertices相当于图形（把一个个点按顺序用线连接起来就是一个图形），着色器OpenGL分成两个部分，一个用于绘制顶点的顶点着色器VerticesShader，一个用于顶点连线后所包围的区域填充颜色的片元着色器，可以理解为windows画图中的填充工具；</p>
-<p><img src="/2019/12/13/opengl/openg1_1/shader.png" alt="1560837291736"></p>
-<p>我们常见的着色器普遍认为有三种，在移动设备上使用较多的OpenGL的<strong>GLSL</strong>,在桌面使用较多微软推的DirectX的<strong>HSLS(High level shader language)</strong>;还有NVIDIA公司的<strong>CG（C for Graphic）</strong>；谷歌后面会推的Vulkan，着色器语言是基于GLSL为基础进行增强；由于本文基于的是OpenGL所以就是用的GLSL;</p>
-<p>语言总是苍白的，来段代码吧~~</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;GL/glew.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;GL/glut.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">float</span> g_lightPos[<span class="number">4</span>] = &#123;<span class="number">1</span>,<span class="number">0.5</span>,<span class="number">1</span>,<span class="number">0</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">changeSize</span><span class="params">(<span class="keyword">int</span> w, <span class="keyword">int</span> h)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Prevent a divide by zero, when window is too short</span></span><br><span class="line">	<span class="comment">// (you cant make a window of zero width).</span></span><br><span class="line">	<span class="keyword">if</span>(h == <span class="number">0</span>)</span><br><span class="line">		h = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">float</span> ratio = <span class="number">1.0</span>* w / h;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Reset the coordinate system before modifying</span></span><br><span class="line">	glMatrixMode(GL_PROJECTION);</span><br><span class="line">	glLoadIdentity();</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// Set the viewport to be the entire window</span></span><br><span class="line">    glViewport(<span class="number">0</span>, <span class="number">0</span>, w, h);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Set the correct perspective.</span></span><br><span class="line">	gluPerspective(<span class="number">45</span>,ratio,<span class="number">1</span>,<span class="number">1000</span>);</span><br><span class="line">	glMatrixMode(GL_MODELVIEW);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">renderScene</span><span class="params">(<span class="keyword">void</span>)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);</span><br><span class="line"></span><br><span class="line">	glLoadIdentity();</span><br><span class="line">	gluLookAt(<span class="number">0.0</span>,<span class="number">0.0</span>,<span class="number">5.0</span>,<span class="number">0.0</span>,<span class="number">0.0</span>,<span class="number">-1.0</span>,<span class="number">0.0f</span>,<span class="number">1.0f</span>,<span class="number">0.0f</span>);</span><br><span class="line"></span><br><span class="line">	glLightfv(GL_LIGHT0, GL_POSITION, g_lightPos);</span><br><span class="line">	glutSolidTeapot(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">	glutSwapBuffers();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">processNormalKeys</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">char</span> key, <span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (key == <span class="number">27</span>) </span><br><span class="line">		<span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">char</span>* <span class="title">readShaderSource</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *fileName)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	FILE *fp;</span><br><span class="line">	<span class="keyword">char</span> *content = <span class="literal">NULL</span>;</span><br><span class="line">	<span class="keyword">int</span> count=<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (fileName != <span class="literal">NULL</span>) </span><br><span class="line">	&#123;</span><br><span class="line">		fp = fopen(fileName,<span class="string">"rt"</span>);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (fp != <span class="literal">NULL</span>) </span><br><span class="line">		&#123;</span><br><span class="line">			fseek(fp, <span class="number">0</span>, SEEK_END);</span><br><span class="line">			count = ftell(fp);</span><br><span class="line">			rewind(fp);</span><br><span class="line">			<span class="keyword">if</span> (count &gt; <span class="number">0</span>) </span><br><span class="line">			&#123;</span><br><span class="line">				content = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">char</span>) * (count+<span class="number">1</span>));</span><br><span class="line">				count = fread(content,<span class="keyword">sizeof</span>(<span class="keyword">char</span>),count,fp);</span><br><span class="line">				content[count] = <span class="literal">NULL</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			fclose(fp);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> content;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">GLuint <span class="title">genShader</span><span class="params">(GLenum type,<span class="keyword">const</span> <span class="keyword">char</span>* fileName,<span class="keyword">char</span>*&amp; <span class="built_in">log</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">//创建着色器对象</span></span><br><span class="line">	GLuint shader = glCreateShader(type);</span><br><span class="line">	<span class="comment">//从文件中读取着色器的实现代码</span></span><br><span class="line">	<span class="keyword">char</span>* shaderSource = readShaderSource(fileName);</span><br><span class="line">	<span class="keyword">if</span>( !shaderSource )</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">const</span> <span class="keyword">char</span>* ptrShaderSource = shaderSource;</span><br><span class="line">	<span class="comment">//将着色器的实现代码与创建的着色器对象绑定</span></span><br><span class="line">	glShaderSource(shader,<span class="number">1</span>,&amp;ptrShaderSource,<span class="literal">NULL</span>);</span><br><span class="line">	<span class="built_in">free</span>(shaderSource);</span><br><span class="line">	<span class="comment">//编译着色器对象</span></span><br><span class="line">	glCompileShader(shader);</span><br><span class="line">	GLint status = <span class="number">0</span>;</span><br><span class="line">	<span class="comment">//查看编译状态</span></span><br><span class="line">	glGetShaderiv(shader,GL_COMPILE_STATUS,&amp;status);</span><br><span class="line">	<span class="keyword">if</span>( !status )</span><br><span class="line">	&#123;</span><br><span class="line">		GLint length;</span><br><span class="line">		<span class="comment">//读取日志信息的长度</span></span><br><span class="line">		glGetShaderiv(shader,GL_INFO_LOG_LENGTH,&amp;length);</span><br><span class="line">		<span class="built_in">log</span> = (GLchar*)<span class="built_in">malloc</span>(length);</span><br><span class="line">		<span class="comment">//读取日志信息</span></span><br><span class="line">		glGetShaderInfoLog(shader,length,&amp;length,<span class="built_in">log</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> 1</span></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"%s\n"</span>,<span class="built_in">log</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">		<span class="comment">//删除着色器对象</span></span><br><span class="line">		glDeleteShader(shader);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> shader;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">GLuint <span class="title">linkProgram</span><span class="params">(GLuint* shader,<span class="keyword">int</span> shaderNum,<span class="keyword">char</span>*&amp; <span class="built_in">log</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">//创建着色器程序</span></span><br><span class="line">	GLuint program = glCreateProgram();</span><br><span class="line">	<span class="keyword">int</span> i;</span><br><span class="line">	<span class="comment">//往着色器程序中加入着色器对象</span></span><br><span class="line">	<span class="keyword">for</span>( i=<span class="number">0</span> ; i&lt;shaderNum ; i++ )</span><br><span class="line">		glAttachShader(program,shader[i]);</span><br><span class="line">	<span class="comment">//链接着色器程序</span></span><br><span class="line">	glLinkProgram(program);</span><br><span class="line">	GLint status;</span><br><span class="line">	<span class="comment">//查看链接状态</span></span><br><span class="line">	glGetProgramiv(program,GL_LINK_STATUS,&amp;status);</span><br><span class="line">	<span class="keyword">if</span>( !status )</span><br><span class="line">	&#123;</span><br><span class="line">		GLint length;</span><br><span class="line">		<span class="comment">//读取日志信息的长度</span></span><br><span class="line">		glGetProgramiv(program,GL_INFO_LOG_LENGTH,&amp;length);</span><br><span class="line">		<span class="built_in">log</span> = (GLchar*)<span class="built_in">malloc</span>(length);</span><br><span class="line">		<span class="comment">//读取日志信息</span></span><br><span class="line">		glGetProgramInfoLog(program,length,&amp;length,<span class="built_in">log</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> 1</span></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"%s\n"</span>,<span class="built_in">log</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">		<span class="comment">//删除着色器对象</span></span><br><span class="line">		glDeleteProgram(program);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> program;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">useProgram</span><span class="params">(GLuint program)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">//运行创建成功的着色器程序</span></span><br><span class="line">	glUseProgram(program);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">setShaders</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">char</span>* <span class="built_in">log</span> = <span class="literal">NULL</span>;</span><br><span class="line">	<span class="comment">//创建一个顶点着色器对象</span></span><br><span class="line">	GLuint vertexShader = genShader(GL_VERTEX_SHADER,<span class="string">"toon.vert"</span>,<span class="built_in">log</span>);</span><br><span class="line">	<span class="keyword">if</span>( !vertexShader )</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">free</span>(<span class="built_in">log</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//创建一个片断着色器对象</span></span><br><span class="line">	GLuint fragmentShader = genShader(GL_FRAGMENT_SHADER,<span class="string">"toon.frag"</span>,<span class="built_in">log</span>);</span><br><span class="line">	<span class="keyword">if</span>( !fragmentShader )</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">free</span>(<span class="built_in">log</span>);</span><br><span class="line">		glDeleteShader(vertexShader);</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//把创建好的顶点和片断着色器对象链接到着色器程序中</span></span><br><span class="line">	GLuint shader[<span class="number">2</span>] = &#123;vertexShader,fragmentShader&#125;;</span><br><span class="line">	GLuint program = linkProgram(shader,<span class="number">2</span>,<span class="built_in">log</span>);</span><br><span class="line">	<span class="keyword">if</span>( !program )</span><br><span class="line">	&#123;</span><br><span class="line">		glDeleteShader(vertexShader);</span><br><span class="line">		glDeleteShader(fragmentShader);</span><br><span class="line">		<span class="built_in">free</span>(<span class="built_in">log</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//使用创建成功的着色器程序</span></span><br><span class="line">	useProgram(program);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span> </span>&#123;</span><br><span class="line">	glutInit(&amp;argc, argv);</span><br><span class="line">	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);</span><br><span class="line">	glutInitWindowPosition(<span class="number">100</span>,<span class="number">100</span>);</span><br><span class="line">	glutInitWindowSize(<span class="number">320</span>,<span class="number">320</span>);</span><br><span class="line">	glutCreateWindow(<span class="string">"Shader-Demo"</span>);</span><br><span class="line"></span><br><span class="line">	glutDisplayFunc(renderScene);</span><br><span class="line">	glutReshapeFunc(changeSize);</span><br><span class="line">	glutKeyboardFunc(processNormalKeys);</span><br><span class="line"></span><br><span class="line">	glEnable(GL_DEPTH_TEST);</span><br><span class="line">	glClearColor(<span class="number">1.0</span>,<span class="number">1.0</span>,<span class="number">1.0</span>,<span class="number">1.0</span>);</span><br><span class="line"></span><br><span class="line">	</span><br><span class="line">	glewInit();</span><br><span class="line">	<span class="comment">//判断是否支持GLSL</span></span><br><span class="line">	<span class="keyword">if</span> (GLEW_ARB_vertex_shader &amp;&amp; GLEW_ARB_fragment_shader)</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"Ready for GLSL\n"</span>);</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"No GLSL support\n"</span>);</span><br><span class="line">		<span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	setShaders();</span><br><span class="line">	glutMainLoop();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2><span id="顶点着色器">顶点着色器</span></h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">varying vec3 normal, lightDir;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;	</span><br><span class="line">	lightDir = normalize(vec3(gl_LightSource[<span class="number">0</span>].position));</span><br><span class="line">	normal = normalize(gl_NormalMatrix * gl_Normal);</span><br><span class="line">		</span><br><span class="line">	gl_Position = ftransform();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>当我们讨论到顶点着色器的时候，每个输入变量也叫顶点属性（Vertex Attribute）。我们能声明的顶点属性是有上限的</p>
-<h2><span id="片源着色器">片源着色器</span></h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">varying vec3 normal, lightDir;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">float</span> intensity;</span><br><span class="line">	vec3 n;</span><br><span class="line">	vec4 color;</span><br><span class="line"></span><br><span class="line">	n = normalize(normal);</span><br><span class="line">	intensity = max(dot(lightDir,n),<span class="number">0.0</span>); </span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (intensity &gt; <span class="number">0.98</span>)</span><br><span class="line">		color = vec4(<span class="number">0.8</span>,<span class="number">0.8</span>,<span class="number">0.8</span>,<span class="number">1.0</span>);</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (intensity &gt; <span class="number">0.5</span>)</span><br><span class="line">		color = vec4(<span class="number">0.4</span>,<span class="number">0.4</span>,<span class="number">0.8</span>,<span class="number">1.0</span>);	</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (intensity &gt; <span class="number">0.25</span>)</span><br><span class="line">		color = vec4(<span class="number">0.2</span>,<span class="number">0.2</span>,<span class="number">0.4</span>,<span class="number">1.0</span>);</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		color = vec4(<span class="number">0.1</span>,<span class="number">0.1</span>,<span class="number">0.1</span>,<span class="number">1.0</span>);		</span><br><span class="line">		</span><br><span class="line">	gl_FragColor = color;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>   <strong>效果图如下所示：</strong></p>
-<p><img src="/2019/12/13/opengl/openg1_1/shader_demo.png" alt="1561355152918"></p>
-<h2><span id="总结">总结</span></h2><p>着色器的创建流程 <strong>genShader</strong>：</p>
-<ol>
-<li>创建一个着色器对象 <strong>glCreateShader</strong>；</li>
-<li>将着色器的实现代码与创建的着色器对象绑定 <strong>glShaderSource</strong>;</li>
-<li>把着色器源代码编译为目标代码 <strong>glCompileShader</strong>；</li>
-<li>验证是否编译通过 <strong>glGetShaderiv</strong>；</li>
-</ol>
-<p>接着，把创建好的着色器加入到着色程序中</p>
-<ol>
-<li>创建一个着色程序 <strong>glCreateProgram</strong>;</li>
-<li>把适当的着色对象连接到这个着色程序中 <strong>glAttachShader</strong>；</li>
-<li>链接到这个着色器程序 <strong>glLinkProgram</strong>；</li>
-<li>验证这着色器结点已经成功完成 <strong>glGetProgramiv</strong>；</li>
-<li>使用着色器进行顶点或者片元处理 <strong>useProgram</strong>；</li>
-</ol>
-<p>对于安卓来讲，会把这些接口都进行封装，简化使用；</p>
-<h1><span id="参考资料">参考资料</span></h1><p><a href="http://zhangwenli.com/blog/2015/08/28/opengl-matrix-transformations/" target="_blank" rel="noopener">搞懂矩阵运算</a></p>
-<p><a href="http://www.opengl-tutorial.org/cn/beginners-tutorials/tutorial-3-matrices/#%E7%B4%AF%E7%A7%AF%E5%8F%98%E6%8D%A2" target="_blank" rel="noopener">第三课：矩阵</a></p>
-<p><a href="https://learnopengl-cn.readthedocs.io/zh/latest/01%20Getting%20started/05%20Shaders/" target="_blank" rel="noopener">着色器</a></p>
-<p><a href="https://www.jianshu.com/p/68ee05d6106a" target="_blank" rel="noopener">openGL ES学习之着色器语言</a></p>
-<p><a href="https://www.jianshu.com/p/ce20f98e20cf" target="_blank" rel="noopener">Android OpenGL ES从白痴到入门</a></p>
-<p><a href="https://blog.csdn.net/lyx2007825/article/details/8792475" target="_blank" rel="noopener">openGl 矩阵变换</a></p>
-<p><a href="http://www.twinklingstar.cn/2013/793/basic-shader/" target="_blank" rel="noopener">openGL着色器介绍</a></p>
-<p><a href="https://blog.csdn.net/jxt1234and2010/article/details/53440644" target="_blank" rel="noopener">OpenGL替代者-Vulkan</a></p>
-<p><a href="https://mp.weixin.qq.com/s?__biz=MzU0ODE1NDE0NQ==&amp;mid=2247524191&amp;idx=1&amp;sn=2a851fc5d146edc8f4ba46dbc039bd4a&amp;chksm=fb41a111cc362807399a9fa8f1663e3df81e3e93518861da9e6296888df83b87257190db6cfd&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;key=ab45025d723271920e5e7ceef2a9ff96508f755ae36ab1b9330852f71e41819720da88eecf0ee779b0dd170445ecad71d719642eaa88850b4922a7f38b4185529549b4e4a841e4e4fda560e3d975e9d2&amp;ascene=1&amp;uin=MTkyMDU3MjE0MQ%3D%3D&amp;devicetype=Windows+10&amp;version=62060833&amp;lang=zh_CN&amp;pass_ticket=%2BPax7dvNed53rjvvLVZae0UUuqun3ie29KvXg7y2zh0MPYnAnkQy8uIjADaL0cHi" target="_blank" rel="noopener">是立体还是平面</a></p>
+            <h1><span id="双屏异显">双屏异显</span></h1><h1><span id="异显apk分析">异显apk分析</span></h1><p>在安卓的SDK中有线程的ApiDemo提供给我们去参考设计</p>
+<p>目录为：development/samples/ApiDemos/src/com/example/android/apis/app/PresentationActivity.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCheckedChanged</span><span class="params">(CompoundButton buttonView, <span class="keyword">boolean</span> isChecked)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">if</span> (buttonView == mShowAllDisplaysCheckbox) &#123;</span><br><span class="line">         <span class="comment">// Show all displays checkbox was toggled.</span></span><br><span class="line">         mDisplayListAdapter.updateContents();</span><br><span class="line">     &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">         <span class="comment">// Display item checkbox was toggled.</span></span><br><span class="line">         <span class="keyword">final</span> Display display = (Display)buttonView.getTag();</span><br><span class="line">         <span class="keyword">if</span> (isChecked) &#123;</span><br><span class="line">             DemoPresentationContents contents = <span class="keyword">new</span> DemoPresentationContents(getNextPhoto());</span><br><span class="line">             showPresentation(display, contents);</span><br><span class="line">         &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">             hidePresentation(display);</span><br><span class="line">         &#125;</span><br><span class="line">         mDisplayListAdapter.updateContents();</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoPresentationSurfaceView</span> <span class="keyword">extends</span> <span class="title">Presentation</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> GLSurfaceView mSurfaceView;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String TAG = <span class="string">"DemoPresentationActivity"</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DemoPresentationSurfaceView</span><span class="params">(Context context, Display display)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(context, display);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Be sure to call the super class.</span></span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Get the resources for the context of the presentation.</span></span><br><span class="line">        <span class="comment">// Notice that we are getting the resources from the context of the presentation.</span></span><br><span class="line">        Resources r = getContext().getResources();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Inflate the layout.</span></span><br><span class="line">        setContentView(R.layout.presentation_with_media_router_content);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Set up the surface view for visual interest.</span></span><br><span class="line">        mSurfaceView = (GLSurfaceView)findViewById(R.id.surface_view);</span><br><span class="line">        mSurfaceView.setRenderer(<span class="keyword">new</span> CubeRenderer(<span class="keyword">false</span>));</span><br><span class="line">        <span class="keyword">final</span> Button button = (Button)findViewById(R.id.textbutton);</span><br><span class="line">        button.setOnClickListener(<span class="keyword">new</span> View.OnClickListener() &#123;</span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span>  </span>&#123;</span><br><span class="line">                Log.d(TAG, <span class="string">"There are currently zhuangnanjian"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> GLSurfaceView <span class="title">getSurfaceView</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mSurfaceView;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这是通过Button的ID去选择哪个显示设备；安卓还提供了另外两种可以获取Presentation的方法</p>
+<p><strong>一：通过Media router去获取首选的设备和显示presentation</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mMediaRouter = (MediaRouter)getSystemService(Context.MEDIA_ROUTER_SERVICE);</span><br><span class="line">MediaRouter.RouteInfo route = mMediaRouter.getSelectedRoute(MediaRouter.ROUTE_TYPE_LIVE_VIDEO);</span><br><span class="line">Display presentation = route != <span class="keyword">null</span> ? route.getPresentationDisplay() :<span class="keyword">null</span>;</span><br><span class="line">presentation.show();</span><br><span class="line">presentation.setOnDismissListener(mOnDismissListener);</span><br></pre></td></tr></table></figure>
+<p>除了ROUTE_TYPE_LIVE_VIDEO，还有ROUTE_TYPE_REMOTE_DISPLAY，ROUTE_TYPE_USER</p>
+<p><strong>二：使用displayManager获取</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Display[]presentationDisplays = mDisplayManager.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION);</span><br><span class="line">Display display = presentationDisplays[<span class="number">0</span>];</span><br><span class="line"><span class="keyword">final</span> <span class="keyword">int</span> displayId = display.getDisplayId();</span><br><span class="line">Display display = presentationDisplays[<span class="number">0</span>];</span><br><span class="line">Presentation presentation = <span class="keyword">new</span> MyPresentation(context, presentationDisplay);</span><br><span class="line">presentation.show();</span><br></pre></td></tr></table></figure>
+<p>支持的类型如下：</p>
+<p><img src="/2019/11/18/display/MutiDisplay/Display类型.png" alt="1571399167593"></p>
+<p><strong>综上为三种创建Presentation对象方法，一：直接指定DisplayId，创建Presentation对象；二：通过MediaRoute获取Presentation对象 三：通过displayManager获取Display对象，获取DisplayId,然后创建Presentation对象；然后调用Presentation的show函数</strong>；</p>
+<p>接下来我们就进入framework看下这个对象和相关的show函数</p>
+<h1><span id="presentationampampshow">Presentation&amp;&amp;show</span></h1><h2><span id="presenation结构体">Presenation结构体</span></h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Presentation</span><span class="params">(Context outerContext, Display display, <span class="keyword">int</span> theme)</span> </span>&#123;              </span><br><span class="line">    <span class="keyword">super</span>(createPresentationContext(outerContext, display, theme), theme, <span class="keyword">false</span>); <span class="comment">//调用dialog的构造函数   </span></span><br><span class="line">                                                                                     </span><br><span class="line">    mDisplay = display;                                                              </span><br><span class="line">    mDisplayManager = (DisplayManager)getContext().getSystemService(DISPLAY_SERVICE);</span><br><span class="line">                                                                                     </span><br><span class="line">    <span class="keyword">final</span> Window w = getWindow();                                                    </span><br><span class="line">    <span class="keyword">final</span> WindowManager.LayoutParams attr = w.getAttributes();                       </span><br><span class="line">    attr.token = mToken;                                                             </span><br><span class="line">    w.setAttributes(attr);                                                           </span><br><span class="line">    w.setGravity(Gravity.FILL);                                                      </span><br><span class="line">    w.setType(TYPE_PRESENTATION);                                                    </span><br><span class="line">    setCanceledOnTouchOutside(<span class="keyword">false</span>);                                                </span><br><span class="line">&#125;                   </span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> Context <span class="title">createPresentationContext</span><span class="params">(                              </span></span></span><br><span class="line"><span class="function"><span class="params">        Context outerContext, Display display, <span class="keyword">int</span> theme)</span> </span>&#123;                    </span><br><span class="line">    <span class="keyword">if</span> (outerContext == <span class="keyword">null</span>) &#123;                                                </span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"outerContext must not be null"</span>);   </span><br><span class="line">    &#125;                                                                          </span><br><span class="line">    <span class="keyword">if</span> (display == <span class="keyword">null</span>) &#123;                                                     </span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"display must not be null"</span>);        </span><br><span class="line">    &#125;                                                                          </span><br><span class="line">                                                                               </span><br><span class="line">    Context displayContext = outerContext.createDisplayContext(display);       </span><br><span class="line">    <span class="keyword">if</span> (theme == <span class="number">0</span>) &#123;                                                          </span><br><span class="line">        TypedValue outValue = <span class="keyword">new</span> TypedValue();                                </span><br><span class="line">        displayContext.getTheme().resolveAttribute(                            </span><br><span class="line">                com.android.internal.R.attr.presentationTheme, outValue, <span class="keyword">true</span>);</span><br><span class="line">        theme = outValue.resourceId;                                           </span><br><span class="line">    &#125;                                                                          </span><br><span class="line">                                                                               </span><br><span class="line">    <span class="comment">// Derive the display's window manager from the outer window manager.      </span></span><br><span class="line">    <span class="comment">// We do this because the outer window manager have some extra information </span></span><br><span class="line">    <span class="comment">// such as the parent window, which is important if the presentation uses  </span></span><br><span class="line">    <span class="comment">// an application window type.                                             </span></span><br><span class="line">    <span class="keyword">final</span> WindowManagerImpl outerWindowManager =                               </span><br><span class="line">            (WindowManagerImpl)outerContext.getSystemService(WINDOW_SERVICE);  </span><br><span class="line">    <span class="keyword">final</span> WindowManagerImpl displayWindowManager =                             </span><br><span class="line">            outerWindowManager.createPresentationWindowManager(displayContext);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ContextThemeWrapper(displayContext, theme) &#123;                    </span><br><span class="line">        <span class="meta">@Override</span>                                                              </span><br><span class="line">        <span class="function"><span class="keyword">public</span> Object <span class="title">getSystemService</span><span class="params">(String name)</span> </span>&#123;                          </span><br><span class="line">            <span class="keyword">if</span> (WINDOW_SERVICE.equals(name)) &#123;                                 </span><br><span class="line">                <span class="keyword">return</span> displayWindowManager;                                   </span><br><span class="line">            &#125;                                                                  </span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">super</span>.getSystemService(name);                               </span><br><span class="line">        &#125;                                                                      </span><br><span class="line">    &#125;;                                                                         </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Presentation继承自Dialog，获取到Presentation要显示的设备后，就要将Activity的context对象和设备信息作为参数来创建Presentation对象；将设备记录在成员变量mDisplay中，将Presentation设置为不可在外部点击取消；</p>
+<h2><span id="show流程">show流程</span></h2><p><img src="/2019/11/18/display/MutiDisplay/show.png" alt="1571476950445"></p>
+<p>创建ViewRoot并将view添加到链表上</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setView</span><span class="params">(View view, WindowManager.LayoutParams attrs, View panelParentView)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">     res = mWindowSession.addToDisplay(mWindow, mSeq, mWindowAttributes,</span><br><span class="line">         getHostVisibility(), mDisplay.getDisplayId(), mTmpFrame,</span><br><span class="line">         mAttachInfo.mContentInsets, mAttachInfo.mStableInsets,</span><br><span class="line">         mAttachInfo.mOutsets, mAttachInfo.mDisplayCutout, mInputChannel,</span><br><span class="line">         mTempInsets);</span><br></pre></td></tr></table></figure>
+<p>setView的作用主要有两个：一：创建InputChannel来接受输入事件；二：将Window加入到WindowManager</p>
+<h1><span id="输入事件的传递">输入事件的传递</span></h1><h2><span id="输入设备类型">输入设备类型</span></h2><p>从InputReader.h我们可以看出来，安卓将输入设备分为以下几种类型：</p>
+<p>开关：SwitchInputMapper</p>
+<p>震动器，严格意义上是输出设备：VibratorInputMapper</p>
+<p>鼠标：CursorInputMapper</p>
+<p>键盘：KeyboardInputMapper</p>
+<p>触摸设备 TouchInputMapper，SingleTouchInputMapper，MultiTouchInputMapper,</p>
+<p>触控笔ExternalStylusInputMapper,</p>
+<p>游戏杆：JoystickInputMapper</p>
+<p>input设备不同初始化参数也不一样如触摸设备的话可以配置displayId,而鼠标则只能输出到主显；</p>
+<h2><span id="touchdisplayid的配置流程">touch.displayId的配置流程</span></h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">services/inputflinger/InputReader.cpp</span><br><span class="line"><span class="keyword">void</span> InputReader::loopOnce() &#123;</span><br><span class="line">	processEventsLocked(mEventBuffer, count);</span><br><span class="line">		addDeviceLocked(rawEvent-&gt;when, rawEvent-&gt;deviceId);</span><br><span class="line">			device-&gt;configure(when, &amp;mConfig, <span class="number">0</span>);</span><br><span class="line">				configureParameters()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (mParameters.orientationAware                                                  </span><br><span class="line">        || mParameters.deviceType == Parameters::DEVICE_TYPE_TOUCH_SCREEN         </span><br><span class="line">        || mParameters.deviceType == Parameters::DEVICE_TYPE_POINTER) &#123;           </span><br><span class="line">    mParameters.hasAssociatedDisplay = <span class="literal">true</span>;                                      </span><br><span class="line">    <span class="keyword">if</span> (mParameters.deviceType == Parameters::DEVICE_TYPE_TOUCH_SCREEN) &#123;         </span><br><span class="line">        mParameters.associatedDisplayIsExternal = getDevice()-&gt;isExternal();      </span><br><span class="line">        String8 uniqueDisplayId;                                                  </span><br><span class="line">        getDevice()-&gt;getConfiguration().tryGetProperty(String8(<span class="string">"touch.displayId"</span>),</span><br><span class="line">                uniqueDisplayId);                                                 </span><br><span class="line">        mParameters.uniqueDisplayId = uniqueDisplayId.c_str();                    </span><br><span class="line">    &#125;                                                                             </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2><span id="touchdisplayid的传递流程">touch.displayId的传递流程</span></h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">services/inputflinger/InputReader.cpp</span><br><span class="line"><span class="keyword">void</span> TouchInputMapper::dispatchMotion</span><br><span class="line">	<span class="keyword">const</span> <span class="keyword">int32_t</span> displayId = getAssociatedDisplay().value_or(ADISPLAY_ID_NONE);</span><br><span class="line">	pointerProperties[pointerCount].copyFrom(properties[index]);</span><br><span class="line">	pointerCoords[pointerCount].copyFrom(coords[index]);        </span><br><span class="line">		<span class="built_in">std</span>::optional&lt;<span class="keyword">int32_t</span>&gt; TouchInputMapper::getAssociatedDisplay() &#123;         </span><br><span class="line">    		<span class="keyword">if</span> (mParameters.hasAssociatedDisplay) &#123;                               </span><br><span class="line">       		<span class="keyword">if</span> (mDeviceMode == DEVICE_MODE_POINTER) &#123;                         </span><br><span class="line">            	<span class="keyword">return</span> <span class="built_in">std</span>::make_optional(mPointerController-&gt;getDisplayId());</span><br><span class="line">        	&#125; <span class="keyword">else</span> &#123;                                                          </span><br><span class="line">            	<span class="keyword">return</span> <span class="built_in">std</span>::make_optional(mViewport.displayId);               </span><br><span class="line">        	&#125;                                                                 </span><br><span class="line">    		&#125;                                                                     </span><br><span class="line">    		<span class="keyword">return</span> <span class="built_in">std</span>::nullopt;                                                  </span><br><span class="line">		&#125;</span><br><span class="line">	NotifyMotionArgs args(mContext-&gt;getNextSequenceNum(), when, deviceId,                   </span><br><span class="line">        source, displayId, policyFlags,                                                 </span><br><span class="line">        action, actionButton, flags, metaState, buttonState, MotionClassification::NONE,</span><br><span class="line">        edgeFlags, deviceTimestamp, pointerCount, pointerProperties, pointerCoords,     </span><br><span class="line">        xPrecision, yPrecision, downTime, <span class="built_in">std</span>::move(frames));                           </span><br><span class="line">	getListener()-&gt;notifyMotion(&amp;args); </span><br><span class="line"></span><br><span class="line">压入队列里面然后在read 的loopOnce中会进行通知</span><br><span class="line">services/inputflinger/InputListener.cpp</span><br><span class="line"><span class="keyword">void</span> QueuedInputListener::notifyConfigurationChanged(          </span><br><span class="line">        <span class="keyword">const</span> NotifyConfigurationChangedArgs* args) &#123;          </span><br><span class="line">    mArgsQueue.push(<span class="keyword">new</span> NotifyConfigurationChangedArgs(*args));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> InputReader::loopOnce() &#123;</span><br><span class="line">    ...</span><br><span class="line">    mQueuedListener-&gt;flush();</span><br><span class="line">    args-&gt;notify(mInnerListener);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line">在InputDispatcher中同样是用的一个线程找到对应的窗口进行分发</span><br><span class="line">services/inputflinger/InputDispatcher.cpp</span><br><span class="line"><span class="keyword">void</span> InputDispatcher::notifyMotion(<span class="keyword">const</span> NotifyMotionArgs* args) &#123;</span><br><span class="line">	...</span><br><span class="line">	needWake = enqueueInboundEventLocked(newEntry);</span><br><span class="line">	mPolicy-&gt;interceptMotionBeforeQueueing(args-&gt;eventTime, <span class="comment">/*byref*/</span> policyFlags);		</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">bool</span> InputDispatcherThread::threadLoop() &#123;</span><br><span class="line">	...</span><br><span class="line">	mDispatcher-&gt;dispatchOnce();</span><br><span class="line">		--&gt;mLooper-&gt;pollOnce(timeoutMillis);</span><br><span class="line">			--&gt;dispatchOnceInnerLocked(&amp;nextWakeupTime);</span><br><span class="line">				--&gt;done = dispatchMotionLocked(currentTime, typedEntry,</span><br><span class="line">                &amp;dropReason, nextWakeupTime);</span><br><span class="line">                	findTouchedWindowTargetsLocked</span><br><span class="line">                	 dispatchEventLocked(currentTime, entry, inputTargets);</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从软件流程分析，touchScreen类型的话是通过配置device.internal来配置TP的输入设备输出到辅显，而Pointer类型的话则是通过displayId去设置输出的方向；</p>
+<h1><span id="idc文件配置">idc文件配置</span></h1><p>idc（Input Device Configuration）为输入设备配置文件，包含设备具体的配置属性，这些属性影响输入设备的行为，常见的配置有；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">device.internal 指定输入设备属于内置组件；还是外部链接（很可能拆卸）的外围设备；0表示外部，1表示内部</span><br><span class="line">touch.deviceType   touchScreen(与显示屏相关的触摸屏),touchPad（不与显示相关连的触摸板）,                            touchNavigation,pointer（类似于鼠标）,default(系统根据分类算法自动检测设备类型)</span><br><span class="line">touch.orientationAware  等于1时表示触摸会随着显示屏方向更改，为0则表示不受显示屏方向更改的影响</span><br><span class="line">touch.gestureMode single-touch multi-touch default</span><br><span class="line">touch.wake   tp是否需要唤醒系统，一般希望外部设备才有这种能力；如果是内部的设备需要唤醒系统，你也可以进行配置</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>从代码流程上看，在双屏异触的场景下，如果是两个TP，需要配置一个为内部设备，一个为外部设备；</p>
+<p>由于安卓的默认鼠标设备的DisplayId只能是0，如代码所示：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> CursorInputMapper::sync(<span class="keyword">nsecs_t</span> when) &#123;</span><br><span class="line">    ...</span><br><span class="line">        <span class="keyword">if</span> (mSource == AINPUT_SOURCE_MOUSE) &#123;</span><br><span class="line">    <span class="keyword">if</span> (moved || scrolled || buttonsChanged) &#123;</span><br><span class="line">        mPointerController-&gt;setPresentation(</span><br><span class="line">                PointerControllerInterface::PRESENTATION_POINTER);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (moved) &#123;</span><br><span class="line">            mPointerController-&gt;move(deltaX, deltaY);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (buttonsChanged) &#123;</span><br><span class="line">            mPointerController-&gt;setButtonState(currentButtonState);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        mPointerController-&gt;unfade(PointerControllerInterface::TRANSITION_IMMEDIATE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">float</span> x, y;</span><br><span class="line">    mPointerController-&gt;getPosition(&amp;x, &amp;y);</span><br><span class="line">    pointerCoords.setAxisValue(AMOTION_EVENT_AXIS_X, x);</span><br><span class="line">    pointerCoords.setAxisValue(AMOTION_EVENT_AXIS_Y, y);</span><br><span class="line">    pointerCoords.setAxisValue(AMOTION_EVENT_AXIS_RELATIVE_X, deltaX);</span><br><span class="line">    pointerCoords.setAxisValue(AMOTION_EVENT_AXIS_RELATIVE_Y, deltaY);</span><br><span class="line">    displayId = ADISPLAY_ID_DEFAULT;</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    	pointerCoords.setAxisValue(AMOTION_EVENT_AXIS_X, deltaX);</span><br><span class="line">   		pointerCoords.setAxisValue(AMOTION_EVENT_AXIS_Y, deltaY);</span><br><span class="line">   	 displayId = ADISPLAY_ID_NONE;</span><br><span class="line">	&#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果想要让鼠标设备支持输出到辅显也可以改变这个displayId,并且需要修改framework/base下对于鼠标控件sprite Layer的LayerStack属性的设置；笔者的话是通过鼠标在主显响应，触摸在辅屏响应来实现双屏异显异触的验证，那么这样其实可以配置；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">system/usr/idc/gslX680.idc</span><br><span class="line">	device.internal = 0</span><br><span class="line">	touch.deviceType = touch</span><br></pre></td></tr></table></figure>
+<p>总结：作为应用，需要指定送显时候的displayId；作为输入设备也需要指定</p>
+<h1><span id="参考链接">参考链接</span></h1><p><a href="https://juejin.im/post/5d2af4ddf265da1b8f1af0eb" target="_blank" rel="noopener">Android折叠屏适配攻略</a></p>
+<p><a href="https://segmentfault.com/a/1190000019213936" target="_blank" rel="noopener">聊聊安卓折叠屏给交互设计和开发带来的变化</a></p>
+<p><a href="https://walkerkai.wang/Android-Presentation.html" target="_blank" rel="noopener">Android开发-双屏异显（Presentation）实现</a></p>
+<p><a href="https://www.jianshu.com/p/6e5eda3a51af" target="_blank" rel="noopener">手把手带你深入浅出神秘的设计模式</a></p>
+<p><a href="https://blog.csdn.net/fu_kevin0606/article/details/79420621" target="_blank" rel="noopener">Android7.1 Presentation双屏异显原理分析</a></p>
+<p><a href="https://source.android.google.cn/devices/input/touch-devices" target="_blank" rel="noopener">输入输出设备配置文件</a></p>
+<p><a href="https://www.jianshu.com/p/34f5c7d55337" target="_blank" rel="noopener">Android触摸事件传递</a></p>
+<p><a href="https://cwgoover.github.io/2016/05/31/android-setting-pointer-location/" target="_blank" rel="noopener">Android Input of Pointer Location</a></p>
+<p><a href="http://ddrv.cn/a/296013" target="_blank" rel="noopener">Android双屏分析</a></p>
+<p><a href="http://liuwangshu.cn/framework/ims/4-inputtarget.html" target="_blank" rel="noopener">输入事件是怎么分发到目标窗口的</a></p>
 
           
         
@@ -1111,6 +1079,228 @@
 <p><a href="https://www.twblogs.net/a/5c1f1a11bd9eee16b3da61e8" target="_blank" rel="noopener">android 8.0 Hwcomposer2 HIDL流程</a></p>
 <p><a href="https://blog.csdn.net/xiaosayidao/article/details/75577940" target="_blank" rel="noopener">Android OTreble架构-HIDL源代码分析</a></p>
 <p><a href="[http://windrunnerlihuan.com/2017/12/01/Android-SurfaceFlinger-%E5%AD%A6%E4%B9%A0%E4%B9%8B%E8%B7%AF-%E5%8D%81%E4%B8%80-%E5%90%88%E6%88%90Layer%E4%B9%8B%E5%87%86%E5%A4%87%E5%90%88%E6%88%90/](http://windrunnerlihuan.com/2017/12/01/Android-SurfaceFlinger-学习之路-十一-合成Layer之准备合成/">Android SurfaceFlinger学习之路（十一）合成layer之准备合成</a>)</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/13/opengl/openg1_1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/05/13/opengl/openg1_1/" itemprop="url">opengl学习总结</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-05-13T00:07:09+00:00">
+                2019-05-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/opengl/" itemprop="url" rel="index">
+                    <span itemprop="name">opengl</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1><span id="opengl流程">opengl流程</span></h1><p>在OpenGL中，任何事物都在3D空间中，而屏幕和窗口确实2D像素组，这导致OpenGL大部分的工作都是关于把3D坐标转变为适应屏幕的2D像素；3D转成2D坐标的处理过程是OpenGl的图形渲染管线（Graphic Pipeline,大多译为管线，实际上指的是一堆原始图形数据途径一个输送管道，期间经过各种变化处理最终出现在屏幕的过程）管理的；图形渲染管线可以划分为两个主要部分，第一部分把你3D的坐标转换成2D坐标；第二部分是把2D坐标转变成实际的有颜色的像素；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2D坐标和像素不同，2D坐标精确表示一个点在2D空间中的位置，而2D像素是这个点的近似值，2D像素受到屏幕/窗口分辨率的限制</span><br></pre></td></tr></table></figure>
+<p>openGL首先接收用户提供的几何数据（顶点和几何图元），并且将它输入到一系列着色器阶段中进行处理，包括：顶点着色（vertex shader ），细分着色，以及最后的几何着色，然后被送入光栅化单元（resterizer）光栅化单元负责对所有剪切区域（clipping region）内的图元生成片元数据，然后对每个生成的片元都执行一个片元着色器；</p>
+<p><img src="/2019/05/13/opengl/openg1_1/render_pipeline.png" alt="1561280730893"></p>
+<p>下面有个更清晰容易理解的图~</p>
+<p><img src="/2019/05/13/opengl/openg1_1/pipe_line图示.png" alt=""></p>
+<p><strong>顶点着色器（Vertex Shader</strong>）,它把一个单独的顶点（Vertex）作为输入，顶点着色器主要的目的是把3D坐标转为另一种3D坐标,同时顶点着色器允许我们对顶点属性进行一些基本处理；<strong>如：顶点变换，法向量变化和单位化，生成相应的纹理坐标，纹理坐标变换，雾坐标，光照计算；</strong> 当需要计算顶点在屏幕上的位置，就会涉及到<strong>矩阵变换</strong></p>
+<p><strong>图元装配（Primitive Assembly</strong>）阶段将顶点着色器输出的所有顶点作为输入（r如果是GL_POINTS,那么就是一个顶点），并所有的点装配成指定的图形，如上图就是一个三角形；</p>
+<p><strong>几何着色器（Geometry Shader）</strong>几何图形把图元形式的一系列顶点的集合作为输入，它可以通过产生新的顶点构造出新的图元来生成其他形状；<strong>这个着色阶段是可选</strong></p>
+<p>之后就会传入<strong>光栅化阶段（Rasterization Stage</strong>）,这里它会把图元映射为最终屏幕上相应的像素，生成供片段着色器（Fragment Shader）使用的片段（Fragment）.在这之前还会线做下<strong>裁切（Cliping）</strong>会丢弃超出视图以外的所有像素，用来提升效率；</p>
+<p><strong>片段着色器</strong>的主要目的是计算一个像素的最终颜色，这也是OpenGL高级效果产生的地方。通常，片段着色器包含3D场景的数据（比如光照，阴影，光的颜色等等），这些数据可以用来计算最终像素的颜色；片元着色器的作用有：<strong>雾；提取纹理单元，用于纹理贴图；颜色混合</strong>，等</p>
+<p>最后的测试和混合简单而言是根据Zorder和Alpha值进行的图形合成过程；</p>
+<p>先有个大概流程的印像，接下来我们会通过一些例子慢慢将流程梳理清楚；先从opengl的基本库开始讲起；</p>
+<h1><span id="opengl相关库">Opengl相关库</span></h1><p>opengl基本函数库用来描述图元（graphics output promitive），属性（attribute），几何变换(geometric transformation)，观察变换（viewing transform）和进行其他的操作；由于OpenGl被设计成硬件无关型，因此输入和输出函数等许多操作均不包括在其基础库中；而是放在OpenGl开发的辅助库中；</p>
+<p><strong>Opengl基本库(也称OpenGL核心库)：</strong>常见有gl开头的这些函数的写法glBegin, glClear, glCopyPixels, glPolygonMode；变量中GL_2D,GL_RGB,GL_CCW;GL_POLYGON,GL_AMBIENT_AND_DIFFUSE;</p>
+<p><strong>相关库：</strong>OpenGL实用函数（openGL Utility,GLU）提供了一些例程，<strong>可以设置观察和投影矩阵，利用线条和多边形近似法来描述复杂对象</strong>，使用线性近似法显示二次曲线和样条曲线，处理表面绘制操作，以及完成其他复杂任务。每一个OpenGL实现中都包括了<strong>GLU库，所有的函数名都用glu开头</strong>。窗口显示系统，opengl实用函数工具包（OpenGL Utility Toolkit,GLUT）<strong>提供了与任意屏幕窗口系统进行交互的函数库</strong>。<strong>GLUT库函数以glut为前缀</strong>，该库也包含了描述与绘制二次和样条曲线及曲面的方法；</p>
+<p>说这么多，先来个demo~</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;GL/GLUT.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	glClearColor(<span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>);<span class="comment">//使用RGB颜色值将显示窗口的背景颜色设定为白色，参数解析前面为RGB,最后为alpha值</span></span><br><span class="line"></span><br><span class="line">	glMatrixMode(GL_PROJECTION);<span class="comment">//设置投影矩阵，</span></span><br><span class="line">	gluOrtho2D(<span class="number">0.0</span>, <span class="number">200.0</span>, <span class="number">0.0</span>, <span class="number">150.0</span>);<span class="comment">//正交投影见过世界坐标系二维矩阵区域的内容映射到屏幕上，区域的x的坐标值从0.0到200，y坐标从0到150.只要再该矩形内定义的对象，都会出现在显示窗口</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">lineSegment</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	glClear(GL_COLOR_BUFFER_BIT);<span class="comment">//用来指定它是颜色缓存中的位值</span></span><br><span class="line"></span><br><span class="line">	glColor3f(<span class="number">0.0</span>, <span class="number">0.4</span>, <span class="number">0.2</span>);<span class="comment">//设置线段的颜色</span></span><br><span class="line">	glBegin(GL_LINES);</span><br><span class="line">		glVertex2i(<span class="number">180</span>, <span class="number">15</span>);</span><br><span class="line">		glVertex2i(<span class="number">10</span>, <span class="number">145</span>);</span><br><span class="line">	glEnd();</span><br><span class="line"></span><br><span class="line">	glFlush();</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>** argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	glutInit(&amp;argc, argv); <span class="comment">//初始化glut.该函数也能处理命令行参数</span></span><br><span class="line">	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB); <span class="comment">//指定显示窗口使用单个缓存和用RGB的颜色模型旋转颜色</span></span><br><span class="line">	glutInitWindowPosition(<span class="number">50</span>, <span class="number">100</span>);<span class="comment">//窗口显示的地方在在显示器的左上角向右50，向下100像素开始显示</span></span><br><span class="line">	glutInitWindowSize(<span class="number">400</span>, <span class="number">300</span>);<span class="comment">//设定显示窗口的初始宽度和高度的像素数</span></span><br><span class="line">	glutCreateWindow(<span class="string">"An Example"</span>); <span class="comment">//窗口创建的时候给个标题</span></span><br><span class="line">	init();</span><br><span class="line">	glutDisplayFunc(lineSegment);<span class="comment">//显示lineSegment线段</span></span><br><span class="line">	glutMainLoop();<span class="comment">//激活已创建的窗口和图形显示的内容</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>显示效果如下：</p>
+<p><img src="/2019/05/13/opengl/openg1_1/demo.png" alt="demo"></p>
+<p>通过这个demo我们大致了解到opengl的大致使用步骤</p>
+<ol>
+<li>初始化物体渲染所对应的状态。</li>
+<li>设置需要渲染的物体</li>
+</ol>
+<p>接着demo下面我们引入几个概念：</p>
+<h1><span id="mvp">MVP</span></h1><p>demo中的init函数中glMatrixMode(GL_PROJECTION);//设置投影矩阵，这个涉及到了投影矩阵，对于opengl常见的就是要进行矩阵变换；我们这里稍微带下</p>
+<p><img src="/2019/05/13/opengl/openg1_1/矩阵变换.png" alt="矩阵变换"></p>
+<ol>
+<li>红色坐标系位模型坐标系，指定了模型各个点的位置，每个点是(x,y,z)组成的数组；由于后面的矩阵都是4*4，所以在后面补上1；</li>
+<li>模型变换，将模型坐标转化成世界坐标，把物体在世界坐标系的位置拆分成旋转，平移，缩放的表达式；</li>
+<li>视图变换：指定一个相机的位置和角度，然后去观察世界坐标系下的物体；</li>
+<li>投影变换：把前面三位空间的坐标系投影到二维屏幕的坐标系，除了屏幕的横纵坐标，另外一个维度就是垂直屏幕方向的坐标，就是之后可以写入深度缓冲区的值。将三维坐标转换到二维屏幕，主要分为正交投影和透视投影，都是用相似三角形算比例；</li>
+<li>视口变换，这里只是一个非常简单的XoY平面上的缩放；它决定了最终渲染到平面的哪一块，所以用之前的缩放同样的处理就能得到相应矩阵；这里相当于我们经常在ui中遇到的缩放因子；</li>
+</ol>
+<p>于是乎：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">变换后的坐标=视口矩阵 * 投影矩阵（P） * 视图矩阵(V) * 模型矩阵(M) * 模型点坐标</span><br></pre></td></tr></table></figure>
+<p>对应的VR里面左右眼的矩阵模型公式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">leftEyeMvp = projectMatrix*projRot(投影矩阵) * mHeadOrient*mleftEye（视口矩阵） * mode（模型点）</span><br></pre></td></tr></table></figure>
+<p>通过这个矩阵我们就能从三维空间映射到我们的屏幕上，由于左右眼的视口矩阵不同产生的视觉差，让我们又产生了3d的效果；</p>
+<p>这里有两个工具可以更好的理解这一概念：</p>
+<p><strong>MODELVIEW</strong></p>
+<p><a href="http://www.songho.ca/opengl/files/matrixModelView.zip" target="_blank" rel="noopener">http://www.songho.ca/opengl/files/matrixModelView.zip</a></p>
+<p><strong>PROJECTION</strong></p>
+<p><a href="http://www.songho.ca/opengl/files/matrixProjection.zip" target="_blank" rel="noopener">http://www.songho.ca/opengl/files/matrixProjection.zip</a></p>
+<p>知道了矩阵变换后；我们还会经常遇到着色器这个名字；那这个是什么呢？</p>
+<h1><span id="着色器">着色器</span></h1><p>着色器（Shader）是运行在GPU上的小程序，这些小程序为图形渲染管线的某个特定部分而运行；在openGL中着色器就相当于画笔，而顶点vertices相当于图形（把一个个点按顺序用线连接起来就是一个图形），着色器OpenGL分成两个部分，一个用于绘制顶点的顶点着色器VerticesShader，一个用于顶点连线后所包围的区域填充颜色的片元着色器，可以理解为windows画图中的填充工具；</p>
+<p><img src="/2019/05/13/opengl/openg1_1/shader.png" alt="1560837291736"></p>
+<p>我们常见的着色器普遍认为有三种，在移动设备上使用较多的OpenGL的<strong>GLSL</strong>,在桌面使用较多微软推的DirectX的<strong>HSLS(High level shader language)</strong>;还有NVIDIA公司的<strong>CG（C for Graphic）</strong>；谷歌后面会推的Vulkan，着色器语言是基于GLSL为基础进行增强；由于本文基于的是OpenGL所以就是用的GLSL;</p>
+<p>语言总是苍白的，来段代码吧~~</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;GL/glew.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;GL/glut.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">float</span> g_lightPos[<span class="number">4</span>] = &#123;<span class="number">1</span>,<span class="number">0.5</span>,<span class="number">1</span>,<span class="number">0</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">changeSize</span><span class="params">(<span class="keyword">int</span> w, <span class="keyword">int</span> h)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Prevent a divide by zero, when window is too short</span></span><br><span class="line">	<span class="comment">// (you cant make a window of zero width).</span></span><br><span class="line">	<span class="keyword">if</span>(h == <span class="number">0</span>)</span><br><span class="line">		h = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">float</span> ratio = <span class="number">1.0</span>* w / h;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Reset the coordinate system before modifying</span></span><br><span class="line">	glMatrixMode(GL_PROJECTION);</span><br><span class="line">	glLoadIdentity();</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// Set the viewport to be the entire window</span></span><br><span class="line">    glViewport(<span class="number">0</span>, <span class="number">0</span>, w, h);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Set the correct perspective.</span></span><br><span class="line">	gluPerspective(<span class="number">45</span>,ratio,<span class="number">1</span>,<span class="number">1000</span>);</span><br><span class="line">	glMatrixMode(GL_MODELVIEW);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">renderScene</span><span class="params">(<span class="keyword">void</span>)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);</span><br><span class="line"></span><br><span class="line">	glLoadIdentity();</span><br><span class="line">	gluLookAt(<span class="number">0.0</span>,<span class="number">0.0</span>,<span class="number">5.0</span>,<span class="number">0.0</span>,<span class="number">0.0</span>,<span class="number">-1.0</span>,<span class="number">0.0f</span>,<span class="number">1.0f</span>,<span class="number">0.0f</span>);</span><br><span class="line"></span><br><span class="line">	glLightfv(GL_LIGHT0, GL_POSITION, g_lightPos);</span><br><span class="line">	glutSolidTeapot(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">	glutSwapBuffers();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">processNormalKeys</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">char</span> key, <span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (key == <span class="number">27</span>) </span><br><span class="line">		<span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">char</span>* <span class="title">readShaderSource</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *fileName)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	FILE *fp;</span><br><span class="line">	<span class="keyword">char</span> *content = <span class="literal">NULL</span>;</span><br><span class="line">	<span class="keyword">int</span> count=<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (fileName != <span class="literal">NULL</span>) </span><br><span class="line">	&#123;</span><br><span class="line">		fp = fopen(fileName,<span class="string">"rt"</span>);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (fp != <span class="literal">NULL</span>) </span><br><span class="line">		&#123;</span><br><span class="line">			fseek(fp, <span class="number">0</span>, SEEK_END);</span><br><span class="line">			count = ftell(fp);</span><br><span class="line">			rewind(fp);</span><br><span class="line">			<span class="keyword">if</span> (count &gt; <span class="number">0</span>) </span><br><span class="line">			&#123;</span><br><span class="line">				content = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">char</span>) * (count+<span class="number">1</span>));</span><br><span class="line">				count = fread(content,<span class="keyword">sizeof</span>(<span class="keyword">char</span>),count,fp);</span><br><span class="line">				content[count] = <span class="literal">NULL</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			fclose(fp);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> content;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">GLuint <span class="title">genShader</span><span class="params">(GLenum type,<span class="keyword">const</span> <span class="keyword">char</span>* fileName,<span class="keyword">char</span>*&amp; <span class="built_in">log</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">//创建着色器对象</span></span><br><span class="line">	GLuint shader = glCreateShader(type);</span><br><span class="line">	<span class="comment">//从文件中读取着色器的实现代码</span></span><br><span class="line">	<span class="keyword">char</span>* shaderSource = readShaderSource(fileName);</span><br><span class="line">	<span class="keyword">if</span>( !shaderSource )</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">const</span> <span class="keyword">char</span>* ptrShaderSource = shaderSource;</span><br><span class="line">	<span class="comment">//将着色器的实现代码与创建的着色器对象绑定</span></span><br><span class="line">	glShaderSource(shader,<span class="number">1</span>,&amp;ptrShaderSource,<span class="literal">NULL</span>);</span><br><span class="line">	<span class="built_in">free</span>(shaderSource);</span><br><span class="line">	<span class="comment">//编译着色器对象</span></span><br><span class="line">	glCompileShader(shader);</span><br><span class="line">	GLint status = <span class="number">0</span>;</span><br><span class="line">	<span class="comment">//查看编译状态</span></span><br><span class="line">	glGetShaderiv(shader,GL_COMPILE_STATUS,&amp;status);</span><br><span class="line">	<span class="keyword">if</span>( !status )</span><br><span class="line">	&#123;</span><br><span class="line">		GLint length;</span><br><span class="line">		<span class="comment">//读取日志信息的长度</span></span><br><span class="line">		glGetShaderiv(shader,GL_INFO_LOG_LENGTH,&amp;length);</span><br><span class="line">		<span class="built_in">log</span> = (GLchar*)<span class="built_in">malloc</span>(length);</span><br><span class="line">		<span class="comment">//读取日志信息</span></span><br><span class="line">		glGetShaderInfoLog(shader,length,&amp;length,<span class="built_in">log</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> 1</span></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"%s\n"</span>,<span class="built_in">log</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">		<span class="comment">//删除着色器对象</span></span><br><span class="line">		glDeleteShader(shader);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> shader;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">GLuint <span class="title">linkProgram</span><span class="params">(GLuint* shader,<span class="keyword">int</span> shaderNum,<span class="keyword">char</span>*&amp; <span class="built_in">log</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">//创建着色器程序</span></span><br><span class="line">	GLuint program = glCreateProgram();</span><br><span class="line">	<span class="keyword">int</span> i;</span><br><span class="line">	<span class="comment">//往着色器程序中加入着色器对象</span></span><br><span class="line">	<span class="keyword">for</span>( i=<span class="number">0</span> ; i&lt;shaderNum ; i++ )</span><br><span class="line">		glAttachShader(program,shader[i]);</span><br><span class="line">	<span class="comment">//链接着色器程序</span></span><br><span class="line">	glLinkProgram(program);</span><br><span class="line">	GLint status;</span><br><span class="line">	<span class="comment">//查看链接状态</span></span><br><span class="line">	glGetProgramiv(program,GL_LINK_STATUS,&amp;status);</span><br><span class="line">	<span class="keyword">if</span>( !status )</span><br><span class="line">	&#123;</span><br><span class="line">		GLint length;</span><br><span class="line">		<span class="comment">//读取日志信息的长度</span></span><br><span class="line">		glGetProgramiv(program,GL_INFO_LOG_LENGTH,&amp;length);</span><br><span class="line">		<span class="built_in">log</span> = (GLchar*)<span class="built_in">malloc</span>(length);</span><br><span class="line">		<span class="comment">//读取日志信息</span></span><br><span class="line">		glGetProgramInfoLog(program,length,&amp;length,<span class="built_in">log</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> 1</span></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"%s\n"</span>,<span class="built_in">log</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">		<span class="comment">//删除着色器对象</span></span><br><span class="line">		glDeleteProgram(program);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> program;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">useProgram</span><span class="params">(GLuint program)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">//运行创建成功的着色器程序</span></span><br><span class="line">	glUseProgram(program);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">setShaders</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">char</span>* <span class="built_in">log</span> = <span class="literal">NULL</span>;</span><br><span class="line">	<span class="comment">//创建一个顶点着色器对象</span></span><br><span class="line">	GLuint vertexShader = genShader(GL_VERTEX_SHADER,<span class="string">"toon.vert"</span>,<span class="built_in">log</span>);</span><br><span class="line">	<span class="keyword">if</span>( !vertexShader )</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">free</span>(<span class="built_in">log</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//创建一个片断着色器对象</span></span><br><span class="line">	GLuint fragmentShader = genShader(GL_FRAGMENT_SHADER,<span class="string">"toon.frag"</span>,<span class="built_in">log</span>);</span><br><span class="line">	<span class="keyword">if</span>( !fragmentShader )</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">free</span>(<span class="built_in">log</span>);</span><br><span class="line">		glDeleteShader(vertexShader);</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//把创建好的顶点和片断着色器对象链接到着色器程序中</span></span><br><span class="line">	GLuint shader[<span class="number">2</span>] = &#123;vertexShader,fragmentShader&#125;;</span><br><span class="line">	GLuint program = linkProgram(shader,<span class="number">2</span>,<span class="built_in">log</span>);</span><br><span class="line">	<span class="keyword">if</span>( !program )</span><br><span class="line">	&#123;</span><br><span class="line">		glDeleteShader(vertexShader);</span><br><span class="line">		glDeleteShader(fragmentShader);</span><br><span class="line">		<span class="built_in">free</span>(<span class="built_in">log</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//使用创建成功的着色器程序</span></span><br><span class="line">	useProgram(program);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span> </span>&#123;</span><br><span class="line">	glutInit(&amp;argc, argv);</span><br><span class="line">	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);</span><br><span class="line">	glutInitWindowPosition(<span class="number">100</span>,<span class="number">100</span>);</span><br><span class="line">	glutInitWindowSize(<span class="number">320</span>,<span class="number">320</span>);</span><br><span class="line">	glutCreateWindow(<span class="string">"Shader-Demo"</span>);</span><br><span class="line"></span><br><span class="line">	glutDisplayFunc(renderScene);</span><br><span class="line">	glutReshapeFunc(changeSize);</span><br><span class="line">	glutKeyboardFunc(processNormalKeys);</span><br><span class="line"></span><br><span class="line">	glEnable(GL_DEPTH_TEST);</span><br><span class="line">	glClearColor(<span class="number">1.0</span>,<span class="number">1.0</span>,<span class="number">1.0</span>,<span class="number">1.0</span>);</span><br><span class="line"></span><br><span class="line">	</span><br><span class="line">	glewInit();</span><br><span class="line">	<span class="comment">//判断是否支持GLSL</span></span><br><span class="line">	<span class="keyword">if</span> (GLEW_ARB_vertex_shader &amp;&amp; GLEW_ARB_fragment_shader)</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"Ready for GLSL\n"</span>);</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"No GLSL support\n"</span>);</span><br><span class="line">		<span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	setShaders();</span><br><span class="line">	glutMainLoop();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2><span id="顶点着色器">顶点着色器</span></h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">varying vec3 normal, lightDir;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;	</span><br><span class="line">	lightDir = normalize(vec3(gl_LightSource[<span class="number">0</span>].position));</span><br><span class="line">	normal = normalize(gl_NormalMatrix * gl_Normal);</span><br><span class="line">		</span><br><span class="line">	gl_Position = ftransform();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当我们讨论到顶点着色器的时候，每个输入变量也叫顶点属性（Vertex Attribute）。我们能声明的顶点属性是有上限的</p>
+<h2><span id="片源着色器">片源着色器</span></h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">varying vec3 normal, lightDir;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">float</span> intensity;</span><br><span class="line">	vec3 n;</span><br><span class="line">	vec4 color;</span><br><span class="line"></span><br><span class="line">	n = normalize(normal);</span><br><span class="line">	intensity = max(dot(lightDir,n),<span class="number">0.0</span>); </span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (intensity &gt; <span class="number">0.98</span>)</span><br><span class="line">		color = vec4(<span class="number">0.8</span>,<span class="number">0.8</span>,<span class="number">0.8</span>,<span class="number">1.0</span>);</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (intensity &gt; <span class="number">0.5</span>)</span><br><span class="line">		color = vec4(<span class="number">0.4</span>,<span class="number">0.4</span>,<span class="number">0.8</span>,<span class="number">1.0</span>);	</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (intensity &gt; <span class="number">0.25</span>)</span><br><span class="line">		color = vec4(<span class="number">0.2</span>,<span class="number">0.2</span>,<span class="number">0.4</span>,<span class="number">1.0</span>);</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		color = vec4(<span class="number">0.1</span>,<span class="number">0.1</span>,<span class="number">0.1</span>,<span class="number">1.0</span>);		</span><br><span class="line">		</span><br><span class="line">	gl_FragColor = color;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>   <strong>效果图如下所示：</strong></p>
+<p><img src="/2019/05/13/opengl/openg1_1/shader_demo.png" alt="1561355152918"></p>
+<h2><span id="总结">总结</span></h2><p>着色器的创建流程 <strong>genShader</strong>：</p>
+<ol>
+<li>创建一个着色器对象 <strong>glCreateShader</strong>；</li>
+<li>将着色器的实现代码与创建的着色器对象绑定 <strong>glShaderSource</strong>;</li>
+<li>把着色器源代码编译为目标代码 <strong>glCompileShader</strong>；</li>
+<li>验证是否编译通过 <strong>glGetShaderiv</strong>；</li>
+</ol>
+<p>接着，把创建好的着色器加入到着色程序中</p>
+<ol>
+<li>创建一个着色程序 <strong>glCreateProgram</strong>;</li>
+<li>把适当的着色对象连接到这个着色程序中 <strong>glAttachShader</strong>；</li>
+<li>链接到这个着色器程序 <strong>glLinkProgram</strong>；</li>
+<li>验证这着色器结点已经成功完成 <strong>glGetProgramiv</strong>；</li>
+<li>使用着色器进行顶点或者片元处理 <strong>useProgram</strong>；</li>
+</ol>
+<p>对于安卓来讲，会把这些接口都进行封装，简化使用；</p>
+<h1><span id="参考资料">参考资料</span></h1><p><a href="http://zhangwenli.com/blog/2015/08/28/opengl-matrix-transformations/" target="_blank" rel="noopener">搞懂矩阵运算</a></p>
+<p><a href="http://www.opengl-tutorial.org/cn/beginners-tutorials/tutorial-3-matrices/#%E7%B4%AF%E7%A7%AF%E5%8F%98%E6%8D%A2" target="_blank" rel="noopener">第三课：矩阵</a></p>
+<p><a href="https://learnopengl-cn.readthedocs.io/zh/latest/01%20Getting%20started/05%20Shaders/" target="_blank" rel="noopener">着色器</a></p>
+<p><a href="https://www.jianshu.com/p/68ee05d6106a" target="_blank" rel="noopener">openGL ES学习之着色器语言</a></p>
+<p><a href="https://www.jianshu.com/p/ce20f98e20cf" target="_blank" rel="noopener">Android OpenGL ES从白痴到入门</a></p>
+<p><a href="https://blog.csdn.net/lyx2007825/article/details/8792475" target="_blank" rel="noopener">openGl 矩阵变换</a></p>
+<p><a href="http://www.twinklingstar.cn/2013/793/basic-shader/" target="_blank" rel="noopener">openGL着色器介绍</a></p>
+<p><a href="https://blog.csdn.net/jxt1234and2010/article/details/53440644" target="_blank" rel="noopener">OpenGL替代者-Vulkan</a></p>
+<p><a href="https://mp.weixin.qq.com/s?__biz=MzU0ODE1NDE0NQ==&amp;mid=2247524191&amp;idx=1&amp;sn=2a851fc5d146edc8f4ba46dbc039bd4a&amp;chksm=fb41a111cc362807399a9fa8f1663e3df81e3e93518861da9e6296888df83b87257190db6cfd&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;key=ab45025d723271920e5e7ceef2a9ff96508f755ae36ab1b9330852f71e41819720da88eecf0ee779b0dd170445ecad71d719642eaa88850b4922a7f38b4185529549b4e4a841e4e4fda560e3d975e9d2&amp;ascene=1&amp;uin=MTkyMDU3MjE0MQ%3D%3D&amp;devicetype=Windows+10&amp;version=62060833&amp;lang=zh_CN&amp;pass_ticket=%2BPax7dvNed53rjvvLVZae0UUuqun3ie29KvXg7y2zh0MPYnAnkQy8uIjADaL0cHi" target="_blank" rel="noopener">是立体还是平面</a></p>
 
           
         
@@ -2806,250 +2996,6 @@ venus-a3:/ # settings list system | grep  next
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/17/cpu/arm体系架构的发展/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/11/17/cpu/arm体系架构的发展/" itemprop="url">ARM体系架构概述</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-11-17T14:54:00+00:00">
-                2018-11-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cpu/" itemprop="url" rel="index">
-                    <span itemprop="name">cpu</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1><span id="arm体系架构的发展">ARM体系架构的发展</span></h1><p>本文将从以下几点去展开介绍arm体系架构的发展：</p>
-<ol>
-<li>指令集架构</li>
-<li>arm公司的发展历史以及授权模式</li>
-<li>arm的体系架构 </li>
-</ol>
-<h1><span id="arm公司的发展历史">arm公司的发展历史</span></h1><p>arm的发展历程在此文章讲的非常详细，故不再赘述<a href="http://www.eefocus.com/mcu-dsp/409079/r0" target="_blank" rel="noopener">一文带你了解ARM的发展历程</a></p>
-<h2><span id="arm授权模式">arm授权模式</span></h2><p>在传统PC领域，半导体有两种路子可以走，一种是Intel这种，<strong>从头到尾一条龙，架构和芯片设计，生产一律不靠任何人</strong>； 这样做需要极其雄厚，全方位的实力做保障，得有钱，有人，有技术，在半导体技术日益复杂的今天，能这么做屈指可数；好处就是利润率比较高，想卖多少钱就多少；当然技术上得做到领先甚至于垄断的地位优势才比较明显；</p>
-<p>另外一种则无工厂模式（Fabless）,<strong>NVIDIA,AMD,这类企业都是自己设计芯片，制造交给代工厂，比如台积电，联电，GlobalFoundries,三星电子</strong>。好处很明显，负担轻，但是在半导体这种工艺在功耗与性能中扮演重要角色的行业，你设计出来的是否能设计出来，怎么设计出来，很大程度看代工厂的能耐；幸好这些代工厂也十分给力，不断的逼近物理极限；使得AMD最近也能慢慢的赶上挤牙膏的Intel;</p>
-<p>arm就不一样了，它不制造，不销售芯片，只是自己设计IP,包括指令集，微处理器，GPU,总线，然后谁要的话就买arm的授权；授权模式分为此三种：</p>
-<h3><span id="处理器授权">处理器授权</span></h3><p>ARM设计好一颗CPU或者GPU，armv7架构对应的IP为Cortex-A5/A7/A9/A12/A15/A17这几个核心架构，对应armv8-A就有Cortext-A35/A53/A57/A72/A73;ARMv8.2A指令集：Cortext-A55/A75;然后授权卖给伙伴，买下它们后，只能按照图纸实现，能发挥的不多，如何实现就比较随便，如配置哪些模块，几个核心，多少缓存，多高频率，什么工艺，谁来代工等等；</p>
-<p>如果想优化，但是技术有限，那么可以买arm的处理器优化包/物理IP包授权（POP）<br>如果只是想更快速搞出产品，那么更干脆了，arm已经帮你制定好代工厂处理器类型和工艺了；<br>代表商家有联发科，展讯，联芯，全志，瑞芯微，炬力等；这些设计公司获得的是软核或者这点硬核授权，通过购买的CPU核，与GPU核，以及通过一定的流程，集成出SOC；</p>
-<p>购买处理器授权的本质上就大同小异了，可以做出差异化的只能在一些IP上做出差异化；</p>
-<h3><span id="架构指令授权">架构/指令授权</span></h3><p>这种授权方式价格比较贵，为防止碎片化的情况出现还有可能处于技术上的保护，arm禁止对指令集进行修改或者添加，但其他公司是否确切遵守了，这个就不得而知了；总之这种授权需要具有非常强的技术实力，也不过15家，如我们熟知的高通，苹果，三星，华为等公司；</p>
-<p>除了版税，那些购买了arm IP授权的，还需要为每一个芯片支付版税；</p>
-<p>在这里有些问题就应该提出来思考了，为什么都是arm的指令集，苹果的芯片却可以吊打现在的Android厂商的芯片呢？评价CPU性能指标在以下几个方面：</p>
-<p>一：指令集宽度（ISSUE）6</p>
-<p>二：乱序指令执行缓冲区（Recorder Buffer）（192）</p>
-<p>三：内存加载延迟（Load Latency）:4</p>
-<p>四：分支预测错误代价（Misprediction Penalty）:16(一般介于14~19)</p>
-<p>不得不说，<strong>苹果很早就开始布局CPU的设计之路，具有极强的芯片设计能力</strong>，在厂家都是基于arm的公版进行设计，苹果就已经通过购买arm指令集，然后进行自己的CPU设计，在14年的时候A7处理器，作为第一个ARM 64位CPU商用，而且将指令集宽度位6，作为对比arm目前的指令集为3；由于封闭式的开发，不像高通，需要考虑各个厂家的需求和成本，<strong>苹果有更高的溢价能力，可以用面积去换取性能与功耗，并根据自己的系统去做定制化</strong>；</p>
-<h1><span id="指令集架构isa">指令集架构（ISA）</span></h1><p>CPU执行计算任务时都需要遵从一定的规范，程序在被执行时都需要先翻译成CPU可以理解的语言。这种规范就是指令集<strong>（ISA，Intruction Set Architecrure）;</strong></p>
-<p>例如以下的机器码：1110 0001 1010 0000 0010 0000 0000 0001</p>
-<p>比如有个CPU定位1110 0001就是ADD指令，1010 0000对应的是存储数据的寄存器R2；0010 0000对应的寄存器R0;<br>0000 0001对应是寄存器R1,故意思可以是ADD R2 R0 R1,将R0,R1的值加起来放到R2；指令集就是定义一套约定俗成的CPU运行规则，对于编程人员，面对的汇编指令；而对于CPU来说，就是怎么去理解这段二进制码，不同的CPU对这段二进制代码不同，故就有了不同的指令集架构； </p>
-<p>指令集一般分为两种：<strong>精简指令集</strong>（RISC:reduced instruction set computer)和<strong>复杂指令集</strong>（CISC：Complex Instrution Set Computer）,以洗衣机洗衣服为例，RISC架构为，加水-&gt;漂洗-&gt;风干；而复杂指令集则可以发出洗衣服的指令，从而让洗衣机自动帮忙做这一整套的流程；CISC可以通过一条复杂的指令来完成许多事情，性能在处理复杂的任务时，会比RISC更为高效；但随之而来的是面积和功耗的提升；基于2/8理论，程序大部分时间（80%）都是在做重复而简单的事情；所以RISC架构就应运而生，更为精简的指令，将任务更多的放在了编译器这块，通过复杂的指令转化成简单指令的组合，在一定程度上增加了代码量，但使其大部分场合能比CISC取得更小的面积和功耗；</p>
-<p>采用精简指令集的微处理，常见为ARM,MIPS，Power Architecture(包括PowerPC,PowerXCell),SPARC，RISC-V等而采用CISC则为X86和AMD</p>
-<p>至于arm为代表RISC架构与以X86为代表的CISC之间的优劣比较还有是否存在替代一说，笔者认为，不会，而且从目前的发展来看，已经出现了你中有我，我中有你的局面；<br><a href="https://www.zhihu.com/question/20783321" target="_blank" rel="noopener">更进一步的探讨可以看下知乎上关于精简指令集与负杂指令集的讨论</a>,我也很赞同其中一个答主的观点，这已经不是个技术问题了，而是一个商业的问题</p>
-<p>总结完RISC和CISC之间的关系，再讲讲基于RISC阵营里面的ARM和最近比较火热的RISC-V，arm大家都熟悉，而RISC-V又是个什么东西呢？</p>
-<p>RISC-V是加州大学伯克利分校的开源指令集，由计算机架构的宗师级任务David Patterson领衔打造，通过将核心指令集以及<br>关键IP开源，意图改变半导体生态；详细的可以看这篇文档；<a href="http://www.semiinsights.com/s/electronic_components/23/30744.shtml" target="_blank" rel="noopener">名家专栏丨一文看懂RISC-V</a></p>
-<p>总结如下：RISC-V具有以下优点：1.可模块化配置的指令集。 2.支持可扩展的指令集 3.一套指令集支持所有架构，基本指令集仅40余条指令，以此为共用基础，加上其他常用模块子集指令总指令集也仅几十条 4.硬件设计和编译器非常简单</p>
-<p>笔者认为，RISC-V目前作为一个像linux看齐的硬件开源组织，linux之所以能健康长足发展，在于社区成千上万的内核爱好者的不断贡献，使得linux能够蓬勃发展；而硬件则不同，在这动辄上百万的流片费的无数摆在硬件设计者面前的坎，是否会有公司或者团体愿意将自己用血与泪验证的IP，贡献到社区，如果没有做到这一点，即将面临由于厂家扩展指令不同的碎片化问题解决，还有RISC-V后面的长足发展，将付之空谈；这样RISC-V架构只能作为几个大厂找到的低廉的替代arm方案的选择，而无法真正做到普惠；</p>
-<h1><span id="arm的体系架构">arm的体系架构</span></h1><table>
-<thead>
-<tr>
-<th>时间</th>
-<th>架构</th>
-<th>主要更新</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1985</td>
-<td>ARMv1</td>
-<td>只有26位的寻值空间，没有用于商业产品</td>
-</tr>
-<tr>
-<td>1986</td>
-<td>ARMv2</td>
-<td>首颗量产的ARM处理器，包括32位乘法指令和协处理器指令</td>
-</tr>
-<tr>
-<td>1990</td>
-<td>ARMv3</td>
-<td>具有片上高速缓存，MMU和写缓冲，寻址空间增大到32位</td>
-</tr>
-<tr>
-<td>1993</td>
-<td>ARMv4</td>
-<td>ARM7，ARM8，ARM9和Strong ARM采用这种架构。增加了16 Thumb指令集</td>
-</tr>
-<tr>
-<td>1998</td>
-<td>ARMv5</td>
-<td>ARM7(EJ),ARM9(E),ARM10(E)和Xscale采用这种了该架构，改进了ARM/Thumb状态之间的切换效率，此外还引入DSP指令和支持JAVA</td>
-</tr>
-<tr>
-<td>2001</td>
-<td>ARMv6</td>
-<td>ARM11,强化了图形处理性能，通过追加有效进行多媒体处理的SIMD将语音及图像的处理功能大大提高。此外ARM在这个系列中引入混合16位/32位的Thumb-2指令集</td>
-</tr>
-<tr>
-<td>2004</td>
-<td>ARMv7</td>
-<td>Cortex-M3/4/7,Cortex-R4/5/6/7,Cortex-A8/9都是基于该架构，该架构包括NEON技术扩展，可将DSP和媒体处理吞吐量高达400%，并提供改进的浮点支持以满足下一代3D图形和游戏以及传统嵌入式控制应用的需要</td>
-</tr>
-<tr>
-<td>2007</td>
-<td>ARMv6-M</td>
-<td>专门为低成本，高性能的设备而设计，Cortex-M0/1即采用该架构</td>
-</tr>
-<tr>
-<td>2011</td>
-<td>ARMv8</td>
-<td>Cortex-A32/35/53/57/72/73采用此架构，第一款支持64位的处理器架构</td>
-</tr>
-</tbody>
-</table>
-<h2><span id="arm架构发展图">ARM架构发展图：</span></h2><p><img src="/2018/11/17/cpu/arm体系架构的发展/arm_develop.png" alt="Arm架构发展"></p>
-<h2><span id="arm体系的cpu工作模式">arm体系的CPU工作模式：</span></h2><p>1.用户模式(usr):正常的程序执行状态<br>2.快速中断模式（fiq）:用于支持高速数据传输或者通道处理<br>3.中断模式（irq）:用于普通中断处理<br>4.管理模式（svc）:操作系统使用的保护模式<br>5.系统模式（sys）:运行具有特权的操作系统的任务；<br>6.数据访问终止模式（abt）:数据或指令与预取终止时进入该模式<br>7.未定义指令终止模式（und）:未定义的指令执行时进入该模式；</p>
-<p>linux如何从用户态进入内核态<br>分为两种：主动式和被动式、</p>
-<p>1.主动式：就是linux用户在（ARM在用户模式下）工作，通过发起用户态程序发起命令请求，ARM响应进入特权模式进而Linux切入内核态，就是系统调用；系统调用可被堪称一个内核与用户空间程序交互的接口；把用户进程的请求传达 给内核，待内核把请求处理完毕后再将处理结果送回给用户空间；<br>系统调用的主要用途：</p>
-<p>一：控制硬件-系统调用往往作为硬件资源和用户空间的抽象接口，比如读写文件用到的write/read调用</p>
-<p>二：设置系统状态或读取内核数据；</p>
-<p>2.被动式：就是Linux在用户态（ARM在用户模式）工作，没有主动发起请求，而被动地进入内核态，包括硬件中断和程序异常；</p>
-<p>参考资料：</p>
-<p><a href="http://www.10tiao.com/html/523/201708/2458284920/1.html" target="_blank" rel="noopener">arm汇编基础教程</a></p>
-<p><a href="https://zhuanlan.zhihu.com/p/36372153" target="_blank" rel="noopener">给开源架构泼泼冷水</a></p>
-<p><a href="https://www.techbang.com/posts/10678-fully-understand-arm-processors-cisc-and-risc-are-what-history-structure-a-see-through-the-computer-96-issues-cover-story-the-king?comment_page=2&amp;page=1" target="_blank" rel="noopener">完全看懂ARM处理器:RISC与CISC是什么？历史，架构一次性看透</a></p>
-<p><a href="http://www.wowotech.net/armv8a_arch/armv8-a_overview.html" target="_blank" rel="noopener">ARMv8-a</a></p>
-<p><a href="https://www.veryarm.com/1164.html" target="_blank" rel="noopener">ARM介绍1：发展史</a><br><a href="https://www.veryarm.com/1170.html" target="_blank" rel="noopener">ARM介绍2：授权模式</a></p>
-<p><a href="http://wiki.csie.ncku.edu.tw/embedded/ARMv8" target="_blank" rel="noopener">ARMV8</a></p>
-<p><a href="https://www.ednchina.com/news/20170421apple.html" target="_blank" rel="noopener">从arm到三星，苹果是如何走向自研芯片的</a></p>
-<p><a href="http://technews.tw/2017/12/13/why-apple-soc-so-dope/" target="_blank" rel="noopener">一样是ARM架构，为何苹果处理器效能就是压下其他人</a><br><a href="https://www.cnblogs.com/douzi2/p/5112743.html" target="_blank" rel="noopener">浅析arm的异常，中断和arm工作模式的联系</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -3100,7 +3046,7 @@ venus-a3:/ # settings list system | grep  next
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-count">22</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -3122,7 +3068,7 @@ venus-a3:/ # settings list system | grep  next
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-count">14</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
