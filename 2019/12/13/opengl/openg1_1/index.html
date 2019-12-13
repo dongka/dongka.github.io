@@ -90,10 +90,10 @@
 <meta property="og:image" content="http://yoursite.com/2019/12/13/opengl/openg1_1/render_pipeline.png">
 <meta property="og:image" content="http://yoursite.com/2019/12/13/opengl/openg1_1/pipe_line图示.png">
 <meta property="og:image" content="http://yoursite.com/2019/12/13/opengl/openg1_1/demo.png">
-<meta property="og:image" content="http://yoursite.com/2019/12/13/opengl/openg1_1/Users/key/Desktop/study/display/opengl/矩阵变换.png">
+<meta property="og:image" content="http://yoursite.com/2019/12/13/opengl/openg1_1/矩阵变换.png">
 <meta property="og:image" content="http://yoursite.com/2019/12/13/opengl/openg1_1/shader.png">
 <meta property="og:image" content="http://yoursite.com/2019/12/13/opengl/openg1_1/shader_demo.png">
-<meta property="og:updated_time" content="2019-12-13T01:51:43.831Z">
+<meta property="og:updated_time" content="2019-12-13T01:53:53.576Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="opengl学习总结">
 <meta name="twitter:description" content="opengl流程在OpenGL中，任何事物都在3D空间中，而屏幕和窗口确实2D像素组，这导致OpenGL大部分的工作都是关于把3D坐标转变为适应屏幕的2D像素；3D转成2D坐标的处理过程是OpenGl的图形渲染管线（Graphic Pipeline,大多译为管线，实际上指的是一堆原始图形数据途径一个输送管道，期间经过各种变化处理最终出现在屏幕的过程）管理的；图形渲染管线可以划分为两个主要部分，第一">
@@ -376,7 +376,7 @@
 </ol>
 <p>接着demo下面我们引入几个概念：</p>
 <h1><span id="mvp">MVP</span></h1><p>demo中的init函数中glMatrixMode(GL_PROJECTION);//设置投影矩阵，这个涉及到了投影矩阵，对于opengl常见的就是要进行矩阵变换；我们这里稍微带下</p>
-<p><img src="/2019/12/13/opengl/openg1_1/Users\key\Desktop\study\display\opengl\矩阵变换.png" alt="矩阵变换"></p>
+<p><img src="/2019/12/13/opengl/openg1_1/矩阵变换.png" alt="矩阵变换"></p>
 <ol>
 <li>红色坐标系位模型坐标系，指定了模型各个点的位置，每个点是(x,y,z)组成的数组；由于后面的矩阵都是4*4，所以在后面补上1；</li>
 <li>模型变换，将模型坐标转化成世界坐标，把物体在世界坐标系的位置拆分成旋转，平移，缩放的表达式；</li>
