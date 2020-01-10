@@ -89,7 +89,7 @@
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2018/12/13/standby/kernel_suspend/信号响应时机.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/12/13/standby/kernel_suspend/suspend_resume_trace.jpg">
-<meta property="og:updated_time" content="2019-10-29T12:36:48.546Z">
+<meta property="og:updated_time" content="2020-01-10T04:46:42.697Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="内核的休眠流程">
 <meta name="twitter:description" content="内核休眠流程当安卓合适的时机(wakeup_count = save_count &amp;amp;&amp;amp; inpr == 0),与内核一致，在没有wakeup事件的时候，走进一步的流程，发echo mem &amp;gt; /sys/power/state命令后，内核开始处理休眠流程 ./kernel/power/main.c  state_store     -&amp;gt;pm_suspend">
@@ -504,7 +504,7 @@ schedule_work -&gt; queue_work -&gt; queue_work_on -&gt;
                     --&gt;enable_irq_wake-&gt;irq_set_irq_wake-&gt;set_irq_wake_real-&gt;irq_set_wake-&gt;sunxi_irq_set_wake 
                         这样传递后怎么处理？？
                   suspend_device_irqs();
-                    --&gt;没有唤醒标志的 enable_irq_wake,  request_irq(irq, xxx_isr, flag | irqf_no_suspend, xxx, xxx)的时候，此时中断会被清除,此时切断的是irq device和irq controller之间的联系
+                    --&gt;没有唤醒标志的 enable_irq_wake,  request_irq(irq, xxx_isr, flag | IRQF_NO_SUSPEND`, xxx, xxx)的时候，此时中断会被清除,此时切断的是irq device和irq controller之间的联系
                         这两者的区别在于enable_irq_wake还会走到synchronize_irq(irq),等待中断处理完毕
 
               device_suspend_noirq(dev) //处理关闭中断后的事情    
@@ -540,15 +540,18 @@ syscore_suspend();//主要调用sched_clock_suspend,timekeeping_suspend,irq_gc_s
 <pre><code>一般而言inpr已经足够表示系统有事件在进行，不要进入休眠；引入这个条件笔者认为只是为了能更新该值，保证wakeup_event都能被统计到；
 当cnt != save_cnt 
 打印如下 last active wakeup source: axp22_wakeup_source；表明是上次是被谁影响到休眠
-</code></pre><p><strong>2: 为什么即有request_irq(irq, xxx_isr, flag | irqf_no_suspend, xxx, xxx)又有，enanle_irq_wake?</strong></p>
+</code></pre><p><strong>2: 为什么即有request_irq(irq, xxx_isr, flag | IRQF_NO_SUSPEND, xxx, xxx)又有，enanle_irq_wake?</strong></p>
 <pre><code>http://www.wowotech.net/forum/viewtopic.php?id=20
 这里有相关的讨论，大意是
 这两个方法，做的是同一件事情，都是控制“request line和irq controller之间的联系”。
-irqf_no_suspend是旧方法；
+IRQF_NO_SUSPEND是旧方法；
 enable_irq_wake是新方法。
-之所以所有的driver都调用这两个接口，有两种可能：一是为兼容；而是不太理解，为保险起见，都调用。
-从代码上看request的时候带的参数irqf_no_suspend只能在内核休眠的时候起到阻止休眠的功能，而enable_irq_wake则可以在深度休眠后仍然能唤醒；
+之有的driver都调用这两个接口，有两种可能：一是为兼容；而是不太理解，为保险起见，都调用。
+从代码上看request的时候带的参数IRQF_OF_SUSPEND只能在内核休眠的时候起到阻止休眠的功能，而enable_irq_wake则可以在深度休眠后仍然能唤醒；
 当休眠到core阶段的时候cpu的irq和fiq都已关闭，但仍保存着wakeup信号线，通过wakeup信号线唤醒从而唤醒cpu,当cpu中断使能开启后再响应中断
+不建议使用IRQF_NO_SUSPEND的方式,原因有两个，一:对于电平触发的会在唤醒的是时候由于中断处理线程得不到调度导致pending存在,阻塞系统唤醒;
+二:enable_irq_wake能通过disable_irq_wake的方式动态处理开关是否需要唤醒系统,或者在probe的时候通过device_init_wakeup的方式添加设备唤醒系统的属性
+这样无需调用enable_irq_wake就能使能设备休眠唤醒系统属性 三：enable_irq_wake的设备，中断底半部处理函数即使调用sleep函数,系统仍会等到中断处理完成才睡眠不会漏处理
 </code></pre><p><strong>3：怎么对休眠流程进行分解debug</strong></p>
 <pre><code>内核在休眠的流程中加入了trace point可以根据这个去定位是哪个流程去定位哪个流程异常：
     echo 1 &gt; /sys/kernel/debug/tracing/events/power/suspend_resume/enable
@@ -635,8 +638,8 @@ cat /proc/wakelocks
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/12/13/standby/android_standby/" rel="next" title="安卓休眠流程">
-                <i class="fa fa-chevron-left"></i> 安卓休眠流程
+              <a href="/2018/11/17/cpu/arm体系架构的发展/" rel="next" title="ARM体系架构概述">
+                <i class="fa fa-chevron-left"></i> ARM体系架构概述
               </a>
             
           </div>
@@ -645,8 +648,8 @@ cat /proc/wakelocks
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/02/27/display/display_hardware/" rel="prev" title="显示硬件篇">
-                显示硬件篇 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/12/13/standby/android_standby/" rel="prev" title="安卓休眠流程">
+                安卓休眠流程 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -799,7 +802,7 @@ cat /proc/wakelocks
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

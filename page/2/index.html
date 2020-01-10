@@ -711,7 +711,7 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/tools/ds5-userguide/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/cpu/cpu_freq/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dongka">
@@ -730,7 +730,7 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/25/tools/ds5-userguide/" itemprop="url">DS5相关介绍</a></h1>
+                <a class="post-title-link" href="/2018/06/25/cpu/cpu_freq/" itemprop="url">CPUFreq</a></h1>
         
 
         <div class="post-meta">
@@ -765,8 +765,8 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/工具使用/" itemprop="url" rel="index">
-                    <span itemprop="name">工具使用</span>
+                  <a href="/categories/cpu/" itemprop="url" rel="index">
+                    <span itemprop="name">cpu</span>
                   </a>
                 </span>
 
@@ -804,82 +804,171 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
       
         
           
-            <!-- toc -->
-<ul>
-<li><a href="#一-ds5-与-dstream">一. DS5 与 DSTREAM</a><ul>
-<li><a href="#1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</a></li>
-<li><a href="#2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</a></li>
-</ul>
-</li>
-<li><a href="#二-安装ds5">二. 安装DS5</a></li>
-<li><a href="#三-ds5的使用">三. DS5的使用</a><ul>
-<li><a href="#1新建debug-control">1.新建debug control</a></li>
-<li><a href="#2建立连接">2.建立连接</a></li>
-<li><a href="#3load-vmlinux">3.load vmlinux</a></li>
-<li><a href="#4查看logbuf">4.查看logbuf</a></li>
-<li><a href="#5load-源码单步调试">5.load 源码单步调试</a></li>
-</ul>
-</li>
-<li><a href="#四csat的使用">四：csat的使用</a><ul>
-<li><a href="#1csatcoresight-access-toolcsat">1.csat:CoreSight Access Tool(CSAT)</a></li>
-<li><a href="#2csat-ds-5-diff">2.CSAT &amp; DS-5 diff</a></li>
-<li><a href="#3csat的命令">3.CSAT的命令</a></li>
-</ul>
-</li>
-</ul>
-<!-- tocstop -->
-<h1><span id="一-ds5-与-dstream">一. DS5 与 DSTREAM</span></h1><h2><span id="1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/ds5.png" alt="ds5"><br>  从以下工具发展而来：DS5&lt;RVDS&lt;ADS&lt;SDT,目前除DS5外其他都已停用；<br>  有图形化的streamline性能分析器，可基于C源码，汇编程序，地址对bare裸机程序，uboot,kernel,驱动，app进行热点，程序瓶颈，CPU使用，Cache hit/miss,功耗分析</p>
-<h2><span id="2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/dstream.png" alt="dstream"><br>    共有7个接口，其中ARM JTAG 14，TI JTAG 14，ARM JTAG 20和Coresight 10这4个接口仅有debug功能，同时MICTOR 38，MIPI34，Coresight 20这3个接口有debug+trace功能</p>
-<h1><span id="二-安装ds5">二. 安装DS5</span></h1><ol>
-<li>安装虚拟网卡；</li>
-<li>安装DS5-19和完成licence注册</li>
-<li>拷贝模型到安装目录下</li>
-<li>打开DS5</li>
-</ol>
-<h1><span id="三-ds5的使用">三. DS5的使用</span></h1><h2><span id="1新建debug-control">1.新建debug control</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use1.png" alt="use1"></p>
-<h2><span id="2建立连接">2.建立连接</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use2.jpg" alt="use2"></p>
-<h2><span id="3load-vmlinux">3.load vmlinux</span></h2><p>   当建立连接后一般都是一些汇编语言，这时候需要将vmlinux load进DS5方便debug<br><img src="/2018/06/25/tools/ds5-userguide/ds5/load.png" alt="load"></p>
-<h2><span id="4查看logbuf">4.查看logbuf</span></h2><p>   logbuf的大小由.config中的CONIFG_LOG_BUF_SHIFT决定，在init/Kconfig中有对应的说明<br>   如何确定log_buf的地址：<br>   目前在arm64中log_buf的地址对应的是system.map中__log_buf对应的地址；<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf.jpg" alt="load"><br>   arm32对应的地址为system.map的log_buf对应地址的地址，需要ds5找到映射位置后在通过此地址去查看log_buf中的内容：<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf_arm32.jpg" alt="load"></p>
-<h2><span id="5load-源码单步调试">5.load 源码单步调试</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/load_code.jpg" alt="load"></p>
-<h1><span id="四csat的使用">四：csat的使用</span></h1><h2><span id="1csatcoresight-access-toolcsat">1.csat:CoreSight Access Tool(CSAT)</span></h2><p>  DS-5的命令行工具，处理器挂住了，通过DS-5无法连接上，只能用CSAT连接上，但是CSAT无法访问到处理器内部的寄存器；<br>一般访问步骤：<br>    读寄存器,如果不ok,说明总线挂了；<br>    读dram,如果dram不ok,说明mbus挂了；<br>    读PC,如果PC读取不ok,说明CPU挂了</p>
-<h2><span id="2csat-amp-ds-5-diff">2.CSAT &amp; DS-5 diff</span></h2><p>  CSAT:通过APB总线连接，CPU挂死之后还能连接上，不能访问到CPU内部的寄存器<br>  DS5：通过CPU连接，CPU挂死之后无法连接上，能够访问到CPU内部的寄存器</p>
-<h2><span id="3csat的命令">3.CSAT的命令</span></h2><ol>
-<li>打开DS5的命令行；</li>
-<li>输入以下命令：</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">csat</span><br><span class="line">  con USB</span><br><span class="line">  chain dev=auto clk=A</span><br><span class="line">  dvo 0</span><br></pre></td></tr></table></figure>
-<table>
-<thead>
-<tr>
-<th>command</th>
-<th style="text-align:right">short name</th>
-<th style="text-align:center">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>dpmemread</td>
-<td style="text-align:right">dmr</td>
-<td style="text-align:center">Read mememory</td>
-</tr>
-<tr>
-<td>dpmemwrite</td>
-<td style="text-align:right">dmw</td>
-<td style="text-align:center">Write memory</td>
-</tr>
-<tr>
-<td>dpfileload</td>
-<td style="text-align:right">dfl</td>
-<td style="text-align:center">Load a file into memory</td>
-</tr>
-<tr>
-<td>dpfilesave</td>
-<td style="text-align:right">dfs</td>
-<td style="text-align:center">Save a block of memory to file.</td>
-</tr>
-</tbody>
-</table>
-<p>example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dmr 0 0x00010000 0x50</span><br><span class="line">#save a block of memory to file</span><br><span class="line">dfs 0 0x047fb000 0x350 dram2.bin</span><br><span class="line">#load a file into memory</span><br><span class="line">dfl 0 bin 0x8000 myfile.bin Load binary file into 0x8000 on AP 0</span><br></pre></td></tr></table></figure></p>
+            <h1><span id="代码主要的功能">代码主要的功能</span></h1><p>1) 平台相关的初始化动作，包括CPU core的clock/regulator获取，初始化<br>2) 生成frequency table,即 CPU core所支持的频率/电压列表。并在初始化的时候将该table保存在policy<br>3) 定义一个strcut cpufreq_driver变量，填充必要的字段，并根据平台的特性，实现其中的回调函数；<br>4) 调用cpufreq_register_driver将driver注册到cpufreq framework中<br>5) cpufreq core会在CPU设备添加时，调用driver的init接口。driver需要在接口中初始化struct cpufreq变量<br>6) 系统运行过程中，cpufreq core会根据实际情况，调用driver的sepolicy或者target/target_index等接口，设置<br>CPU的调频策略或者频率值<br>7) 系统suspend的时候，会将CPU的频率设置为指定的值，或者调用driver的suspend回调函数；系统resume时调用driver的resume回调函数；</p>
+<h1><span id="cpufreq-driver">cpufreq driver</span></h1><p>frequency table是CPU core可以正确运行的一组频率/电压组合</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/process/process_day1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/25/process/process_day1/" itemprop="url">进程初识</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/进程/" itemprop="url" rel="index">
+                    <span itemprop="name">进程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1><span id="一进程结构体">一：进程结构体</span></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">声明目录：include/linux/sched.h</span><br></pre></td></tr></table></figure>
+<h2><span id="进程的状态">进程的状态</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">volatile long state; /* -1 unrunnable, 0 runnable, &gt;0 stopped */ </span><br><span class="line">//1. R:运行(正在运行或在运行队列中等待)</span><br><span class="line">//2. S:中断(休眠中，受阻，在等待某个条件形成或接受到信号)</span><br><span class="line">//3. D:不可中断(收到信号不唤醒和不可运行，进程必须等待直到有中断发生): </span><br><span class="line">//4. T:僵死(进程已终止，但进程描述符存在，直到父进程调用wait4()系统调用后释放)</span><br><span class="line">//5. Z:停止(进程收到SIGSTOP,STGSTP,SIGIN,SIGOU信号后停止运行)</span><br></pre></td></tr></table></figure>
+<p><img src="/2018/06/25/process/process_day1/process_life.jpg" alt="进程的生命周期"></p>
+<h2><span id="进程的进程标识">进程的进程标识</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pid_t pid;</span><br><span class="line">pid_t tgid;</span><br></pre></td></tr></table></figure>
+<p>在linux系统中，所有进程都有直接或间接的联系，每个进程都有其父进程<br>linux把不同的pid与系统中的每个进程或轻量级线程关联，一个线程组所有线程与零头线程具有相同的pid,存入tgid中；</p>
+<h2><span id="进程标记">进程标记</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">unsigned int flags;</span><br></pre></td></tr></table></figure>
+<p>反应进程状态信息,但不是运行状态，用于内核识别进程当前的状态，以备下一步操作</p>
+<h2><span id="表示进程亲属关系的成员">表示进程亲属关系的成员</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">/*  </span><br><span class="line"> * pointers to (original) parent process, youngest child, younger sibling,</span><br><span class="line"> * older sibling, respectively.  (p-&gt;father can be replaced with</span><br><span class="line"> * p-&gt;real_parent-&gt;pid)</span><br><span class="line"> */</span><br><span class="line"> struct task_struct __rcu *real_parent; /* real parent process */</span><br><span class="line"> struct task_struct __rcu *parent; /* recipient of SIGCHLD, wait4() reports */</span><br><span class="line">/*   </span><br><span class="line"> * children/sibling forms the list of my natural children</span><br><span class="line">*/</span><br><span class="line"> struct list_head children;      /* list of my children */</span><br><span class="line"> struct list_head sibling;       /* linkage in my parent&apos;s children list */</span><br><span class="line"> struct task_struct *group_leader;       /* threadgroup leader */</span><br></pre></td></tr></table></figure>
+<h2><span id="进程内核栈">进程内核栈</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">struct thread_info thread_info;</span><br><span class="line">void *stack;</span><br></pre></td></tr></table></figure>
+<h2><span id="ptrace系统调用">ptrace系统调用</span></h2><p>提供一种父进程可以控制子进程运行,并可以检查和改变它的核心image;</p>
+<h2><span id="优先级">优先级</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">int prio,保存静态优先级，可以通过nice系统调用来进行修改</span><br><span class="line">rt_prority,用于保存实时优先级</span><br><span class="line">normal_prio 取决于静态优先级和调度策略</span><br><span class="line">prio 用于保存动态优先级</span><br></pre></td></tr></table></figure>
+<h2><span id="调度策略相关字段">调度策略相关字段</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">policy 调度策略</span><br><span class="line">sched_class 调度类</span><br></pre></td></tr></table></figure>
+<h1><span id="task_struct的初始化">task_struct的初始化</span></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">__mmap_switched_data  arch/arm/kernel/head-common.S</span><br><span class="line">  --&gt;__mmap_switched_data</span><br><span class="line">     --&gt;.long   init_thread_union + THREAD_START_SP @ sp</span><br><span class="line">         --&gt; INIT_THREAD_INFO(init_task) init/init_task</span><br></pre></td></tr></table></figure>
+<p><code>`</code></p>
+<h1><span id="init进程">init进程</span></h1><p>linux下有3个特殊的进程，idle进程（PID=0）,init进程(PID=1)和kthreadd(PID=2)<br><em>ilde进程由系统自动创建，运行在内核态<br>idle进程其pid=0,其前身是系统创建的第一个进程，也是唯一一个没有通过fork或者kernel_thread产生的进程。完成加载系统后，演变成为进程调度，交换;
+</em>init进程由idle通过kernel_thread创建，在内核空间中完成初始化后，加载init程序;</p>
+<h1><span id="三僵尸进程">三：僵尸进程</span></h1><h1><span id="其他">其他</span></h1><p> 当一个进程在执行时，CPU的所有寄存器中的值，进程的状态以及堆栈中的内容被称为该进程中的上下文。当内核需要切换到另外一个进程时，它需要保存当前的所有状态，即保存当前进程的上下文;以便在再次执行该进程时，能够必得到切换时的状态执行下去。在linux中，当前进程上下文均保存在任务数据结构中；<br> 当发生中断时，内核就在被中断的上下文中，在内核态下执行中断服务历程。但同时会保留所有需要用到的资源，以便中继服务结束时能恢复被中断进程的执行；</p>
+<h1><span id="进程优先级">进程优先级</span></h1><p>设置SCHED_FIFO和50 RT优先级</p>
+<p>#chrt -f -a -p 50 10576<br>设置nice</p>
+<p>#renice -n -5 -g 9394</p>
+<p>#nice -n 5 ./a.out</p>
+<h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.ibm.com/developerworks/cn/linux/l-cn-scheduler/index.html" target="_blank" rel="noopener">linux调度器发展简述</a><br><a href="https://blog.csdn.net/gatieme/article/details/51383272" target="_blank" rel="noopener">linux进程描述符task_struct结构体详解–linux进程的管理与调度(一)</a><br><a href="https://blog.csdn.net/gatieme/article/details/51484562" target="_blank" rel="noopener">Linux下0号进程的前世(init_task进程)今生(idle进程)—-Linux进程的管理与调度（五）</a></p>
 
           
         
@@ -1066,169 +1155,6 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
 <li><strong>active CPU</strong> 只是为了方便调度器操作</li>
 </ol>
 <h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cool3c.com/article/124149" target="_blank" rel="noopener">一图看懂ARM DynamIQ运作原理</a><br><a href="http://www.wowotech.net/pm_subsystem/cpu_core_pm_overview.html" target="_blank" rel="noopener">Linux CPU core的电源管理(1)概述</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/process/process_day1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/25/process/process_day1/" itemprop="url">进程初识</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
-                2018-06-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/进程/" itemprop="url" rel="index">
-                    <span itemprop="name">进程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1><span id="一进程结构体">一：进程结构体</span></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">声明目录：include/linux/sched.h</span><br></pre></td></tr></table></figure>
-<h2><span id="进程的状态">进程的状态</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">volatile long state; /* -1 unrunnable, 0 runnable, &gt;0 stopped */ </span><br><span class="line">//1. R:运行(正在运行或在运行队列中等待)</span><br><span class="line">//2. S:中断(休眠中，受阻，在等待某个条件形成或接受到信号)</span><br><span class="line">//3. D:不可中断(收到信号不唤醒和不可运行，进程必须等待直到有中断发生): </span><br><span class="line">//4. T:僵死(进程已终止，但进程描述符存在，直到父进程调用wait4()系统调用后释放)</span><br><span class="line">//5. Z:停止(进程收到SIGSTOP,STGSTP,SIGIN,SIGOU信号后停止运行)</span><br></pre></td></tr></table></figure>
-<p><img src="/2018/06/25/process/process_day1/process_life.jpg" alt="进程的生命周期"></p>
-<h2><span id="进程的进程标识">进程的进程标识</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pid_t pid;</span><br><span class="line">pid_t tgid;</span><br></pre></td></tr></table></figure>
-<p>在linux系统中，所有进程都有直接或间接的联系，每个进程都有其父进程<br>linux把不同的pid与系统中的每个进程或轻量级线程关联，一个线程组所有线程与零头线程具有相同的pid,存入tgid中；</p>
-<h2><span id="进程标记">进程标记</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">unsigned int flags;</span><br></pre></td></tr></table></figure>
-<p>反应进程状态信息,但不是运行状态，用于内核识别进程当前的状态，以备下一步操作</p>
-<h2><span id="表示进程亲属关系的成员">表示进程亲属关系的成员</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">/*  </span><br><span class="line"> * pointers to (original) parent process, youngest child, younger sibling,</span><br><span class="line"> * older sibling, respectively.  (p-&gt;father can be replaced with</span><br><span class="line"> * p-&gt;real_parent-&gt;pid)</span><br><span class="line"> */</span><br><span class="line"> struct task_struct __rcu *real_parent; /* real parent process */</span><br><span class="line"> struct task_struct __rcu *parent; /* recipient of SIGCHLD, wait4() reports */</span><br><span class="line">/*   </span><br><span class="line"> * children/sibling forms the list of my natural children</span><br><span class="line">*/</span><br><span class="line"> struct list_head children;      /* list of my children */</span><br><span class="line"> struct list_head sibling;       /* linkage in my parent&apos;s children list */</span><br><span class="line"> struct task_struct *group_leader;       /* threadgroup leader */</span><br></pre></td></tr></table></figure>
-<h2><span id="进程内核栈">进程内核栈</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">struct thread_info thread_info;</span><br><span class="line">void *stack;</span><br></pre></td></tr></table></figure>
-<h2><span id="ptrace系统调用">ptrace系统调用</span></h2><p>提供一种父进程可以控制子进程运行,并可以检查和改变它的核心image;</p>
-<h2><span id="优先级">优先级</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">int prio,保存静态优先级，可以通过nice系统调用来进行修改</span><br><span class="line">rt_prority,用于保存实时优先级</span><br><span class="line">normal_prio 取决于静态优先级和调度策略</span><br><span class="line">prio 用于保存动态优先级</span><br></pre></td></tr></table></figure>
-<h2><span id="调度策略相关字段">调度策略相关字段</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">policy 调度策略</span><br><span class="line">sched_class 调度类</span><br></pre></td></tr></table></figure>
-<h1><span id="task_struct的初始化">task_struct的初始化</span></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">__mmap_switched_data  arch/arm/kernel/head-common.S</span><br><span class="line">  --&gt;__mmap_switched_data</span><br><span class="line">     --&gt;.long   init_thread_union + THREAD_START_SP @ sp</span><br><span class="line">         --&gt; INIT_THREAD_INFO(init_task) init/init_task</span><br></pre></td></tr></table></figure>
-<p><code>`</code></p>
-<h1><span id="init进程">init进程</span></h1><p>linux下有3个特殊的进程，idle进程（PID=0）,init进程(PID=1)和kthreadd(PID=2)<br><em>ilde进程由系统自动创建，运行在内核态<br>idle进程其pid=0,其前身是系统创建的第一个进程，也是唯一一个没有通过fork或者kernel_thread产生的进程。完成加载系统后，演变成为进程调度，交换;
-</em>init进程由idle通过kernel_thread创建，在内核空间中完成初始化后，加载init程序;</p>
-<h1><span id="三僵尸进程">三：僵尸进程</span></h1><h1><span id="其他">其他</span></h1><p> 当一个进程在执行时，CPU的所有寄存器中的值，进程的状态以及堆栈中的内容被称为该进程中的上下文。当内核需要切换到另外一个进程时，它需要保存当前的所有状态，即保存当前进程的上下文;以便在再次执行该进程时，能够必得到切换时的状态执行下去。在linux中，当前进程上下文均保存在任务数据结构中；<br> 当发生中断时，内核就在被中断的上下文中，在内核态下执行中断服务历程。但同时会保留所有需要用到的资源，以便中继服务结束时能恢复被中断进程的执行；</p>
-<h1><span id="进程优先级">进程优先级</span></h1><p>设置SCHED_FIFO和50 RT优先级</p>
-<p>#chrt -f -a -p 50 10576<br>设置nice</p>
-<p>#renice -n -5 -g 9394</p>
-<p>#nice -n 5 ./a.out</p>
-<h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.ibm.com/developerworks/cn/linux/l-cn-scheduler/index.html" target="_blank" rel="noopener">linux调度器发展简述</a><br><a href="https://blog.csdn.net/gatieme/article/details/51383272" target="_blank" rel="noopener">linux进程描述符task_struct结构体详解–linux进程的管理与调度(一)</a><br><a href="https://blog.csdn.net/gatieme/article/details/51484562" target="_blank" rel="noopener">Linux下0号进程的前世(init_task进程)今生(idle进程)—-Linux进程的管理与调度（五）</a></p>
 
           
         
@@ -1711,7 +1637,7 @@ k_d 为求导，一般设置为0
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/cpu/cpu_freq/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/tools/ds5-userguide/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dongka">
@@ -1730,7 +1656,7 @@ k_d 为求导，一般设置为0
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/25/cpu/cpu_freq/" itemprop="url">CPUFreq</a></h1>
+                <a class="post-title-link" href="/2018/06/25/tools/ds5-userguide/" itemprop="url">DS5相关介绍</a></h1>
         
 
         <div class="post-meta">
@@ -1765,8 +1691,8 @@ k_d 为求导，一般设置为0
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cpu/" itemprop="url" rel="index">
-                    <span itemprop="name">cpu</span>
+                  <a href="/categories/工具使用/" itemprop="url" rel="index">
+                    <span itemprop="name">工具使用</span>
                   </a>
                 </span>
 
@@ -1804,8 +1730,82 @@ k_d 为求导，一般设置为0
       
         
           
-            <h1><span id="代码主要的功能">代码主要的功能</span></h1><p>1) 平台相关的初始化动作，包括CPU core的clock/regulator获取，初始化<br>2) 生成frequency table,即 CPU core所支持的频率/电压列表。并在初始化的时候将该table保存在policy<br>3) 定义一个strcut cpufreq_driver变量，填充必要的字段，并根据平台的特性，实现其中的回调函数；<br>4) 调用cpufreq_register_driver将driver注册到cpufreq framework中<br>5) cpufreq core会在CPU设备添加时，调用driver的init接口。driver需要在接口中初始化struct cpufreq变量<br>6) 系统运行过程中，cpufreq core会根据实际情况，调用driver的sepolicy或者target/target_index等接口，设置<br>CPU的调频策略或者频率值<br>7) 系统suspend的时候，会将CPU的频率设置为指定的值，或者调用driver的suspend回调函数；系统resume时调用driver的resume回调函数；</p>
-<h1><span id="cpufreq-driver">cpufreq driver</span></h1><p>frequency table是CPU core可以正确运行的一组频率/电压组合</p>
+            <!-- toc -->
+<ul>
+<li><a href="#一-ds5-与-dstream">一. DS5 与 DSTREAM</a><ul>
+<li><a href="#1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</a></li>
+<li><a href="#2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</a></li>
+</ul>
+</li>
+<li><a href="#二-安装ds5">二. 安装DS5</a></li>
+<li><a href="#三-ds5的使用">三. DS5的使用</a><ul>
+<li><a href="#1新建debug-control">1.新建debug control</a></li>
+<li><a href="#2建立连接">2.建立连接</a></li>
+<li><a href="#3load-vmlinux">3.load vmlinux</a></li>
+<li><a href="#4查看logbuf">4.查看logbuf</a></li>
+<li><a href="#5load-源码单步调试">5.load 源码单步调试</a></li>
+</ul>
+</li>
+<li><a href="#四csat的使用">四：csat的使用</a><ul>
+<li><a href="#1csatcoresight-access-toolcsat">1.csat:CoreSight Access Tool(CSAT)</a></li>
+<li><a href="#2csat-ds-5-diff">2.CSAT &amp; DS-5 diff</a></li>
+<li><a href="#3csat的命令">3.CSAT的命令</a></li>
+</ul>
+</li>
+</ul>
+<!-- tocstop -->
+<h1><span id="一-ds5-与-dstream">一. DS5 与 DSTREAM</span></h1><h2><span id="1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/ds5.png" alt="ds5"><br>  从以下工具发展而来：DS5&lt;RVDS&lt;ADS&lt;SDT,目前除DS5外其他都已停用；<br>  有图形化的streamline性能分析器，可基于C源码，汇编程序，地址对bare裸机程序，uboot,kernel,驱动，app进行热点，程序瓶颈，CPU使用，Cache hit/miss,功耗分析</p>
+<h2><span id="2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/dstream.png" alt="dstream"><br>    共有7个接口，其中ARM JTAG 14，TI JTAG 14，ARM JTAG 20和Coresight 10这4个接口仅有debug功能，同时MICTOR 38，MIPI34，Coresight 20这3个接口有debug+trace功能</p>
+<h1><span id="二-安装ds5">二. 安装DS5</span></h1><ol>
+<li>安装虚拟网卡；</li>
+<li>安装DS5-19和完成licence注册</li>
+<li>拷贝模型到安装目录下</li>
+<li>打开DS5</li>
+</ol>
+<h1><span id="三-ds5的使用">三. DS5的使用</span></h1><h2><span id="1新建debug-control">1.新建debug control</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use1.png" alt="use1"></p>
+<h2><span id="2建立连接">2.建立连接</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use2.jpg" alt="use2"></p>
+<h2><span id="3load-vmlinux">3.load vmlinux</span></h2><p>   当建立连接后一般都是一些汇编语言，这时候需要将vmlinux load进DS5方便debug<br><img src="/2018/06/25/tools/ds5-userguide/ds5/load.png" alt="load"></p>
+<h2><span id="4查看logbuf">4.查看logbuf</span></h2><p>   logbuf的大小由.config中的CONIFG_LOG_BUF_SHIFT决定，在init/Kconfig中有对应的说明<br>   如何确定log_buf的地址：<br>   目前在arm64中log_buf的地址对应的是system.map中__log_buf对应的地址；<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf.jpg" alt="load"><br>   arm32对应的地址为system.map的log_buf对应地址的地址，需要ds5找到映射位置后在通过此地址去查看log_buf中的内容：<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf_arm32.jpg" alt="load"></p>
+<h2><span id="5load-源码单步调试">5.load 源码单步调试</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/load_code.jpg" alt="load"></p>
+<h1><span id="四csat的使用">四：csat的使用</span></h1><h2><span id="1csatcoresight-access-toolcsat">1.csat:CoreSight Access Tool(CSAT)</span></h2><p>  DS-5的命令行工具，处理器挂住了，通过DS-5无法连接上，只能用CSAT连接上，但是CSAT无法访问到处理器内部的寄存器；<br>一般访问步骤：<br>    读寄存器,如果不ok,说明总线挂了；<br>    读dram,如果dram不ok,说明mbus挂了；<br>    读PC,如果PC读取不ok,说明CPU挂了</p>
+<h2><span id="2csat-amp-ds-5-diff">2.CSAT &amp; DS-5 diff</span></h2><p>  CSAT:通过APB总线连接，CPU挂死之后还能连接上，不能访问到CPU内部的寄存器<br>  DS5：通过CPU连接，CPU挂死之后无法连接上，能够访问到CPU内部的寄存器</p>
+<h2><span id="3csat的命令">3.CSAT的命令</span></h2><ol>
+<li>打开DS5的命令行；</li>
+<li>输入以下命令：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">csat</span><br><span class="line">  con USB</span><br><span class="line">  chain dev=auto clk=A</span><br><span class="line">  dvo 0</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th style="text-align:right">short name</th>
+<th style="text-align:center">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dpmemread</td>
+<td style="text-align:right">dmr</td>
+<td style="text-align:center">Read mememory</td>
+</tr>
+<tr>
+<td>dpmemwrite</td>
+<td style="text-align:right">dmw</td>
+<td style="text-align:center">Write memory</td>
+</tr>
+<tr>
+<td>dpfileload</td>
+<td style="text-align:right">dfl</td>
+<td style="text-align:center">Load a file into memory</td>
+</tr>
+<tr>
+<td>dpfilesave</td>
+<td style="text-align:right">dfs</td>
+<td style="text-align:center">Save a block of memory to file.</td>
+</tr>
+</tbody>
+</table>
+<p>example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dmr 0 0x00010000 0x50</span><br><span class="line">#save a block of memory to file</span><br><span class="line">dfs 0 0x047fb000 0x350 dram2.bin</span><br><span class="line">#load a file into memory</span><br><span class="line">dfl 0 bin 0x8000 myfile.bin Load binary file into 0x8000 on AP 0</span><br></pre></td></tr></table></figure></p>
 
           
         
@@ -2475,7 +2475,7 @@ pmu_battery_rdc            = 100
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
