@@ -2435,10 +2435,10 @@ len:0x100000
 如果debug下没有节点，需先进行挂载：mount -t debugfs none /mnt ,然后在mnt目录下查看
 早期的linux版本，3.4
 cat /proc/wakelocks    
-</code></pre><p><strong>5.项目经验总结</strong></p>
+</code></pre><p><strong>5.查看唤醒源</strong><br>    cat /sys/power/pm_wakeup_irq 这个会保存深度休眠的时候唤醒系统的中断号<br>    配合 cat /proc/interrupts可获取当前唤醒系统的唤醒源是哪个<br>    原理如下<br>    在supend_device_irq的流程中能够wakeup系统的都会被置上IRQD_WAKEUP_ARMED的标志,然后就关闭中断;如果在中断处理流程里面的<br>    会通过synchronize_irq等待中断线程处理完；<br>    当由于中断事件来临唤醒系统的时候会先进入中断处理流程,这个时候会判断是否是带有ARMED标志的有的话暂时不处理，通过pm_system_irq_wakeup标记唤醒源;<br>    等待resume_irq的时候后重新enable_irq进入中断处理流程<br><strong>5.项目经验总结</strong></p>
 <pre><code>1. 硬件需确保电源信号稳定性；
 2. 在项目开发过程中，休眠唤醒稳定性测试，在每次迭代的时候尽量做到一周进行一次多台机器休眠唤醒老化测试,测试老化的时候，应加大负载，如同时播放视频;
-   以便增加问题的复现概率 
+   以便增加问题的复现概率
 </code></pre><h1><span id="参考资料">参考资料</span></h1><p><a href="http://www.wowotech.net/pm_subsystem/237.html" target="_blank" rel="noopener">linux进程冻结技术</a></p>
 <p><a href="http://www.wowotech.net/pm_subsystem/suspend_and_resume.html" target="_blank" rel="noopener">Linux电源管理（6）_Generic PM之Suspend功能</a></p>
 <p><a href="http://www.wowotech.net/irq_subsystem/workqueue.html" target="_blank" rel="noopener">Concurrency Managed Workqueue之（一）：workqueue的基本概念</a></p>
@@ -2958,7 +2958,7 @@ echo 0取消
 查看闹钟应用设置闹钟：
 venus-a3:/ # settings list system | grep  next
        next_alarm_formatted=Wed 11:50 AM
-</code></pre><p><strong>怎么捕捉休眠唤醒的systrace</strong><br>    休眠前<br>    atrace –async_start -b 8192 -o /data/trace2.dat gfx view wm am power<br>    唤醒后<br>    atrace –async_stop -b 8192 -o /data/trace2.dat gfx view wm am power</p>
+</code></pre><p><strong>怎么捕捉休眠唤醒的systrace</strong><br>    休眠前<br>    atrace –async_start -b 8192 -o /data/trace2.dat gfx view wm am power<br>    唤醒后<br>    atrace –async_stop</p>
 <h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cnblogs.com/dyufei/p/8018016.html" target="_blank" rel="noopener">Android7.0 PowerManagerService 之亮灭屏（二） PMS 电源状态管理updatePowerStateLocked（）</a></p>
 <p><a href="https://www.jianshu.com/p/b40e1b61e6d2" target="_blank" rel="noopener">Android 保持屏幕常亮的几种方法</a></p>
 <p><a href="https://blog.csdn.net/Gaugamela/article/details/52838654" target="_blank" rel="noopener">Android7.0 PowerManagerService(3)核心函数updatePowerStateLocked的主要流程</a></p>
