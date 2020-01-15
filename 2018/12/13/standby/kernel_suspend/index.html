@@ -89,7 +89,7 @@
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2018/12/13/standby/kernel_suspend/信号响应时机.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/12/13/standby/kernel_suspend/suspend_resume_trace.jpg">
-<meta property="og:updated_time" content="2020-01-15T02:50:15.765Z">
+<meta property="og:updated_time" content="2020-01-15T04:25:55.026Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="内核的休眠流程">
 <meta name="twitter:description" content="内核休眠流程当安卓合适的时机(wakeup_count = save_count &amp;amp;&amp;amp; inpr == 0),与内核一致，在没有wakeup事件的时候，走进一步的流程，发echo mem &amp;gt; /sys/power/state命令后，内核开始处理休眠流程 ./kernel/power/main.c  state_store     -&amp;gt;pm_suspend">
@@ -606,8 +606,7 @@ cat /proc/wakelocks
 原理如下
 在supend_device_irq的流程中能够wakeup系统的都会被置上IRQD_WAKEUP_ARMED的标志,然后就关闭中断;如果在中断处理流程里面的
 会通过synchronize_irq等待中断线程处理完；
-当由于中断事件来临唤醒系统的时候会先进入中断处理流程,这个时候会判断是否是带有ARMED标志的有的话暂时不处理，通过pm_system_irq_wakeup标记唤醒源;
-等待resume_irq的时候后重新enable_irq进入中断处理流程
+resume_irq的时候后重新enable_irq进入中断处理流程,通过pm_system_irq_wakeup标记第一次的唤醒源;
 </code></pre><p><strong>6.项目经验总结</strong></p>
 <pre><code>1. 硬件需确保电源信号稳定性；
 2. 在项目开发过程中，休眠唤醒稳定性测试，在每次迭代的时候尽量做到一周进行一次多台机器休眠唤醒老化测试,测试老化的时候，应加大负载，如同时播放视频;
