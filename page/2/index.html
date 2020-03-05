@@ -1071,6 +1071,575 @@ Robots.txt 只是一个建议，并不是所有爬虫都遵守，一般只有大
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/cpu/cpu概述/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/25/cpu/cpu概述/" itemprop="url">CPU概述</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index">
+                    <span itemprop="name">cpu</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <!-- toc-aside -->
+<h1><span id="cpu-topology">cpu topology</span></h1><h2><span id="11-cpu拓扑">1.1. cpu拓扑</span></h2><p><strong>cluster(socket)-&gt;core-&gt;Threads(目前为止arm没有提出多线程的概念)</strong><br><img src="/2018/06/25/cpu/cpu概述/cpu拓扑.png" alt="cpu拓扑图"> </p>
+<h2><span id="12-多核技术">1.2 多核技术</span></h2><p>  基于制程，扩充性等考虑，芯片厂商会把多个core封装在一个chip上，称为socket。socket的概念在X86架构上使用尤其多，可以理解为插槽；<br>假设一个插槽上有两个core,那么我在主板上插2个插槽，就是4核系统，插上4个插槽就是8核；arm的话则是另外一个概念cluster,簇<br>  在X86架构的PC上，唯一目的的话是提高CPU的处理性能（不在乎功耗），但在移动市场中（大多是arm），性能提高后，对应着就更多的power消耗；对于设备电源管理以及散热提出了更高的要求。与此同时电池并没有随着CPU的拓扑的进化而进化，于是HMP技术就被提出来了；</p>
+<h2><span id="13hmpheterogeneous-multi-processing">1.3HMP(Heterogeneous Multi-Processing)</span></h2><p><strong>big-little:</strong></p>
+<ul>
+<li>在一个chip中封装两类ARM Core,以kirin 960为例:一类为高性能Core,4核ARM A73，最高主频为2.4G，一类为低性能Core,4核ARM A53，最高主频为1.8G<br><img src="/2018/06/25/cpu/cpu概述/kirin960.png" alt="cpu拓扑图"></li>
+</ul>
+<p><strong>DynamIQ:</strong></p>
+<ul>
+<li>在单一cluster内可有8个核心，且可由不同架构，时钟的核心组成，提升了运作效率与配置的弹性,如高通的845 4核ARM A75，最高为2.8，4核 ARM A55，最高为1.8G</li>
+</ul>
+<p><strong>DynamIQ较big-little好处:</strong></p>
+<ol>
+<li>单cluster可有8核心</li>
+<li>cluster可搭配不同架构的CPU</li>
+<li>各cpu可有独立的运作时钟</li>
+<li>CPU各自开关休眠互不影响</li>
+<li>依照效能需求弹性运用各核心</li>
+</ol>
+<p>以龙舟比喻ARM的DynamIQ与先前的big.LITTLE技术，我们把龙舟当成cluster,船员当成core,那么big.LITTLE龙舟上只能有4个船员，而且每个船员身材需要一样（核心架构），划船的时候若多位船员一起划船时，每个人的出力均等(频率一致),不能有人慢划或者快划;<br>当使用DynamIQ时，每艘船（cluster）上可以有8位高低胖瘦不等(架构)的船员（core），换船频率可以不等，且船员可以依照指令睡觉（关闭）,休息（休眠），或划船（运作）；</p>
+<h1><span id="cpu内核代码框架">cpu内核代码框架</span></h1><ol>
+<li><a href="./cpu_init.md">系统启动时，CPU core的初始化，信息获取</a></li>
+<li>系统启动时，CPU core的启动（enable）</li>
+<li>系统运行过程中，根据当前负荷，动态enable/disable 某些CPU core,以便在性能与功耗间平衡</li>
+<li>cpu core的hotplug支持，所谓的hotplug,是可以在系统运行的过程中，动态的增加或者减少CPU core(可以是物理上，也可以是逻辑上)</li>
+<li>系统运行过程中CPU idle管理</li>
+<li>系统运行过程中，根据当前负荷，动态的调整CPU core的电压和频率，以便在性能和功耗之间平衡</li>
+</ol>
+<p><img src="/2018/06/25/cpu/cpu概述/cpu代码框架.png" alt="cpu拓扑图"><br>arch-depedent部分位于”arch\arm64\kernel”负责平台相关的控制操作，包括</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu 信息的获取（cpuinfo）</span><br><span class="line">cpu拓扑结构的获取（cpu topology）</span><br><span class="line">底层的CPU操作（init,disable等）的实现，cpu ops</span><br><span class="line">SMP相关的初始化（smp）</span><br></pre></td></tr></table></figure>
+<p>arch-independent负责实现平台无关的抽象，包括</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu control模块，屏蔽底层平台相关实现细节，提供控制CPU(enable,disable等)的统一API，供系统启动，进程调度等模块调用</span><br><span class="line">cpu subsystem driver像用户空间提供CPU hotplug有关的功能；</span><br><span class="line">cpuidle,处理CPU idle有关的逻辑</span><br><span class="line">cpufreq 处理CPU frequency调整有关的逻辑</span><br></pre></td></tr></table></figure>
+<h1><span id="cpu的状态表示">cpu的状态表示</span></h1><ol>
+<li><strong>possible CPU:</strong> 就是在DTS中指定了的，物理存在的CPU core</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;boot_cpu_init-&gt;smp_process_id用于获取cpu id</span><br><span class="line">		           -&gt;set_cpu_xxx,用于将指定的CPU设置为（或清除）指定状态</span><br><span class="line">	    -&gt;setup_arch-&gt;smp_init_cpus-&gt;sunxi_smp_init_cpus-&gt;set_cpu_possible(i, true)</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li><strong>present cpu:</strong> 被kernel标识的，具备执行代码条件，后续可以在需要的时候（如hotplug的时候），启动该CPU </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;rest_init-&gt;kernel_init-&gt;kernel_init_freeable</span><br><span class="line">				     -&gt;smp_prepare_cpus</span><br><span class="line">			     	if (cpu_prepare(cpu)) /**/</span><br><span class="line">					set_cpu_present(cpu,true);</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li><strong>online CPU:</strong> 某个CPU是present的，不一定是boot,所谓CPU boot,就是让CPU执行（取指译码/执行）代码</li>
+<li><strong>active CPU</strong> 只是为了方便调度器操作</li>
+</ol>
+<h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cool3c.com/article/124149" target="_blank" rel="noopener">一图看懂ARM DynamIQ运作原理</a><br><a href="http://www.wowotech.net/pm_subsystem/cpu_core_pm_overview.html" target="_blank" rel="noopener">Linux CPU core的电源管理(1)概述</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/process/process_day1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/25/process/process_day1/" itemprop="url">进程初识</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/进程/" itemprop="url" rel="index">
+                    <span itemprop="name">进程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1><span id="一进程结构体">一：进程结构体</span></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">声明目录：include/linux/sched.h</span><br></pre></td></tr></table></figure>
+<h2><span id="进程的状态">进程的状态</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">volatile long state; /* -1 unrunnable, 0 runnable, &gt;0 stopped */ </span><br><span class="line">//1. R:运行(正在运行或在运行队列中等待)</span><br><span class="line">//2. S:中断(休眠中，受阻，在等待某个条件形成或接受到信号)</span><br><span class="line">//3. D:不可中断(收到信号不唤醒和不可运行，进程必须等待直到有中断发生): </span><br><span class="line">//4. T:僵死(进程已终止，但进程描述符存在，直到父进程调用wait4()系统调用后释放)</span><br><span class="line">//5. Z:停止(进程收到SIGSTOP,STGSTP,SIGIN,SIGOU信号后停止运行)</span><br></pre></td></tr></table></figure>
+<p><img src="/2018/06/25/process/process_day1/process_life.jpg" alt="进程的生命周期"></p>
+<h2><span id="进程的进程标识">进程的进程标识</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pid_t pid;</span><br><span class="line">pid_t tgid;</span><br></pre></td></tr></table></figure>
+<p>在linux系统中，所有进程都有直接或间接的联系，每个进程都有其父进程<br>linux把不同的pid与系统中的每个进程或轻量级线程关联，一个线程组所有线程与零头线程具有相同的pid,存入tgid中；</p>
+<h2><span id="进程标记">进程标记</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">unsigned int flags;</span><br></pre></td></tr></table></figure>
+<p>反应进程状态信息,但不是运行状态，用于内核识别进程当前的状态，以备下一步操作</p>
+<h2><span id="表示进程亲属关系的成员">表示进程亲属关系的成员</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">/*  </span><br><span class="line"> * pointers to (original) parent process, youngest child, younger sibling,</span><br><span class="line"> * older sibling, respectively.  (p-&gt;father can be replaced with</span><br><span class="line"> * p-&gt;real_parent-&gt;pid)</span><br><span class="line"> */</span><br><span class="line"> struct task_struct __rcu *real_parent; /* real parent process */</span><br><span class="line"> struct task_struct __rcu *parent; /* recipient of SIGCHLD, wait4() reports */</span><br><span class="line">/*   </span><br><span class="line"> * children/sibling forms the list of my natural children</span><br><span class="line">*/</span><br><span class="line"> struct list_head children;      /* list of my children */</span><br><span class="line"> struct list_head sibling;       /* linkage in my parent&apos;s children list */</span><br><span class="line"> struct task_struct *group_leader;       /* threadgroup leader */</span><br></pre></td></tr></table></figure>
+<h2><span id="进程内核栈">进程内核栈</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">struct thread_info thread_info;</span><br><span class="line">void *stack;</span><br></pre></td></tr></table></figure>
+<h2><span id="ptrace系统调用">ptrace系统调用</span></h2><p>提供一种父进程可以控制子进程运行,并可以检查和改变它的核心image;</p>
+<h2><span id="优先级">优先级</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">int prio,保存静态优先级，可以通过nice系统调用来进行修改</span><br><span class="line">rt_prority,用于保存实时优先级</span><br><span class="line">normal_prio 取决于静态优先级和调度策略</span><br><span class="line">prio 用于保存动态优先级</span><br></pre></td></tr></table></figure>
+<h2><span id="调度策略相关字段">调度策略相关字段</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">policy 调度策略</span><br><span class="line">sched_class 调度类</span><br></pre></td></tr></table></figure>
+<h1><span id="task_struct的初始化">task_struct的初始化</span></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">__mmap_switched_data  arch/arm/kernel/head-common.S</span><br><span class="line">  --&gt;__mmap_switched_data</span><br><span class="line">     --&gt;.long   init_thread_union + THREAD_START_SP @ sp</span><br><span class="line">         --&gt; INIT_THREAD_INFO(init_task) init/init_task</span><br></pre></td></tr></table></figure>
+<p><code>`</code></p>
+<h1><span id="init进程">init进程</span></h1><p>linux下有3个特殊的进程，idle进程（PID=0）,init进程(PID=1)和kthreadd(PID=2)<br><em>ilde进程由系统自动创建，运行在内核态<br>idle进程其pid=0,其前身是系统创建的第一个进程，也是唯一一个没有通过fork或者kernel_thread产生的进程。完成加载系统后，演变成为进程调度，交换;
+</em>init进程由idle通过kernel_thread创建，在内核空间中完成初始化后，加载init程序;</p>
+<h1><span id="三僵尸进程">三：僵尸进程</span></h1><h1><span id="其他">其他</span></h1><p> 当一个进程在执行时，CPU的所有寄存器中的值，进程的状态以及堆栈中的内容被称为该进程中的上下文。当内核需要切换到另外一个进程时，它需要保存当前的所有状态，即保存当前进程的上下文;以便在再次执行该进程时，能够必得到切换时的状态执行下去。在linux中，当前进程上下文均保存在任务数据结构中；<br> 当发生中断时，内核就在被中断的上下文中，在内核态下执行中断服务历程。但同时会保留所有需要用到的资源，以便中继服务结束时能恢复被中断进程的执行；</p>
+<h1><span id="进程优先级">进程优先级</span></h1><p>设置SCHED_FIFO和50 RT优先级</p>
+<p>#chrt -f -a -p 50 10576<br>设置nice</p>
+<p>#renice -n -5 -g 9394</p>
+<p>#nice -n 5 ./a.out</p>
+<h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.ibm.com/developerworks/cn/linux/l-cn-scheduler/index.html" target="_blank" rel="noopener">linux调度器发展简述</a><br><a href="https://blog.csdn.net/gatieme/article/details/51383272" target="_blank" rel="noopener">linux进程描述符task_struct结构体详解–linux进程的管理与调度(一)</a><br><a href="https://blog.csdn.net/gatieme/article/details/51484562" target="_blank" rel="noopener">Linux下0号进程的前世(init_task进程)今生(idle进程)—-Linux进程的管理与调度（五）</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/other/TYPE-C耳机适配工作/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/25/other/TYPE-C耳机适配工作/" itemprop="url">全志TYPE-C使用介绍</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/TYPE-C/" itemprop="url" rel="index">
+                    <span itemprop="name">TYPE-C</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>有无TYPE-C方案，主从识别和耳机的插拔检测不同;有TYPE-C情况下，主要为TYPE-C逻辑进行侦测;而没有TYPE-C的方案;主从区分需要USB-ID detect管脚进行判断,耳机则靠HP-DET进行区分;</p>
+<h1><span id="传统侦测方式">传统侦测方式</span></h1><h2><span id="主从侦测">主从侦测</span></h2><p><img src="/2018/06/25/other/TYPE-C耳机适配工作/usb_id_detect.jpg" alt="usb_id_detect"></p>
+<p>在没有TYPE-C的硬件上，主要靠USB-ID管脚的上下拉来区分主从;</p>
+<h1><span id="耳机侦测">耳机侦测</span></h1><h2><span id="耳机结构">耳机结构</span></h2><p>3.5mm耳机插头有三段（TRS,Tip-Ring-Sleeve）和四段（TRRS,Tip-Ring-Sleeve）之分，其中三段的不带麦克风，尾段（Sleeve)是公共地；中间环（Ring）是右声道，尖部（Tip）是左声道，四节的分两种，一种是CTIA,一种是OMTP;</p>
+<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/耳机结构.png" alt="耳机结构"></p>
+<p>HP-L耳机左声道，HP-R耳机右声道，GND接地，V-Mic语音麦克风</p>
+<h2><span id="耳机座以及传统耳机侦测介绍">耳机座以及传统耳机侦测介绍</span></h2><p>耳机座分为支持欧标设计的耳机座和支持美标的耳机座。另外从耳机座左声道的检测方式来又可以分为”Normal-closed type”(常闭型)和“Normal  -type”(常开型)两种。设计图如下：</p>
+<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/耳机座子.png" alt="耳机座子"></p>
+<p>. 在常闭型中，不接耳机时，耳机座左声道和检测端HS-DET接触，接入耳机时，HS-DET与HPH-L不导通</p>
+<p>. 在常开型中，不接耳机时，耳机座左声道和检测端HS-DET不接触，插入耳机时，HS-DET与HPH-L导通</p>
+<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/headphone.jpg" alt="耳机侦测电路"></p>
+<p>如图为常开型结构，HP-DET上拉，当插入耳机后HP-DET和HP-OUTL导通，DET下拉引起软件中断。软件上通过debounce后，检测到持续的低电平，于是认为耳机插入；这时候需要判断，插入的还是三段还是四段，平台上打开mic_bias,当插入的是三段耳机，MIC被拉低，于是判断为三段耳机；若为四段耳机，MIC接近于MIC_BIAS，软件判断该处的直流电压为四段耳机；当按键按下时，MIC的电压发生变化，触发了系统中断，之后软件通过采样该处的电压值确定按下了哪一个按键；</p>
+<h1><span id="type-c方案侦测方式讲解">TYPE-C方案侦测方式讲解</span></h1><h2><span id="type-c主要电路如下">TYPE-C主要电路如下</span></h2><p><img src="/2018/06/25/other/TYPE-C耳机适配工作/TYPE-C关键电路.png" alt="TYPE-C关键电路"></p>
+<p>Type-C连接并没有在物理结构上区分DFP(Host)和UFP(Device),无连接时DFP未给VBUS供电，连接后通过CC信号线配置，确认连接有效，VBUS供电打开并确认使用哪一个端口传输数据;<br><strong>状态说明</strong></p>
+<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/cc_logic.jpg" alt="cc_logic"></p>
+<p><strong>如图所示</strong></p>
+<p>DFP的CC1/CC2会接上拉电阻Rp或电流源，UFP的CC1/CC2会接下拉电阻Rd,AUDIO设备则会接两个下拉电阻</p>
+<p>如何确认当前TYPE_C接入设备类型:</p>
+<pre><code>echo 1 &gt; /sys/class/axp/axp_num
+echo 0x37 &gt; /sys/class/axp_reg &amp;&amp; cat /sys/class/axp/axp_reg
+</code></pre><p>若读出状态为ATTACH_SNK 说明接入的是适配器或pc<br>若读出的状态为ATTACH_SOURCE 说明此时作为host<br>如读出为AUDIO_ACSY,说明此时为音频设备</p>
+<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/type_c_detect.jpg" alt="type_c_detect"></p>
+<p><strong>TS5USBA224RSWR</strong>：</p>
+<p> 用于将D-,D+在(USB0-DM,USB0-DP),(HPOUTL,HPOUTR)两种模式之间切换；由于VBUS默认低后，无法满足通过SEL切换状态，故VBUS一般设置为高；通过ASEL来设置高低实现切换</p>
+<p><strong>TS3A226AE</strong>:</p>
+<p>可以用于区分三四节耳机，并且可以将MIC和GROUND区分出来，降低软件设计复杂度；</p>
+<p>使用TYPE-C方案时，TYPE-C 中断服务程序负责将D-,D+选择为USB模式的Dp,Dm或者为耳机模式HP-OUTL,HP-OUTR;并通知音频驱动耳机接入;</p>
+<h2><span id="软件流程为">软件流程为：</span></h2><p>一：bmu驱动产生中断：</p>
+<pre><code>irqreturn_t axp_tc_in_isr(int irq, void *data)
+{
+    struct axp_charger_dev *chg_dev = data;
+    #ifdef CONFIG_TYPE_C_AUDIO
+    struct axp_usb_info *usb = chg_dev-&gt;spy_info-&gt;usb;
+    u8 cc_mode = 0; 
+    /*axp_usbac_in(chg_dev);*/
+    cc_mode = usb-&gt;get_cc_mode(chg_dev); //获取cc 侦测结果
+    if (cc_mode == AUDIO_ACSY) {    //如果为音频设备
+            usb-&gt;set_sel_mode(chg_dev, 1);  //D+ D- 连接到耳机的左右声道
+            call_notifier_call_chain(1);    //通知耳机驱动耳机接入
+    } else {
+            usb-&gt;set_sel_mode(chg_dev, 0); //D+ D- 连接到 USB的 Dp,Dm口
+            call_notifier_call_chain(0);   //通知耳机驱动拔出
+    }    
+    #endif
+    axp_change(chg_dev);
+    return IRQ_HANDLED;
+}
+</code></pre><p>二：耳机接受到通知：</p>
+<pre><code>static int type_c_chain_notify(struct notifier_block *nb, unsigned long mode, void *_unused)
+{
+    struct mc_private *ctx = container_of(nb, struct mc_private, type_c_chain_nb);
+
+    if (mode) {
+            ctx-&gt;detect_state = PLUG_IN; //切换接入状态
+            printk(&quot;%s PLUG_IN&quot;, __func__);
+    } else {
+            ctx-&gt;detect_state = PLUG_OUT;
+            printk(&quot;%s PLUG_OUT&quot;, __func__);
+    }
+
+    schedule_delayed_work(&amp;ctx-&gt;hs_detect_work,
+                            msecs_to_jiffies(10)); //执行音频相关的处理函数
+    return 0;
+}
+</code></pre><h1><span id="软件配置demo">软件配置demo</span></h1><p><strong>使能TYPE-C SINK与SOURCE 检测功能：</strong></p>
+<p>一：sys_config.fex中：</p>
+<pre><code>usb_id_gpio = &quot;axp_ctrl&quot;
+</code></pre><p>二：deconfig中</p>
+<pre><code>CONFIG_TYPE_C=y
+</code></pre><p><strong>使能TYPE-C耳机功能</strong></p>
+<p>一：如原理图所示，使用的是PH10作为选通管脚，故对pmu_typc_c_sel进行配置</p>
+<pre><code>[charger0]
+ compatible                 = &quot;bmu1760-charger&quot;
+pmu_type_c_sel             = port:PH10&lt;1&gt;&lt;default&gt;&lt;default&gt;&lt;0&gt;
+ pmu_chg_ic_temp            = 0
+pmu_battery_rdc            = 100
+ pmu_battery_cap            = 4200
+</code></pre><p>二：deconfig中</p>
+<pre><code>CONFIG_TYPE_C_AUDIO=y
+</code></pre>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/thermal/thermal_framework/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1505,575 +2074,6 @@ k_d 为求导，一般设置为0
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/process/process_day1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/25/process/process_day1/" itemprop="url">进程初识</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
-                2018-06-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/进程/" itemprop="url" rel="index">
-                    <span itemprop="name">进程</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1><span id="一进程结构体">一：进程结构体</span></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">声明目录：include/linux/sched.h</span><br></pre></td></tr></table></figure>
-<h2><span id="进程的状态">进程的状态</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">volatile long state; /* -1 unrunnable, 0 runnable, &gt;0 stopped */ </span><br><span class="line">//1. R:运行(正在运行或在运行队列中等待)</span><br><span class="line">//2. S:中断(休眠中，受阻，在等待某个条件形成或接受到信号)</span><br><span class="line">//3. D:不可中断(收到信号不唤醒和不可运行，进程必须等待直到有中断发生): </span><br><span class="line">//4. T:僵死(进程已终止，但进程描述符存在，直到父进程调用wait4()系统调用后释放)</span><br><span class="line">//5. Z:停止(进程收到SIGSTOP,STGSTP,SIGIN,SIGOU信号后停止运行)</span><br></pre></td></tr></table></figure>
-<p><img src="/2018/06/25/process/process_day1/process_life.jpg" alt="进程的生命周期"></p>
-<h2><span id="进程的进程标识">进程的进程标识</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pid_t pid;</span><br><span class="line">pid_t tgid;</span><br></pre></td></tr></table></figure>
-<p>在linux系统中，所有进程都有直接或间接的联系，每个进程都有其父进程<br>linux把不同的pid与系统中的每个进程或轻量级线程关联，一个线程组所有线程与零头线程具有相同的pid,存入tgid中；</p>
-<h2><span id="进程标记">进程标记</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">unsigned int flags;</span><br></pre></td></tr></table></figure>
-<p>反应进程状态信息,但不是运行状态，用于内核识别进程当前的状态，以备下一步操作</p>
-<h2><span id="表示进程亲属关系的成员">表示进程亲属关系的成员</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">/*  </span><br><span class="line"> * pointers to (original) parent process, youngest child, younger sibling,</span><br><span class="line"> * older sibling, respectively.  (p-&gt;father can be replaced with</span><br><span class="line"> * p-&gt;real_parent-&gt;pid)</span><br><span class="line"> */</span><br><span class="line"> struct task_struct __rcu *real_parent; /* real parent process */</span><br><span class="line"> struct task_struct __rcu *parent; /* recipient of SIGCHLD, wait4() reports */</span><br><span class="line">/*   </span><br><span class="line"> * children/sibling forms the list of my natural children</span><br><span class="line">*/</span><br><span class="line"> struct list_head children;      /* list of my children */</span><br><span class="line"> struct list_head sibling;       /* linkage in my parent&apos;s children list */</span><br><span class="line"> struct task_struct *group_leader;       /* threadgroup leader */</span><br></pre></td></tr></table></figure>
-<h2><span id="进程内核栈">进程内核栈</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">struct thread_info thread_info;</span><br><span class="line">void *stack;</span><br></pre></td></tr></table></figure>
-<h2><span id="ptrace系统调用">ptrace系统调用</span></h2><p>提供一种父进程可以控制子进程运行,并可以检查和改变它的核心image;</p>
-<h2><span id="优先级">优先级</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">int prio,保存静态优先级，可以通过nice系统调用来进行修改</span><br><span class="line">rt_prority,用于保存实时优先级</span><br><span class="line">normal_prio 取决于静态优先级和调度策略</span><br><span class="line">prio 用于保存动态优先级</span><br></pre></td></tr></table></figure>
-<h2><span id="调度策略相关字段">调度策略相关字段</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">policy 调度策略</span><br><span class="line">sched_class 调度类</span><br></pre></td></tr></table></figure>
-<h1><span id="task_struct的初始化">task_struct的初始化</span></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">__mmap_switched_data  arch/arm/kernel/head-common.S</span><br><span class="line">  --&gt;__mmap_switched_data</span><br><span class="line">     --&gt;.long   init_thread_union + THREAD_START_SP @ sp</span><br><span class="line">         --&gt; INIT_THREAD_INFO(init_task) init/init_task</span><br></pre></td></tr></table></figure>
-<p><code>`</code></p>
-<h1><span id="init进程">init进程</span></h1><p>linux下有3个特殊的进程，idle进程（PID=0）,init进程(PID=1)和kthreadd(PID=2)<br><em>ilde进程由系统自动创建，运行在内核态<br>idle进程其pid=0,其前身是系统创建的第一个进程，也是唯一一个没有通过fork或者kernel_thread产生的进程。完成加载系统后，演变成为进程调度，交换;
-</em>init进程由idle通过kernel_thread创建，在内核空间中完成初始化后，加载init程序;</p>
-<h1><span id="三僵尸进程">三：僵尸进程</span></h1><h1><span id="其他">其他</span></h1><p> 当一个进程在执行时，CPU的所有寄存器中的值，进程的状态以及堆栈中的内容被称为该进程中的上下文。当内核需要切换到另外一个进程时，它需要保存当前的所有状态，即保存当前进程的上下文;以便在再次执行该进程时，能够必得到切换时的状态执行下去。在linux中，当前进程上下文均保存在任务数据结构中；<br> 当发生中断时，内核就在被中断的上下文中，在内核态下执行中断服务历程。但同时会保留所有需要用到的资源，以便中继服务结束时能恢复被中断进程的执行；</p>
-<h1><span id="进程优先级">进程优先级</span></h1><p>设置SCHED_FIFO和50 RT优先级</p>
-<p>#chrt -f -a -p 50 10576<br>设置nice</p>
-<p>#renice -n -5 -g 9394</p>
-<p>#nice -n 5 ./a.out</p>
-<h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.ibm.com/developerworks/cn/linux/l-cn-scheduler/index.html" target="_blank" rel="noopener">linux调度器发展简述</a><br><a href="https://blog.csdn.net/gatieme/article/details/51383272" target="_blank" rel="noopener">linux进程描述符task_struct结构体详解–linux进程的管理与调度(一)</a><br><a href="https://blog.csdn.net/gatieme/article/details/51484562" target="_blank" rel="noopener">Linux下0号进程的前世(init_task进程)今生(idle进程)—-Linux进程的管理与调度（五）</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/other/TYPE-C耳机适配工作/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/25/other/TYPE-C耳机适配工作/" itemprop="url">全志TYPE-C使用介绍</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
-                2018-06-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/TYPE-C/" itemprop="url" rel="index">
-                    <span itemprop="name">TYPE-C</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>有无TYPE-C方案，主从识别和耳机的插拔检测不同;有TYPE-C情况下，主要为TYPE-C逻辑进行侦测;而没有TYPE-C的方案;主从区分需要USB-ID detect管脚进行判断,耳机则靠HP-DET进行区分;</p>
-<h1><span id="传统侦测方式">传统侦测方式</span></h1><h2><span id="主从侦测">主从侦测</span></h2><p><img src="/2018/06/25/other/TYPE-C耳机适配工作/usb_id_detect.jpg" alt="usb_id_detect"></p>
-<p>在没有TYPE-C的硬件上，主要靠USB-ID管脚的上下拉来区分主从;</p>
-<h1><span id="耳机侦测">耳机侦测</span></h1><h2><span id="耳机结构">耳机结构</span></h2><p>3.5mm耳机插头有三段（TRS,Tip-Ring-Sleeve）和四段（TRRS,Tip-Ring-Sleeve）之分，其中三段的不带麦克风，尾段（Sleeve)是公共地；中间环（Ring）是右声道，尖部（Tip）是左声道，四节的分两种，一种是CTIA,一种是OMTP;</p>
-<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/耳机结构.png" alt="耳机结构"></p>
-<p>HP-L耳机左声道，HP-R耳机右声道，GND接地，V-Mic语音麦克风</p>
-<h2><span id="耳机座以及传统耳机侦测介绍">耳机座以及传统耳机侦测介绍</span></h2><p>耳机座分为支持欧标设计的耳机座和支持美标的耳机座。另外从耳机座左声道的检测方式来又可以分为”Normal-closed type”(常闭型)和“Normal  -type”(常开型)两种。设计图如下：</p>
-<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/耳机座子.png" alt="耳机座子"></p>
-<p>. 在常闭型中，不接耳机时，耳机座左声道和检测端HS-DET接触，接入耳机时，HS-DET与HPH-L不导通</p>
-<p>. 在常开型中，不接耳机时，耳机座左声道和检测端HS-DET不接触，插入耳机时，HS-DET与HPH-L导通</p>
-<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/headphone.jpg" alt="耳机侦测电路"></p>
-<p>如图为常开型结构，HP-DET上拉，当插入耳机后HP-DET和HP-OUTL导通，DET下拉引起软件中断。软件上通过debounce后，检测到持续的低电平，于是认为耳机插入；这时候需要判断，插入的还是三段还是四段，平台上打开mic_bias,当插入的是三段耳机，MIC被拉低，于是判断为三段耳机；若为四段耳机，MIC接近于MIC_BIAS，软件判断该处的直流电压为四段耳机；当按键按下时，MIC的电压发生变化，触发了系统中断，之后软件通过采样该处的电压值确定按下了哪一个按键；</p>
-<h1><span id="type-c方案侦测方式讲解">TYPE-C方案侦测方式讲解</span></h1><h2><span id="type-c主要电路如下">TYPE-C主要电路如下</span></h2><p><img src="/2018/06/25/other/TYPE-C耳机适配工作/TYPE-C关键电路.png" alt="TYPE-C关键电路"></p>
-<p>Type-C连接并没有在物理结构上区分DFP(Host)和UFP(Device),无连接时DFP未给VBUS供电，连接后通过CC信号线配置，确认连接有效，VBUS供电打开并确认使用哪一个端口传输数据;<br><strong>状态说明</strong></p>
-<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/cc_logic.jpg" alt="cc_logic"></p>
-<p><strong>如图所示</strong></p>
-<p>DFP的CC1/CC2会接上拉电阻Rp或电流源，UFP的CC1/CC2会接下拉电阻Rd,AUDIO设备则会接两个下拉电阻</p>
-<p>如何确认当前TYPE_C接入设备类型:</p>
-<pre><code>echo 1 &gt; /sys/class/axp/axp_num
-echo 0x37 &gt; /sys/class/axp_reg &amp;&amp; cat /sys/class/axp/axp_reg
-</code></pre><p>若读出状态为ATTACH_SNK 说明接入的是适配器或pc<br>若读出的状态为ATTACH_SOURCE 说明此时作为host<br>如读出为AUDIO_ACSY,说明此时为音频设备</p>
-<p><img src="/2018/06/25/other/TYPE-C耳机适配工作/type_c_detect.jpg" alt="type_c_detect"></p>
-<p><strong>TS5USBA224RSWR</strong>：</p>
-<p> 用于将D-,D+在(USB0-DM,USB0-DP),(HPOUTL,HPOUTR)两种模式之间切换；由于VBUS默认低后，无法满足通过SEL切换状态，故VBUS一般设置为高；通过ASEL来设置高低实现切换</p>
-<p><strong>TS3A226AE</strong>:</p>
-<p>可以用于区分三四节耳机，并且可以将MIC和GROUND区分出来，降低软件设计复杂度；</p>
-<p>使用TYPE-C方案时，TYPE-C 中断服务程序负责将D-,D+选择为USB模式的Dp,Dm或者为耳机模式HP-OUTL,HP-OUTR;并通知音频驱动耳机接入;</p>
-<h2><span id="软件流程为">软件流程为：</span></h2><p>一：bmu驱动产生中断：</p>
-<pre><code>irqreturn_t axp_tc_in_isr(int irq, void *data)
-{
-    struct axp_charger_dev *chg_dev = data;
-    #ifdef CONFIG_TYPE_C_AUDIO
-    struct axp_usb_info *usb = chg_dev-&gt;spy_info-&gt;usb;
-    u8 cc_mode = 0; 
-    /*axp_usbac_in(chg_dev);*/
-    cc_mode = usb-&gt;get_cc_mode(chg_dev); //获取cc 侦测结果
-    if (cc_mode == AUDIO_ACSY) {    //如果为音频设备
-            usb-&gt;set_sel_mode(chg_dev, 1);  //D+ D- 连接到耳机的左右声道
-            call_notifier_call_chain(1);    //通知耳机驱动耳机接入
-    } else {
-            usb-&gt;set_sel_mode(chg_dev, 0); //D+ D- 连接到 USB的 Dp,Dm口
-            call_notifier_call_chain(0);   //通知耳机驱动拔出
-    }    
-    #endif
-    axp_change(chg_dev);
-    return IRQ_HANDLED;
-}
-</code></pre><p>二：耳机接受到通知：</p>
-<pre><code>static int type_c_chain_notify(struct notifier_block *nb, unsigned long mode, void *_unused)
-{
-    struct mc_private *ctx = container_of(nb, struct mc_private, type_c_chain_nb);
-
-    if (mode) {
-            ctx-&gt;detect_state = PLUG_IN; //切换接入状态
-            printk(&quot;%s PLUG_IN&quot;, __func__);
-    } else {
-            ctx-&gt;detect_state = PLUG_OUT;
-            printk(&quot;%s PLUG_OUT&quot;, __func__);
-    }
-
-    schedule_delayed_work(&amp;ctx-&gt;hs_detect_work,
-                            msecs_to_jiffies(10)); //执行音频相关的处理函数
-    return 0;
-}
-</code></pre><h1><span id="软件配置demo">软件配置demo</span></h1><p><strong>使能TYPE-C SINK与SOURCE 检测功能：</strong></p>
-<p>一：sys_config.fex中：</p>
-<pre><code>usb_id_gpio = &quot;axp_ctrl&quot;
-</code></pre><p>二：deconfig中</p>
-<pre><code>CONFIG_TYPE_C=y
-</code></pre><p><strong>使能TYPE-C耳机功能</strong></p>
-<p>一：如原理图所示，使用的是PH10作为选通管脚，故对pmu_typc_c_sel进行配置</p>
-<pre><code>[charger0]
- compatible                 = &quot;bmu1760-charger&quot;
-pmu_type_c_sel             = port:PH10&lt;1&gt;&lt;default&gt;&lt;default&gt;&lt;0&gt;
- pmu_chg_ic_temp            = 0
-pmu_battery_rdc            = 100
- pmu_battery_cap            = 4200
-</code></pre><p>二：deconfig中</p>
-<pre><code>CONFIG_TYPE_C_AUDIO=y
-</code></pre>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/cpu/cpu概述/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/25/cpu/cpu概述/" itemprop="url">CPU概述</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
-                2018-06-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cpu/" itemprop="url" rel="index">
-                    <span itemprop="name">cpu</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <!-- toc-aside -->
-<h1><span id="cpu-topology">cpu topology</span></h1><h2><span id="11-cpu拓扑">1.1. cpu拓扑</span></h2><p><strong>cluster(socket)-&gt;core-&gt;Threads(目前为止arm没有提出多线程的概念)</strong><br><img src="/2018/06/25/cpu/cpu概述/cpu拓扑.png" alt="cpu拓扑图"> </p>
-<h2><span id="12-多核技术">1.2 多核技术</span></h2><p>  基于制程，扩充性等考虑，芯片厂商会把多个core封装在一个chip上，称为socket。socket的概念在X86架构上使用尤其多，可以理解为插槽；<br>假设一个插槽上有两个core,那么我在主板上插2个插槽，就是4核系统，插上4个插槽就是8核；arm的话则是另外一个概念cluster,簇<br>  在X86架构的PC上，唯一目的的话是提高CPU的处理性能（不在乎功耗），但在移动市场中（大多是arm），性能提高后，对应着就更多的power消耗；对于设备电源管理以及散热提出了更高的要求。与此同时电池并没有随着CPU的拓扑的进化而进化，于是HMP技术就被提出来了；</p>
-<h2><span id="13hmpheterogeneous-multi-processing">1.3HMP(Heterogeneous Multi-Processing)</span></h2><p><strong>big-little:</strong></p>
-<ul>
-<li>在一个chip中封装两类ARM Core,以kirin 960为例:一类为高性能Core,4核ARM A73，最高主频为2.4G，一类为低性能Core,4核ARM A53，最高主频为1.8G<br><img src="/2018/06/25/cpu/cpu概述/kirin960.png" alt="cpu拓扑图"></li>
-</ul>
-<p><strong>DynamIQ:</strong></p>
-<ul>
-<li>在单一cluster内可有8个核心，且可由不同架构，时钟的核心组成，提升了运作效率与配置的弹性,如高通的845 4核ARM A75，最高为2.8，4核 ARM A55，最高为1.8G</li>
-</ul>
-<p><strong>DynamIQ较big-little好处:</strong></p>
-<ol>
-<li>单cluster可有8核心</li>
-<li>cluster可搭配不同架构的CPU</li>
-<li>各cpu可有独立的运作时钟</li>
-<li>CPU各自开关休眠互不影响</li>
-<li>依照效能需求弹性运用各核心</li>
-</ol>
-<p>以龙舟比喻ARM的DynamIQ与先前的big.LITTLE技术，我们把龙舟当成cluster,船员当成core,那么big.LITTLE龙舟上只能有4个船员，而且每个船员身材需要一样（核心架构），划船的时候若多位船员一起划船时，每个人的出力均等(频率一致),不能有人慢划或者快划;<br>当使用DynamIQ时，每艘船（cluster）上可以有8位高低胖瘦不等(架构)的船员（core），换船频率可以不等，且船员可以依照指令睡觉（关闭）,休息（休眠），或划船（运作）；</p>
-<h1><span id="cpu内核代码框架">cpu内核代码框架</span></h1><ol>
-<li><a href="./cpu_init.md">系统启动时，CPU core的初始化，信息获取</a></li>
-<li>系统启动时，CPU core的启动（enable）</li>
-<li>系统运行过程中，根据当前负荷，动态enable/disable 某些CPU core,以便在性能与功耗间平衡</li>
-<li>cpu core的hotplug支持，所谓的hotplug,是可以在系统运行的过程中，动态的增加或者减少CPU core(可以是物理上，也可以是逻辑上)</li>
-<li>系统运行过程中CPU idle管理</li>
-<li>系统运行过程中，根据当前负荷，动态的调整CPU core的电压和频率，以便在性能和功耗之间平衡</li>
-</ol>
-<p><img src="/2018/06/25/cpu/cpu概述/cpu代码框架.png" alt="cpu拓扑图"><br>arch-depedent部分位于”arch\arm64\kernel”负责平台相关的控制操作，包括</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu 信息的获取（cpuinfo）</span><br><span class="line">cpu拓扑结构的获取（cpu topology）</span><br><span class="line">底层的CPU操作（init,disable等）的实现，cpu ops</span><br><span class="line">SMP相关的初始化（smp）</span><br></pre></td></tr></table></figure>
-<p>arch-independent负责实现平台无关的抽象，包括</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu control模块，屏蔽底层平台相关实现细节，提供控制CPU(enable,disable等)的统一API，供系统启动，进程调度等模块调用</span><br><span class="line">cpu subsystem driver像用户空间提供CPU hotplug有关的功能；</span><br><span class="line">cpuidle,处理CPU idle有关的逻辑</span><br><span class="line">cpufreq 处理CPU frequency调整有关的逻辑</span><br></pre></td></tr></table></figure>
-<h1><span id="cpu的状态表示">cpu的状态表示</span></h1><ol>
-<li><strong>possible CPU:</strong> 就是在DTS中指定了的，物理存在的CPU core</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;boot_cpu_init-&gt;smp_process_id用于获取cpu id</span><br><span class="line">		           -&gt;set_cpu_xxx,用于将指定的CPU设置为（或清除）指定状态</span><br><span class="line">	    -&gt;setup_arch-&gt;smp_init_cpus-&gt;sunxi_smp_init_cpus-&gt;set_cpu_possible(i, true)</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li><strong>present cpu:</strong> 被kernel标识的，具备执行代码条件，后续可以在需要的时候（如hotplug的时候），启动该CPU </li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;rest_init-&gt;kernel_init-&gt;kernel_init_freeable</span><br><span class="line">				     -&gt;smp_prepare_cpus</span><br><span class="line">			     	if (cpu_prepare(cpu)) /**/</span><br><span class="line">					set_cpu_present(cpu,true);</span><br></pre></td></tr></table></figure>
-<ol start="3">
-<li><strong>online CPU:</strong> 某个CPU是present的，不一定是boot,所谓CPU boot,就是让CPU执行（取指译码/执行）代码</li>
-<li><strong>active CPU</strong> 只是为了方便调度器操作</li>
-</ol>
-<h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cool3c.com/article/124149" target="_blank" rel="noopener">一图看懂ARM DynamIQ运作原理</a><br><a href="http://www.wowotech.net/pm_subsystem/cpu_core_pm_overview.html" target="_blank" rel="noopener">Linux CPU core的电源管理(1)概述</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/19/memory/memory-process/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2222,7 +2222,7 @@ pmu_battery_rdc            = 100
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-hardware-md/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-mtp/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dongka">
@@ -2241,7 +2241,7 @@ pmu_battery_rdc            = 100
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/17/memory/memory-hardware-md/" itemprop="url">内存管理（一）硬件篇</a></h1>
+                <a class="post-title-link" href="/2018/06/17/memory/memory-mtp/" itemprop="url">内存管理（二）mtp拷贝流程</a></h1>
         
 
         <div class="post-meta">
@@ -2315,22 +2315,22 @@ pmu_battery_rdc            = 100
       
         
           
-            <h2><span id="一经典存储结构图">一.经典存储结构图</span></h2><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaghCuOMjibmmJgymLicFZBkXdwOReYVV1WfJHPhsU23ibEzhSsbdK87aGg/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="avatar"> </p>
-<pre><code>L0(寄存器)-&gt;CPU 寄存器保存来自高速缓存的字
-L1(SRAM）-&gt;高速缓存取自L2高速缓存行
-L2(SRAM)-&gt;高速缓存取自L3高速缓存的高速缓存行
-L3(SRAM)-&gt;高速缓存保存自内存的高速缓存行
-L4(内存)-&gt;内存保存自磁盘缓存的磁盘块
-L5(磁盘缓存)-&gt;磁盘缓存保存取自磁盘的磁盘块
-L6磁盘
-</code></pre><p>cpu从磁盘中加载数据,放到内存，之后再放到告诉缓存</p>
-<h2><span id="二虚拟地址和物理地址">二.虚拟地址和物理地址</span></h2><p>在旧的手机中，内存可能只有1G,但是每个进程在执行的时候都仿佛手机有4g内存；<br><strong>物理地址(Physical Address)</strong>：CPU地址总线传来的地址，由硬件电路控制其含义。物理地址中有很大一部分是留给内存条中的内存的但也常被映射到其他存储器上如显存，BIOS等),在没有使用虚拟存储器的机器上，虚拟地址被直接送到内存总线上，使具有相同物理存储器被读写;而在使用了虚拟存储器的情况下，虚拟具体地址不是被直接送到内存地址总线上，而是送到存储器管理单元MMU，把虚拟地址映射为物理地址；我们把上面实际的1G内存叫做：物理地址<br><strong>虚拟地址(Virtual Address)</strong>:是逻辑地址到物理地址变换之间的中间层；进程访问到的叫做虚拟地址；<br>虚拟内存有以下几个作用：<br>1.内存访问保护<br>  有虚拟内存，我们可以通过设置段界限或页表想来设定软件运行时的访问空间，确保软件运行使不越界；<br>2.按需分页（lazy load技术）<br>  可以让软件在没有访问某虚拟内存地址时，不分配虚拟地址，在实际访问的时候，在动态分配物理内存<br>建立虚拟内存到物理内存的页映射关系；<br>3.页换入换出（page swap in/out)<br>  把不经常访问的数据所占的内存空间临时写到硬盘上，这样可以腾出更多的空闲空间出来给到经常访问的数据；当cpu访问到不经常访问的数据时，再把数据从硬件读入到内存中；<br>4.写时复制（copy on write）<br>  两个虚拟页的数据相同时，可只分配一个物理页框，这样如果对两个虚拟页的访问是只读方式，这两个虚拟页可以共享页框，节省空间；如果当CPU对其中一个虚拟页进行了写操作，那么这两个虚拟页的数据内容不同，需要分配一个新的物理页框，并将物理页框标记为可写，这样两个虚拟页面将映射到不同的物理页帧，确保整个内存空间的正确访问。</p>
-<h2><span id="二页页表mmu">二.页，页表，MMU</span></h2><p>在讲虚拟地址到物理地址之中再补充几个概念：<br>页(page)<br>  <em>把APP的虚拟地址切分程若干个大小相等（4K）的片，每一片就是我们说的页</em><br>页框（frame）<br>  *把物理内存页按“页”的大小切分为若干大小相等的片，每一片，就是我们所说的页框 </p>
-<h2><span id="三cpu寻找页面过程">三.cpu寻找页面过程</span></h2><pre><code>CPU获取数据主要有两步：
-a.通过虚拟地址获取物理地址
-b.根据物理地址获取数据
-</code></pre><h3><span id="获取物理地址">获取物理地址</span></h3><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaBdia2Vt94nvPcnj4aYqWRrLibeKQONayr9azNLWEeiabiay7ibIF3ooxibBw/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="获取物理地址"><br>    [a].CPU向MMU发送虚拟地址<br>    [b].MMU查询快表TLB<br>        块表命中：从块表中获取物理地址，由MMU继续根据物理地址匹配数据页步骤[a]<br>        块表不命中：查询页表步骤[c]<br>    [c]:从高速缓存查询页表<br>     “高速缓存”缓存页框，而页表存储于页框中，因此读取页表实际上也是读页（页表的物理地址有单独的寄存器保存）<br>     高速缓存命中：从高速缓存获取物理地址，并更新快表，进入[步骤a]<br>     高速缓存不命中：查询内存中的页表[步骤d]<br>     [d]从内存中查询页表<br>     页表保存了所有虚拟地址的映射关系，而不管页是否有映射物理页框。因此从内存页表中肯定能“命中”页。从页表获取虚拟地址的映射关系后，进入步骤e<br>     [e]把查询的页表想记录到高速缓存<br>     [f]MMU从高速缓存中获取页表项<br>        虚拟地址有分配物理页框；转换物理地址并更新块表，由MMU继续根据物理地址匹配数据页<br>        虚拟地址没分配物理页框：触发缺页中断<br>    [g]进入缺页中断处理程序<br>    [h]为虚拟页分配物理页框<br>        如果无空闲物理页框，则根据LRU算法选择需要淘汰的页，要淘汰的页如果是脏数据就回刷，否则直接丢弃或置换到磁盘的交换分区中<br>        然后，从磁盘中获取页信息更新到物理页框，更新内存页表<br>    [i]缺页中断处理的最后<br>        修改CPU寄存器，使得重新启动导致缺页的指令，返回[步骤a]重新执行</p>
-<h3><span id="根据物理地址获取实际数据">根据物理地址获取实际数据</span></h3><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaMfh510NLONxyc2CSvYr3Vrwqyf9tiajI1jPAuD16Kzm9mOvqQdZTiaJg/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="获取数据"><br>    [A]MMU获取到物理地址后，根据物理地址查询高速缓存<br>        高速缓存命中：CPU直接从高速缓存获取数据<br>        高速缓存不命中：查询物理内存[步骤B]<br>    [B]根据物理地址，获取物理内存中的数据<br>    [C]硬件实现把数据页记录到高速缓存中<br>    [D]cpu直接从高速缓存中获取数据</p>
+            <h2><span id="背景知识介绍">背景知识介绍</span></h2><p>android 从3.0开始集成MTP功能，主要原因有三个：<br>1.手机要支持UMS的话，必须要有一个sd卡，因为sd卡往往采用Windows支持的分区格式。如果想把内部存储空间通过UMS挂载到Windows上，则内部存储空间需采用特定的分区格式。这对某些手机而言根本不可行。因为内部存储空间本身可能就是一个设备，它们采用统一的分区格式。不能因为需要使用UMS，而再增加一块特定的分区格式的存储设备。<br>2.UMS挂载到PC后，PC操作系统拥有绝对的控制权。此时，Android系统无法操作这些设备。<br>3.window所占市场份额较大，故即使linux，MacOS支持力度不够，Android也要集成的；<br>MTP的主要缺点：<br>1.传输大文件的速度较慢 ??<br>2.MTP不能直接修改文件本身，只能先拷贝到本地修改，完毕后再拷贝回去</p>
+<h2><span id="mtp协议介绍">MTP协议介绍</span></h2><p>MTP使用者包括两个部分，分别为Initiator和Resoponder</p>
+<ol>
+<li>Initiator:主要是指USB Host,例如PC机，笔记本等，协议规定所有的MTP操作只能由Initator发起</li>
+<li>Responder:一般是诸如数码相机，智能手机等存储媒体文件的设备，Responder在MTP中的作用就是处理Initator发起的请求。同时，它还会根据自身状态的变化发送Event以通知Initator.</li>
+</ol>
+<h1><span id="mtp-协议栈">MTP 协议栈</span></h1><ol>
+<li>Pyshical Layer(物理层)：物理层在MTP协议中用来传输数据。目前有三种物理层可供MTP使用。它们分别是USB:其主要特点是传输文件，同步媒体文件时速度快，而且可以变工作边充电，这是目前用的最多的一种方式；IP：基于IP的MTP(简称MTP/TP)将通过UPnp来匹配和发现设备。它是家庭网络中最理想的传输方式；Bluetooth:MTP/BT是最省电，同时速度最慢的一种传输方式，用处较少；</li>
+<li>传输层：MTP中，数据传输格式遵循PTP协议</li>
+<li>命令层：实现了MTP协议中的各种命令；</li>
+</ol>
+<p>MTP采用命令-应答方式来工作，(Initator发送命令给Responder处理，Responser反馈处理结果)，这种方式主要特点有：</p>
+<ol>
+<li>所有MTP命令均以Package(数据包)的方式在设备两端进行传递</li>
+<li>Initiator必须接收到前一条消息处理结果，无论是成功或者超时后，才能发送下一条消息</li>
+</ol>
 
           
         
