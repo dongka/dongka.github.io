@@ -570,7 +570,7 @@
 <p><strong>以TP gslx680为例：</strong></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span>  <span class="title">gsl_ts_probe</span><span class="params">(struct i2c_client *client,</span></span></span><br><span class="line"><span class="function"><span class="params">                         <span class="keyword">const</span> struct i2c_device_id *id)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">...</span><br><span class="line">   queue_work(gslX680_wq, &amp;glsX680_init_work);</span><br><span class="line">    	--&gt;glsX680_init_events	</span><br><span class="line">            ret = input_request_int(&amp;(config_info.input_type), gsl_ts_irq,</span><br><span class="line">            CTP_IRQ_MODE, ts_init);</span><br><span class="line"></span><br><span class="line">   gsl_ts_init_ts</span><br><span class="line">     --&gt;set_bit(ABS_MT_POSITION_X, input_device-&gt;absbit);</span><br><span class="line"> 		set_bit(ABS_MT_POSITION_Y, input_device-&gt;absbit);</span><br><span class="line">		set_bit(ABS_MT_TOUCH_MAJOR, input_device-&gt;absbit);</span><br><span class="line">    	set_bit(ABS_MT_WIDTH_MAJOR, input_device-&gt;absbit);</span><br><span class="line">		input_set_abs_params(input_device, ABS_MT_POSITION_X, <span class="number">0</span>,</span><br><span class="line">                         SCREEN_MAX_X, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    	input_set_abs_params(input_device, ABS_MT_POSITION_Y, <span class="number">0</span>,</span><br><span class="line">                         SCREEN_MAX_Y, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    	input_set_abs_params(input_device, ABS_MT_TOUCH_MAJOR, <span class="number">0</span>,</span><br><span class="line">                         PRESS_MAX, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    	input_set_abs_params(input_device, ABS_MT_WIDTH_MAJOR, <span class="number">0</span>, <span class="number">200</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    	设置TP支持的设备属性和参数</span><br><span class="line">        --&gt;  input_device = input_allocate_device();</span><br><span class="line">    		 c = input_register_device(input_device);</span><br><span class="line">    		 跟常见的platform总线模型一样，会将input_device加到input_device_list</span><br><span class="line">    		 在<span class="keyword">register</span>的时候通过match在input_handler_list中找到对应的handler</span><br><span class="line">             流程如下所示：</span><br><span class="line">             --&gt; input_attach_handler(dev, handler);</span><br><span class="line">    			  id = input_match_device(handler, dev);</span><br><span class="line">    			  error = handler-&gt;connect(handler, dev, id);</span><br><span class="line">    		这里就会调到：evdev.c中的event_connect</span><br><span class="line">    			--&gt;error = input_register_handle(&amp;evdev-&gt;handle);</span><br><span class="line">    		evdev基本上支持所有类型，所以这里TP将会与evdev通过handle进行连接</span><br><span class="line">...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">接下来就是中断处理流程，这里我们就能看出他的层级关系；  </span><br><span class="line">input driver  --&gt;input_dev</span><br><span class="line">gsl_ts_irq&#123;</span><br><span class="line">	queue_work(ts-&gt;wq, &amp;ts-&gt;work);</span><br><span class="line">		gsl_ts_xy_worker</span><br><span class="line">			process_gslX680_data</span><br><span class="line">				input_report_abs(ts-&gt;input, ABS_MT_TRACKING_ID, id);</span><br><span class="line">				input_report_abs(ts-&gt;input, ABS_MT_TOUCH_MAJOR, pressure);</span><br><span class="line">				input_report_abs(ts-&gt;input, ABS_MT_POSITION_X, x);</span><br><span class="line">				input_report_abs(ts-&gt;input, ABS_MT_POSITION_Y, y);</span><br><span class="line">				input_report_abs(ts-&gt;input, ABS_MT_WIDTH_MAJOR, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line">input core</span><br><span class="line">input_event(dev, EV_ABS, code, value);</span><br><span class="line">	input_handle_event(dev, type, code, value);</span><br><span class="line">		input_pass_values(dev, dev-&gt;vals, dev-&gt;num_vals);</span><br><span class="line">			count = input_to_handler(handle, vals, count);</span><br><span class="line">				handler-&gt;event(handle, v-&gt;type, v-&gt;code, v-&gt;value);</span><br><span class="line">evdev --&gt; input_handler</span><br><span class="line">evdev_event</span><br><span class="line">	evdev_events(handle, vals, <span class="number">1</span>);</span><br><span class="line">		evdev_pass_values(client, vals, count, ev_time);</span><br><span class="line">			__pass_event(client, &amp;event);</span><br><span class="line">			--&gt;kill_fasync(&amp;client-&gt;fasync, SIGIO, POLL_IN);</span><br><span class="line">			<span class="comment">//走到这里的时候epoll_wait dev/input/xxx的监听就能收到消息</span></span><br><span class="line">			wake_up_interruptible(&amp;evdev-&gt;wait);</span><br></pre></td></tr></table></figure>
 <p><strong>简而言之：input_dev在中断处理函数里面上报事件 -&gt; input_core找到对应的handler -&gt; input_handler:如edev通过___pass_event将事件上报给用户层；</strong></p>
-<h2><span id="androd-input流程">androd Input流程</span></h2><p><a href="https://blog.csdn.net/xingchenxuanfeng/article/details/79208005" target="_blank" rel="noopener">安卓接受事件之后的处理流程</a></p>
+<h2><span id="android-input流程">android Input流程</span></h2><p><a href="https://blog.csdn.net/xingchenxuanfeng/article/details/79208005" target="_blank" rel="noopener">安卓接受事件之后的处理流程</a></p>
 <p><img src="/2019/09/30/display/rotation/Android_input.png" alt="android处理input事件处理流程"></p>
 <p><strong>流程简单介绍：</strong></p>
 <p><strong>一：APP setView建立inputChannel和window的连接</strong></p>
@@ -1627,186 +1627,6 @@ if (size == 1990720) {
 <p><a href="http://www.cnblogs.com/huxiao-tee/p/4660352.html" target="_blank" rel="noopener">认真分析mmap:是什么 为什么 怎么用</a></p>
 <p><a href="https://www.cnblogs.com/arnoldlu/p/9367253.html" target="_blank" rel="noopener">Linux内存管理（9）mmap补充</a></p>
 <p><a href="https://blog.csdn.net/SweeNeil/article/details/83661933" target="_blank" rel="noopener">匿名映射</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/24/other/面试总结/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/03/24/other/面试总结/" itemprop="url">面试总结</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-24T00:07:09+00:00">
-                2019-03-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/职场日志/" itemprop="url" rel="index">
-                    <span itemprop="name">职场日志</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>先讲下18年面试的两家面试公司的心路历程；写给需要的人，还有是对自己做下总结；以告慰自己方向迷茫和对自己能力不确定的一年;</p>
-<h1><span id="面试旅程">面试旅程</span></h1><h2><span id="一加面试电源管理工程师">一加面试（电源管理工程师）</span></h2><p>一面：</p>
-<pre><code>1.进程调度
-2.内存映射，虚拟地址到物理地址的映射关系
-3.中断流程
-4.针对项目解过的问题讲解debug流程
-5.用户态怎么切换到内核态
-</code></pre><p>二面：</p>
-<pre><code>1.项目经历，针对项目解过的问题讲解debug流程
-2.休眠唤醒流程
-3.离职原因
-</code></pre><p><strong>经验总结：</strong>对流程的细节要清楚，对于解过的问题要了然于胸，这两点更为重要，在解问题的切记由于浮躁对问题一知半解，要深挖刨底，不能一来就想着怎样去规避；当面试的时候，离职原因经常会被询问，所以也应该想好自己的离职的初心是什么？</p>
-<p>在面试一加的时候，由于只是熟悉下面试的流程，准备甚少；但确实也面的很没面子，原因在于之前在问题解决的时候没有深究，对于业务流程缺乏一个深度理解；虽然熟悉到具体的细节上并不会影响到你解决问题，但是如果能有更深的理解时，在面试的时候才会有个制高点，你和面试官才会是更为平等的技术交流关系；</p>
-<h2><span id="vivo面试电源管理工程师">vivo面试（电源管理工程师）</span></h2><p>一面：</p>
-<pre><code>1.休眠唤醒流程
-2.常见的锁及锁的作用，设备驱动模型
-3.系统功耗优化方向
-4.针对项目解过的问题讲解debug流程
-</code></pre><p>二面：</p>
-<pre><code>1.自我介绍
-2.技术规划
-    技术框架
-    怎么把自己的模块做好？    
-    如果给你个20人的团队，你会怎样把模块做好？            
-3.职业规划
-</code></pre><p>三面：</p>
-<pre><code>1.主要为薪资协调；还有个人情况了解；
-</code></pre><p><strong>经验总结 :</strong>在vivo的面试的时候，由于有了半年的准备，在技术上细节上有了比较充足的准备，所以在面试技术上并没有遇到特别难缠的问题；感触比较多的还是技术二面，一个是自身知识体系的把握；另外在工作期间是否有注重更好提高思考模块交付的质量；其实这一点无论在哪里工作都会是闪光点；职业规划也是我觉得一个工程师在自己的工作旅程中经常要去思考的问题;</p>
-<h1><span id="职场抉择">职场抉择</span></h1><p><strong>离职的原因：</strong></p>
-<p>一：<strong>没有必要的客户端沟通成本，问题解决反复；</strong> 主要体现为不愿原理性技术开放到客户端，客户需要定制的模块与平台绑定过深甚至于不开源，不是一个作为好的芯片平台架构；给客户支持带来不必要的沟通成本；<br>二：<strong>缺乏技术前瞻性;</strong>与主流市场技术已相差甚远，突破性的技术改进甚少；作为定位在低端市场的芯片厂商，迫于市场压力得想着怎样去cost down自身的芯片成本；<br>三：<strong>知识积累存在局限性;</strong>对于软件工程师而言，学习的知识更多是依赖自己芯片平台，切换到其他平台的时候积累的优势则不复存在；</p>
-<p><strong>职场初心</strong></p>
-<pre><code>work for fun and make some difference for the world!!!
-</code></pre><p>对于自己而言，vivo无疑会是更高的技术平台，能遇见的视野也能更加广阔，薪资给的也可能是在目前公司干2~3年后才有可能拿到的薪酬;只是在职业规划的时候，将职业旅程放大到10年后，想到如果还是搞电源，给自身带来的成就感和满足感并不大，所以在一通挣扎后还是选择放弃这个选择；决定从显示这个技术方向入手，逐渐向XR方向靠近；</p>
-<h1><span id="职场寄语">职场寄语</span></h1><p>一：熟悉相关岗位知识框架;<br>以下是我就电源管理模块知识框架脉络的简单梳理；局限于自身的平台，读者可参考借鉴</p>
-<p><img src="/2019/03/24/other/面试总结/power_framework.png" alt="电源框架"></p>
-<p>二：关注知识细节,熟悉业务流程；</p>
-<p>三：思考如何提高产品竞争力</p>
-<p>四：按照初心进行自己的职业规划</p>
-<p>五：努力，不要为当初的决定打脸</p>
 
           
         
@@ -2991,6 +2811,250 @@ venus-a3:/ # settings list system | grep  next
 
 
     
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/17/cpu/arm体系架构的发展/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/17/cpu/arm体系架构的发展/" itemprop="url">ARM体系架构概述</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-11-17T14:54:00+00:00">
+                2018-11-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index">
+                    <span itemprop="name">cpu</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1><span id="arm体系架构的发展">ARM体系架构的发展</span></h1><p>本文将从以下几点去展开介绍arm体系架构的发展：</p>
+<ol>
+<li>指令集架构</li>
+<li>arm公司的发展历史以及授权模式</li>
+<li>arm的体系架构 </li>
+</ol>
+<h1><span id="arm公司的发展历史">arm公司的发展历史</span></h1><p>arm的发展历程在此文章讲的非常详细，故不再赘述<a href="http://www.eefocus.com/mcu-dsp/409079/r0" target="_blank" rel="noopener">一文带你了解ARM的发展历程</a></p>
+<h2><span id="arm授权模式">arm授权模式</span></h2><p>在传统PC领域，半导体有两种路子可以走，一种是Intel这种，<strong>从头到尾一条龙，架构和芯片设计，生产一律不靠任何人</strong>； 这样做需要极其雄厚，全方位的实力做保障，得有钱，有人，有技术，在半导体技术日益复杂的今天，能这么做屈指可数；好处就是利润率比较高，想卖多少钱就多少；当然技术上得做到领先甚至于垄断的地位优势才比较明显；</p>
+<p>另外一种则无工厂模式（Fabless）,<strong>NVIDIA,AMD,这类企业都是自己设计芯片，制造交给代工厂，比如台积电，联电，GlobalFoundries,三星电子</strong>。好处很明显，负担轻，但是在半导体这种工艺在功耗与性能中扮演重要角色的行业，你设计出来的是否能设计出来，怎么设计出来，很大程度看代工厂的能耐；幸好这些代工厂也十分给力，不断的逼近物理极限；使得AMD最近也能慢慢的赶上挤牙膏的Intel;</p>
+<p>arm就不一样了，它不制造，不销售芯片，只是自己设计IP,包括指令集，微处理器，GPU,总线，然后谁要的话就买arm的授权；授权模式分为此三种：</p>
+<h3><span id="处理器授权">处理器授权</span></h3><p>ARM设计好一颗CPU或者GPU，armv7架构对应的IP为Cortex-A5/A7/A9/A12/A15/A17这几个核心架构，对应armv8-A就有Cortext-A35/A53/A57/A72/A73;ARMv8.2A指令集：Cortext-A55/A75;然后授权卖给伙伴，买下它们后，只能按照图纸实现，能发挥的不多，如何实现就比较随便，如配置哪些模块，几个核心，多少缓存，多高频率，什么工艺，谁来代工等等；</p>
+<p>如果想优化，但是技术有限，那么可以买arm的处理器优化包/物理IP包授权（POP）<br>如果只是想更快速搞出产品，那么更干脆了，arm已经帮你制定好代工厂处理器类型和工艺了；<br>代表商家有联发科，展讯，联芯，全志，瑞芯微，炬力等；这些设计公司获得的是软核或者这点硬核授权，通过购买的CPU核，与GPU核，以及通过一定的流程，集成出SOC；</p>
+<p>购买处理器授权的本质上就大同小异了，可以做出差异化的只能在一些IP上做出差异化；</p>
+<h3><span id="架构指令授权">架构/指令授权</span></h3><p>这种授权方式价格比较贵，为防止碎片化的情况出现还有可能处于技术上的保护，arm禁止对指令集进行修改或者添加，但其他公司是否确切遵守了，这个就不得而知了；总之这种授权需要具有非常强的技术实力，也不过15家，如我们熟知的高通，苹果，三星，华为等公司；</p>
+<p>除了版税，那些购买了arm IP授权的，还需要为每一个芯片支付版税；</p>
+<p>在这里有些问题就应该提出来思考了，为什么都是arm的指令集，苹果的芯片却可以吊打现在的Android厂商的芯片呢？评价CPU性能指标在以下几个方面：</p>
+<p>一：指令集宽度（ISSUE）6</p>
+<p>二：乱序指令执行缓冲区（Recorder Buffer）（192）</p>
+<p>三：内存加载延迟（Load Latency）:4</p>
+<p>四：分支预测错误代价（Misprediction Penalty）:16(一般介于14~19)</p>
+<p>不得不说，<strong>苹果很早就开始布局CPU的设计之路，具有极强的芯片设计能力</strong>，在厂家都是基于arm的公版进行设计，苹果就已经通过购买arm指令集，然后进行自己的CPU设计，在14年的时候A7处理器，作为第一个ARM 64位CPU商用，而且将指令集宽度位6，作为对比arm目前的指令集为3；由于封闭式的开发，不像高通，需要考虑各个厂家的需求和成本，<strong>苹果有更高的溢价能力，可以用面积去换取性能与功耗，并根据自己的系统去做定制化</strong>；</p>
+<h1><span id="指令集架构isa">指令集架构（ISA）</span></h1><p>CPU执行计算任务时都需要遵从一定的规范，程序在被执行时都需要先翻译成CPU可以理解的语言。这种规范就是指令集<strong>（ISA，Intruction Set Architecrure）;</strong></p>
+<p>例如以下的机器码：1110 0001 1010 0000 0010 0000 0000 0001</p>
+<p>比如有个CPU定位1110 0001就是ADD指令，1010 0000对应的是存储数据的寄存器R2；0010 0000对应的寄存器R0;<br>0000 0001对应是寄存器R1,故意思可以是ADD R2 R0 R1,将R0,R1的值加起来放到R2；指令集就是定义一套约定俗成的CPU运行规则，对于编程人员，面对的汇编指令；而对于CPU来说，就是怎么去理解这段二进制码，不同的CPU对这段二进制代码不同，故就有了不同的指令集架构； </p>
+<p>指令集一般分为两种：<strong>精简指令集</strong>（RISC:reduced instruction set computer)和<strong>复杂指令集</strong>（CISC：Complex Instrution Set Computer）,以洗衣机洗衣服为例，RISC架构为，加水-&gt;漂洗-&gt;风干；而复杂指令集则可以发出洗衣服的指令，从而让洗衣机自动帮忙做这一整套的流程；CISC可以通过一条复杂的指令来完成许多事情，性能在处理复杂的任务时，会比RISC更为高效；但随之而来的是面积和功耗的提升；基于2/8理论，程序大部分时间（80%）都是在做重复而简单的事情；所以RISC架构就应运而生，更为精简的指令，将任务更多的放在了编译器这块，通过复杂的指令转化成简单指令的组合，在一定程度上增加了代码量，但使其大部分场合能比CISC取得更小的面积和功耗；</p>
+<p>采用精简指令集的微处理，常见为ARM,MIPS，Power Architecture(包括PowerPC,PowerXCell),SPARC，RISC-V等而采用CISC则为X86和AMD</p>
+<p>至于arm为代表RISC架构与以X86为代表的CISC之间的优劣比较还有是否存在替代一说，笔者认为，不会，而且从目前的发展来看，已经出现了你中有我，我中有你的局面；<br><a href="https://www.zhihu.com/question/20783321" target="_blank" rel="noopener">更进一步的探讨可以看下知乎上关于精简指令集与负杂指令集的讨论</a>,我也很赞同其中一个答主的观点，这已经不是个技术问题了，而是一个商业的问题</p>
+<p>总结完RISC和CISC之间的关系，再讲讲基于RISC阵营里面的ARM和最近比较火热的RISC-V，arm大家都熟悉，而RISC-V又是个什么东西呢？</p>
+<p>RISC-V是加州大学伯克利分校的开源指令集，由计算机架构的宗师级任务David Patterson领衔打造，通过将核心指令集以及<br>关键IP开源，意图改变半导体生态；详细的可以看这篇文档；<a href="http://www.semiinsights.com/s/electronic_components/23/30744.shtml" target="_blank" rel="noopener">名家专栏丨一文看懂RISC-V</a></p>
+<p>总结如下：RISC-V具有以下优点：1.可模块化配置的指令集。 2.支持可扩展的指令集 3.一套指令集支持所有架构，基本指令集仅40余条指令，以此为共用基础，加上其他常用模块子集指令总指令集也仅几十条 4.硬件设计和编译器非常简单</p>
+<p>笔者认为，RISC-V目前作为一个像linux看齐的硬件开源组织，linux之所以能健康长足发展，在于社区成千上万的内核爱好者的不断贡献，使得linux能够蓬勃发展；而硬件则不同，在这动辄上百万的流片费的无数摆在硬件设计者面前的坎，是否会有公司或者团体愿意将自己用血与泪验证的IP，贡献到社区，如果没有做到这一点，即将面临由于厂家扩展指令不同的碎片化问题解决，还有RISC-V后面的长足发展，将付之空谈；这样RISC-V架构只能作为几个大厂找到的低廉的替代arm方案的选择，而无法真正做到普惠；</p>
+<h1><span id="arm的体系架构">arm的体系架构</span></h1><table>
+<thead>
+<tr>
+<th>时间</th>
+<th>架构</th>
+<th>主要更新</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1985</td>
+<td>ARMv1</td>
+<td>只有26位的寻值空间，没有用于商业产品</td>
+</tr>
+<tr>
+<td>1986</td>
+<td>ARMv2</td>
+<td>首颗量产的ARM处理器，包括32位乘法指令和协处理器指令</td>
+</tr>
+<tr>
+<td>1990</td>
+<td>ARMv3</td>
+<td>具有片上高速缓存，MMU和写缓冲，寻址空间增大到32位</td>
+</tr>
+<tr>
+<td>1993</td>
+<td>ARMv4</td>
+<td>ARM7，ARM8，ARM9和Strong ARM采用这种架构。增加了16 Thumb指令集</td>
+</tr>
+<tr>
+<td>1998</td>
+<td>ARMv5</td>
+<td>ARM7(EJ),ARM9(E),ARM10(E)和Xscale采用这种了该架构，改进了ARM/Thumb状态之间的切换效率，此外还引入DSP指令和支持JAVA</td>
+</tr>
+<tr>
+<td>2001</td>
+<td>ARMv6</td>
+<td>ARM11,强化了图形处理性能，通过追加有效进行多媒体处理的SIMD将语音及图像的处理功能大大提高。此外ARM在这个系列中引入混合16位/32位的Thumb-2指令集</td>
+</tr>
+<tr>
+<td>2004</td>
+<td>ARMv7</td>
+<td>Cortex-M3/4/7,Cortex-R4/5/6/7,Cortex-A8/9都是基于该架构，该架构包括NEON技术扩展，可将DSP和媒体处理吞吐量高达400%，并提供改进的浮点支持以满足下一代3D图形和游戏以及传统嵌入式控制应用的需要</td>
+</tr>
+<tr>
+<td>2007</td>
+<td>ARMv6-M</td>
+<td>专门为低成本，高性能的设备而设计，Cortex-M0/1即采用该架构</td>
+</tr>
+<tr>
+<td>2011</td>
+<td>ARMv8</td>
+<td>Cortex-A32/35/53/57/72/73采用此架构，第一款支持64位的处理器架构</td>
+</tr>
+</tbody>
+</table>
+<h2><span id="arm架构发展图">ARM架构发展图：</span></h2><p><img src="/2018/11/17/cpu/arm体系架构的发展/arm_develop.png" alt="Arm架构发展"></p>
+<h2><span id="arm体系的cpu工作模式">arm体系的CPU工作模式：</span></h2><p>1.用户模式(usr):正常的程序执行状态<br>2.快速中断模式（fiq）:用于支持高速数据传输或者通道处理<br>3.中断模式（irq）:用于普通中断处理<br>4.管理模式（svc）:操作系统使用的保护模式<br>5.系统模式（sys）:运行具有特权的操作系统的任务；<br>6.数据访问终止模式（abt）:数据或指令与预取终止时进入该模式<br>7.未定义指令终止模式（und）:未定义的指令执行时进入该模式；</p>
+<p>linux如何从用户态进入内核态<br>分为两种：主动式和被动式、</p>
+<p>1.主动式：就是linux用户在（ARM在用户模式下）工作，通过发起用户态程序发起命令请求，ARM响应进入特权模式进而Linux切入内核态，就是系统调用；系统调用可被堪称一个内核与用户空间程序交互的接口；把用户进程的请求传达 给内核，待内核把请求处理完毕后再将处理结果送回给用户空间；<br>系统调用的主要用途：</p>
+<p>一：控制硬件-系统调用往往作为硬件资源和用户空间的抽象接口，比如读写文件用到的write/read调用</p>
+<p>二：设置系统状态或读取内核数据；</p>
+<p>2.被动式：就是Linux在用户态（ARM在用户模式）工作，没有主动发起请求，而被动地进入内核态，包括硬件中断和程序异常；</p>
+<p>参考资料：</p>
+<p><a href="http://www.10tiao.com/html/523/201708/2458284920/1.html" target="_blank" rel="noopener">arm汇编基础教程</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/36372153" target="_blank" rel="noopener">给开源架构泼泼冷水</a></p>
+<p><a href="https://www.techbang.com/posts/10678-fully-understand-arm-processors-cisc-and-risc-are-what-history-structure-a-see-through-the-computer-96-issues-cover-story-the-king?comment_page=2&amp;page=1" target="_blank" rel="noopener">完全看懂ARM处理器:RISC与CISC是什么？历史，架构一次性看透</a></p>
+<p><a href="http://www.wowotech.net/armv8a_arch/armv8-a_overview.html" target="_blank" rel="noopener">ARMv8-a</a></p>
+<p><a href="https://www.veryarm.com/1164.html" target="_blank" rel="noopener">ARM介绍1：发展史</a><br><a href="https://www.veryarm.com/1170.html" target="_blank" rel="noopener">ARM介绍2：授权模式</a></p>
+<p><a href="http://wiki.csie.ncku.edu.tw/embedded/ARMv8" target="_blank" rel="noopener">ARMV8</a></p>
+<p><a href="https://www.ednchina.com/news/20170421apple.html" target="_blank" rel="noopener">从arm到三星，苹果是如何走向自研芯片的</a></p>
+<p><a href="http://technews.tw/2017/12/13/why-apple-soc-so-dope/" target="_blank" rel="noopener">一样是ARM架构，为何苹果处理器效能就是压下其他人</a><br><a href="https://www.cnblogs.com/douzi2/p/5112743.html" target="_blank" rel="noopener">浅析arm的异常，中断和arm工作模式的联系</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
   </section>
 
   
@@ -3041,7 +3105,7 @@ venus-a3:/ # settings list system | grep  next
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
