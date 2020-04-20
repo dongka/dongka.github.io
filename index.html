@@ -2611,6 +2611,18 @@ handleMessage(Message msg)
    --&gt;updatePowerState();
       --&gt;animateScreenStateChange
         --&gt;setScreenState
+        --&gt;mPowerState.setScreenState(state);(DPC)
+            --&gt;scheduleScreenUpdate--&gt;postScreenUpdateThreadSafe--&gt;setState-&gt;mLock.notifyAll
+                --&gt;mBlanker.requestDisplayState(DPS)
+            --&gt;callbacks.onDisplayStateChange(state)  --&gt;根据亮灭屏走PowerManagerService enable/disable autosuspend
+            --&gt;requestGlobalDisplayStateInternal(state, brightness=0) --&gt;mTempDisplayStateWorkQueue.get(i).run()(DMS)
+            --&gt;SurfaceControl.setDisplayPowerMode(LDA)
+
+        --&gt;blockScreenOn 在亮屏的流程里面监听窗口是否绘制完成，
+           是的话重新发起updatePowerState,设置mColorFadeLevel为1；此时才会去设置背光，这时候对于用户来说屏幕才是最终的亮了
+           否的话此时的背光值一直会为0；
+
+
         --&gt;mWindowManagerPolicy.screenTurningOff(mPendingScreenOffUnblocker)
         在灭屏的同时还发起了activity的pause流程
         --&gt;updateScreenOffSleepToken
@@ -2630,7 +2642,7 @@ handleMessage(Message msg)
         --&gt;removeSleepTokenLocked
         --&gt;updateSleepIfNeededLocked
         --&gt;applySleepTokensLocked
-        --&gt;resumeFocusedStackTopActivityLocked
+        --&gt;resumeFocusedStackTopActivityLockedi
         --&gt;resumeTopActivityUncheckedLocked
         --&gt;resumeTopActivityInnerLocked
 </code></pre><p>函数作用：决策屏幕的量灭状态</p>
@@ -3116,7 +3128,7 @@ venus-a3:/ # settings list system | grep  next
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -3127,7 +3139,7 @@ venus-a3:/ # settings list system | grep  next
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
