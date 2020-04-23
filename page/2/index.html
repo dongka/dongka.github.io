@@ -830,223 +830,6 @@ pmu_battery_rdc            = 100
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/tools/ds5-userguide/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/25/tools/ds5-userguide/" itemprop="url">DS5相关介绍</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
-                2018-06-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/工具使用/" itemprop="url" rel="index">
-                    <span itemprop="name">工具使用</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <!-- toc -->
-<ul>
-<li><a href="#一-ds5-与-dstream">一. DS5 与 DSTREAM</a><ul>
-<li><a href="#1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</a></li>
-<li><a href="#2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</a></li>
-</ul>
-</li>
-<li><a href="#二-安装ds5">二. 安装DS5</a></li>
-<li><a href="#三-ds5的使用">三. DS5的使用</a><ul>
-<li><a href="#1新建debug-control">1.新建debug control</a></li>
-<li><a href="#2建立连接">2.建立连接</a></li>
-<li><a href="#3load-vmlinux">3.load vmlinux</a></li>
-<li><a href="#4查看logbuf">4.查看logbuf</a></li>
-<li><a href="#5load-源码单步调试">5.load 源码单步调试</a></li>
-</ul>
-</li>
-<li><a href="#四csat的使用">四：csat的使用</a><ul>
-<li><a href="#1csatcoresight-access-toolcsat">1.csat:CoreSight Access Tool(CSAT)</a></li>
-<li><a href="#2csat-ds-5-diff">2.CSAT &amp; DS-5 diff</a></li>
-<li><a href="#3csat的命令">3.CSAT的命令</a></li>
-</ul>
-</li>
-</ul>
-<!-- tocstop -->
-<h1><span id="一-ds5-与-dstream">一. DS5 与 DSTREAM</span></h1><h2><span id="1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/ds5.png" alt="ds5"><br>  从以下工具发展而来：DS5&lt;RVDS&lt;ADS&lt;SDT,目前除DS5外其他都已停用；<br>  有图形化的streamline性能分析器，可基于C源码，汇编程序，地址对bare裸机程序，uboot,kernel,驱动，app进行热点，程序瓶颈，CPU使用，Cache hit/miss,功耗分析</p>
-<h2><span id="2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/dstream.png" alt="dstream"><br>    共有7个接口，其中ARM JTAG 14，TI JTAG 14，ARM JTAG 20和Coresight 10这4个接口仅有debug功能，同时MICTOR 38，MIPI34，Coresight 20这3个接口有debug+trace功能</p>
-<h1><span id="二-安装ds5">二. 安装DS5</span></h1><ol>
-<li>安装虚拟网卡；</li>
-<li>安装DS5-19和完成licence注册</li>
-<li>拷贝模型到安装目录下</li>
-<li>打开DS5</li>
-</ol>
-<h1><span id="三-ds5的使用">三. DS5的使用</span></h1><h2><span id="1新建debug-control">1.新建debug control</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use1.png" alt="use1"></p>
-<h2><span id="2建立连接">2.建立连接</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use2.jpg" alt="use2"></p>
-<h2><span id="3load-vmlinux">3.load vmlinux</span></h2><p>   当建立连接后一般都是一些汇编语言，这时候需要将vmlinux load进DS5方便debug<br><img src="/2018/06/25/tools/ds5-userguide/ds5/load.png" alt="load"></p>
-<h2><span id="4查看logbuf">4.查看logbuf</span></h2><p>   logbuf的大小由.config中的CONIFG_LOG_BUF_SHIFT决定，在init/Kconfig中有对应的说明<br>   如何确定log_buf的地址：<br>   目前在arm64中log_buf的地址对应的是system.map中__log_buf对应的地址；<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf.jpg" alt="load"><br>   arm32对应的地址为system.map的log_buf对应地址的地址，需要ds5找到映射位置后在通过此地址去查看log_buf中的内容：<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf_arm32.jpg" alt="load"></p>
-<h2><span id="5load-源码单步调试">5.load 源码单步调试</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/load_code.jpg" alt="load"></p>
-<h1><span id="四csat的使用">四：csat的使用</span></h1><h2><span id="1csatcoresight-access-toolcsat">1.csat:CoreSight Access Tool(CSAT)</span></h2><p>  DS-5的命令行工具，处理器挂住了，通过DS-5无法连接上，只能用CSAT连接上，但是CSAT无法访问到处理器内部的寄存器；<br>一般访问步骤：<br>    读寄存器,如果不ok,说明总线挂了；<br>    读dram,如果dram不ok,说明mbus挂了；<br>    读PC,如果PC读取不ok,说明CPU挂了</p>
-<h2><span id="2csat-amp-ds-5-diff">2.CSAT &amp; DS-5 diff</span></h2><p>  CSAT:通过APB总线连接，CPU挂死之后还能连接上，不能访问到CPU内部的寄存器<br>  DS5：通过CPU连接，CPU挂死之后无法连接上，能够访问到CPU内部的寄存器</p>
-<h2><span id="3csat的命令">3.CSAT的命令</span></h2><ol>
-<li>打开DS5的命令行；</li>
-<li>输入以下命令：</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">csat</span><br><span class="line">  con USB</span><br><span class="line">  chain dev=auto clk=A</span><br><span class="line">  dvo 0</span><br></pre></td></tr></table></figure>
-<table>
-<thead>
-<tr>
-<th>command</th>
-<th style="text-align:right">short name</th>
-<th style="text-align:center">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>dpmemread</td>
-<td style="text-align:right">dmr</td>
-<td style="text-align:center">Read mememory</td>
-</tr>
-<tr>
-<td>dpmemwrite</td>
-<td style="text-align:right">dmw</td>
-<td style="text-align:center">Write memory</td>
-</tr>
-<tr>
-<td>dpfileload</td>
-<td style="text-align:right">dfl</td>
-<td style="text-align:center">Load a file into memory</td>
-</tr>
-<tr>
-<td>dpfilesave</td>
-<td style="text-align:right">dfs</td>
-<td style="text-align:center">Save a block of memory to file.</td>
-</tr>
-</tbody>
-</table>
-<p>example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dmr 0 0x00010000 0x50</span><br><span class="line">#save a block of memory to file</span><br><span class="line">dfs 0 0x047fb000 0x350 dram2.bin</span><br><span class="line">#load a file into memory</span><br><span class="line">dfl 0 bin 0x8000 myfile.bin Load binary file into 0x8000 on AP 0</span><br></pre></td></tr></table></figure></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/process/process_day1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1162,6 +945,192 @@ pmu_battery_rdc            = 100
 <p>#renice -n -5 -g 9394</p>
 <p>#nice -n 5 ./a.out</p>
 <h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.ibm.com/developerworks/cn/linux/l-cn-scheduler/index.html" target="_blank" rel="noopener">linux调度器发展简述</a><br><a href="https://blog.csdn.net/gatieme/article/details/51383272" target="_blank" rel="noopener">linux进程描述符task_struct结构体详解–linux进程的管理与调度(一)</a><br><a href="https://blog.csdn.net/gatieme/article/details/51484562" target="_blank" rel="noopener">Linux下0号进程的前世(init_task进程)今生(idle进程)—-Linux进程的管理与调度（五）</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/cpu/cpu概述/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/25/cpu/cpu概述/" itemprop="url">CPU概述</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-25T00:07:09+00:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cpu/" itemprop="url" rel="index">
+                    <span itemprop="name">cpu</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <!-- toc-aside -->
+<h1><span id="cpu-topology">cpu topology</span></h1><h2><span id="11-cpu拓扑">1.1. cpu拓扑</span></h2><p><strong>cluster(socket)-&gt;core-&gt;Threads(目前为止arm没有提出多线程的概念)</strong><br><img src="/2018/06/25/cpu/cpu概述/cpu拓扑.png" alt="cpu拓扑图"> </p>
+<h2><span id="12-多核技术">1.2 多核技术</span></h2><p>  基于制程，扩充性等考虑，芯片厂商会把多个core封装在一个chip上，称为socket。socket的概念在X86架构上使用尤其多，可以理解为插槽；<br>假设一个插槽上有两个core,那么我在主板上插2个插槽，就是4核系统，插上4个插槽就是8核；arm的话则是另外一个概念cluster,簇<br>  在X86架构的PC上，唯一目的的话是提高CPU的处理性能（不在乎功耗），但在移动市场中（大多是arm），性能提高后，对应着就更多的power消耗；对于设备电源管理以及散热提出了更高的要求。与此同时电池并没有随着CPU的拓扑的进化而进化，于是HMP技术就被提出来了；</p>
+<h2><span id="13hmpheterogeneous-multi-processing">1.3HMP(Heterogeneous Multi-Processing)</span></h2><p><strong>big-little:</strong></p>
+<ul>
+<li>在一个chip中封装两类ARM Core,以kirin 960为例:一类为高性能Core,4核ARM A73，最高主频为2.4G，一类为低性能Core,4核ARM A53，最高主频为1.8G<br><img src="/2018/06/25/cpu/cpu概述/kirin960.png" alt="cpu拓扑图"></li>
+</ul>
+<p><strong>DynamIQ:</strong></p>
+<ul>
+<li>在单一cluster内可有8个核心，且可由不同架构，时钟的核心组成，提升了运作效率与配置的弹性,如高通的845 4核ARM A75，最高为2.8，4核 ARM A55，最高为1.8G</li>
+</ul>
+<p><strong>DynamIQ较big-little好处:</strong></p>
+<ol>
+<li>单cluster可有8核心</li>
+<li>cluster可搭配不同架构的CPU</li>
+<li>各cpu可有独立的运作时钟</li>
+<li>CPU各自开关休眠互不影响</li>
+<li>依照效能需求弹性运用各核心</li>
+</ol>
+<p>以龙舟比喻ARM的DynamIQ与先前的big.LITTLE技术，我们把龙舟当成cluster,船员当成core,那么big.LITTLE龙舟上只能有4个船员，而且每个船员身材需要一样（核心架构），划船的时候若多位船员一起划船时，每个人的出力均等(频率一致),不能有人慢划或者快划;<br>当使用DynamIQ时，每艘船（cluster）上可以有8位高低胖瘦不等(架构)的船员（core），换船频率可以不等，且船员可以依照指令睡觉（关闭）,休息（休眠），或划船（运作）；</p>
+<h1><span id="cpu内核代码框架">cpu内核代码框架</span></h1><ol>
+<li><a href="./cpu_init.md">系统启动时，CPU core的初始化，信息获取</a></li>
+<li>系统启动时，CPU core的启动（enable）</li>
+<li>系统运行过程中，根据当前负荷，动态enable/disable 某些CPU core,以便在性能与功耗间平衡</li>
+<li>cpu core的hotplug支持，所谓的hotplug,是可以在系统运行的过程中，动态的增加或者减少CPU core(可以是物理上，也可以是逻辑上)</li>
+<li>系统运行过程中CPU idle管理</li>
+<li>系统运行过程中，根据当前负荷，动态的调整CPU core的电压和频率，以便在性能和功耗之间平衡</li>
+</ol>
+<p><img src="/2018/06/25/cpu/cpu概述/cpu代码框架.png" alt="cpu拓扑图"><br>arch-depedent部分位于”arch\arm64\kernel”负责平台相关的控制操作，包括</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu 信息的获取（cpuinfo）</span><br><span class="line">cpu拓扑结构的获取（cpu topology）</span><br><span class="line">底层的CPU操作（init,disable等）的实现，cpu ops</span><br><span class="line">SMP相关的初始化（smp）</span><br></pre></td></tr></table></figure>
+<p>arch-independent负责实现平台无关的抽象，包括</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu control模块，屏蔽底层平台相关实现细节，提供控制CPU(enable,disable等)的统一API，供系统启动，进程调度等模块调用</span><br><span class="line">cpu subsystem driver像用户空间提供CPU hotplug有关的功能；</span><br><span class="line">cpuidle,处理CPU idle有关的逻辑</span><br><span class="line">cpufreq 处理CPU frequency调整有关的逻辑</span><br></pre></td></tr></table></figure>
+<h1><span id="cpu的状态表示">cpu的状态表示</span></h1><ol>
+<li><strong>possible CPU:</strong> 就是在DTS中指定了的，物理存在的CPU core</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;boot_cpu_init-&gt;smp_process_id用于获取cpu id</span><br><span class="line">		           -&gt;set_cpu_xxx,用于将指定的CPU设置为（或清除）指定状态</span><br><span class="line">	    -&gt;setup_arch-&gt;smp_init_cpus-&gt;sunxi_smp_init_cpus-&gt;set_cpu_possible(i, true)</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li><strong>present cpu:</strong> 被kernel标识的，具备执行代码条件，后续可以在需要的时候（如hotplug的时候），启动该CPU </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;rest_init-&gt;kernel_init-&gt;kernel_init_freeable</span><br><span class="line">				     -&gt;smp_prepare_cpus</span><br><span class="line">			     	if (cpu_prepare(cpu)) /**/</span><br><span class="line">					set_cpu_present(cpu,true);</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li><strong>online CPU:</strong> 某个CPU是present的，不一定是boot,所谓CPU boot,就是让CPU执行（取指译码/执行）代码</li>
+<li><strong>active CPU</strong> 只是为了方便调度器操作</li>
+</ol>
+<h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cool3c.com/article/124149" target="_blank" rel="noopener">一图看懂ARM DynamIQ运作原理</a><br><a href="http://www.wowotech.net/pm_subsystem/cpu_core_pm_overview.html" target="_blank" rel="noopener">Linux CPU core的电源管理(1)概述</a></p>
 
           
         
@@ -1644,7 +1613,7 @@ k_d 为求导，一般设置为0
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/cpu/cpu概述/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/25/tools/ds5-userguide/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="dongka">
@@ -1663,7 +1632,7 @@ k_d 为求导，一般设置为0
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/25/cpu/cpu概述/" itemprop="url">CPU概述</a></h1>
+                <a class="post-title-link" href="/2018/06/25/tools/ds5-userguide/" itemprop="url">DS5相关介绍</a></h1>
         
 
         <div class="post-meta">
@@ -1698,8 +1667,8 @@ k_d 为求导，一般设置为0
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cpu/" itemprop="url" rel="index">
-                    <span itemprop="name">cpu</span>
+                  <a href="/categories/工具使用/" itemprop="url" rel="index">
+                    <span itemprop="name">工具使用</span>
                   </a>
                 </span>
 
@@ -1737,51 +1706,82 @@ k_d 为求导，一般设置为0
       
         
           
-            <!-- toc-aside -->
-<h1><span id="cpu-topology">cpu topology</span></h1><h2><span id="11-cpu拓扑">1.1. cpu拓扑</span></h2><p><strong>cluster(socket)-&gt;core-&gt;Threads(目前为止arm没有提出多线程的概念)</strong><br><img src="/2018/06/25/cpu/cpu概述/cpu拓扑.png" alt="cpu拓扑图"> </p>
-<h2><span id="12-多核技术">1.2 多核技术</span></h2><p>  基于制程，扩充性等考虑，芯片厂商会把多个core封装在一个chip上，称为socket。socket的概念在X86架构上使用尤其多，可以理解为插槽；<br>假设一个插槽上有两个core,那么我在主板上插2个插槽，就是4核系统，插上4个插槽就是8核；arm的话则是另外一个概念cluster,簇<br>  在X86架构的PC上，唯一目的的话是提高CPU的处理性能（不在乎功耗），但在移动市场中（大多是arm），性能提高后，对应着就更多的power消耗；对于设备电源管理以及散热提出了更高的要求。与此同时电池并没有随着CPU的拓扑的进化而进化，于是HMP技术就被提出来了；</p>
-<h2><span id="13hmpheterogeneous-multi-processing">1.3HMP(Heterogeneous Multi-Processing)</span></h2><p><strong>big-little:</strong></p>
+            <!-- toc -->
 <ul>
-<li>在一个chip中封装两类ARM Core,以kirin 960为例:一类为高性能Core,4核ARM A73，最高主频为2.4G，一类为低性能Core,4核ARM A53，最高主频为1.8G<br><img src="/2018/06/25/cpu/cpu概述/kirin960.png" alt="cpu拓扑图"></li>
+<li><a href="#一-ds5-与-dstream">一. DS5 与 DSTREAM</a><ul>
+<li><a href="#1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</a></li>
+<li><a href="#2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</a></li>
 </ul>
-<p><strong>DynamIQ:</strong></p>
-<ul>
-<li>在单一cluster内可有8个核心，且可由不同架构，时钟的核心组成，提升了运作效率与配置的弹性,如高通的845 4核ARM A75，最高为2.8，4核 ARM A55，最高为1.8G</li>
+</li>
+<li><a href="#二-安装ds5">二. 安装DS5</a></li>
+<li><a href="#三-ds5的使用">三. DS5的使用</a><ul>
+<li><a href="#1新建debug-control">1.新建debug control</a></li>
+<li><a href="#2建立连接">2.建立连接</a></li>
+<li><a href="#3load-vmlinux">3.load vmlinux</a></li>
+<li><a href="#4查看logbuf">4.查看logbuf</a></li>
+<li><a href="#5load-源码单步调试">5.load 源码单步调试</a></li>
 </ul>
-<p><strong>DynamIQ较big-little好处:</strong></p>
-<ol>
-<li>单cluster可有8核心</li>
-<li>cluster可搭配不同架构的CPU</li>
-<li>各cpu可有独立的运作时钟</li>
-<li>CPU各自开关休眠互不影响</li>
-<li>依照效能需求弹性运用各核心</li>
+</li>
+<li><a href="#四csat的使用">四：csat的使用</a><ul>
+<li><a href="#1csatcoresight-access-toolcsat">1.csat:CoreSight Access Tool(CSAT)</a></li>
+<li><a href="#2csat-ds-5-diff">2.CSAT &amp; DS-5 diff</a></li>
+<li><a href="#3csat的命令">3.CSAT的命令</a></li>
+</ul>
+</li>
+</ul>
+<!-- tocstop -->
+<h1><span id="一-ds5-与-dstream">一. DS5 与 DSTREAM</span></h1><h2><span id="1-ds5-是一个软件开发工具">1. DS5 是一个软件开发工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/ds5.png" alt="ds5"><br>  从以下工具发展而来：DS5&lt;RVDS&lt;ADS&lt;SDT,目前除DS5外其他都已停用；<br>  有图形化的streamline性能分析器，可基于C源码，汇编程序，地址对bare裸机程序，uboot,kernel,驱动，app进行热点，程序瓶颈，CPU使用，Cache hit/miss,功耗分析</p>
+<h2><span id="2-dstream-是一个硬件仿真工具">2. DSTREAM 是一个硬件仿真工具</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/dstream.png" alt="dstream"><br>    共有7个接口，其中ARM JTAG 14，TI JTAG 14，ARM JTAG 20和Coresight 10这4个接口仅有debug功能，同时MICTOR 38，MIPI34，Coresight 20这3个接口有debug+trace功能</p>
+<h1><span id="二-安装ds5">二. 安装DS5</span></h1><ol>
+<li>安装虚拟网卡；</li>
+<li>安装DS5-19和完成licence注册</li>
+<li>拷贝模型到安装目录下</li>
+<li>打开DS5</li>
 </ol>
-<p>以龙舟比喻ARM的DynamIQ与先前的big.LITTLE技术，我们把龙舟当成cluster,船员当成core,那么big.LITTLE龙舟上只能有4个船员，而且每个船员身材需要一样（核心架构），划船的时候若多位船员一起划船时，每个人的出力均等(频率一致),不能有人慢划或者快划;<br>当使用DynamIQ时，每艘船（cluster）上可以有8位高低胖瘦不等(架构)的船员（core），换船频率可以不等，且船员可以依照指令睡觉（关闭）,休息（休眠），或划船（运作）；</p>
-<h1><span id="cpu内核代码框架">cpu内核代码框架</span></h1><ol>
-<li><a href="./cpu_init.md">系统启动时，CPU core的初始化，信息获取</a></li>
-<li>系统启动时，CPU core的启动（enable）</li>
-<li>系统运行过程中，根据当前负荷，动态enable/disable 某些CPU core,以便在性能与功耗间平衡</li>
-<li>cpu core的hotplug支持，所谓的hotplug,是可以在系统运行的过程中，动态的增加或者减少CPU core(可以是物理上，也可以是逻辑上)</li>
-<li>系统运行过程中CPU idle管理</li>
-<li>系统运行过程中，根据当前负荷，动态的调整CPU core的电压和频率，以便在性能和功耗之间平衡</li>
+<h1><span id="三-ds5的使用">三. DS5的使用</span></h1><h2><span id="1新建debug-control">1.新建debug control</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use1.png" alt="use1"></p>
+<h2><span id="2建立连接">2.建立连接</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/use2.jpg" alt="use2"></p>
+<h2><span id="3load-vmlinux">3.load vmlinux</span></h2><p>   当建立连接后一般都是一些汇编语言，这时候需要将vmlinux load进DS5方便debug<br><img src="/2018/06/25/tools/ds5-userguide/ds5/load.png" alt="load"></p>
+<h2><span id="4查看logbuf">4.查看logbuf</span></h2><p>   logbuf的大小由.config中的CONIFG_LOG_BUF_SHIFT决定，在init/Kconfig中有对应的说明<br>   如何确定log_buf的地址：<br>   目前在arm64中log_buf的地址对应的是system.map中__log_buf对应的地址；<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf.jpg" alt="load"><br>   arm32对应的地址为system.map的log_buf对应地址的地址，需要ds5找到映射位置后在通过此地址去查看log_buf中的内容：<br><img src="/2018/06/25/tools/ds5-userguide/ds5/logbuf_arm32.jpg" alt="load"></p>
+<h2><span id="5load-源码单步调试">5.load 源码单步调试</span></h2><p><img src="/2018/06/25/tools/ds5-userguide/ds5/load_code.jpg" alt="load"></p>
+<h1><span id="四csat的使用">四：csat的使用</span></h1><h2><span id="1csatcoresight-access-toolcsat">1.csat:CoreSight Access Tool(CSAT)</span></h2><p>  DS-5的命令行工具，处理器挂住了，通过DS-5无法连接上，只能用CSAT连接上，但是CSAT无法访问到处理器内部的寄存器；<br>一般访问步骤：<br>    读寄存器,如果不ok,说明总线挂了；<br>    读dram,如果dram不ok,说明mbus挂了；<br>    读PC,如果PC读取不ok,说明CPU挂了</p>
+<h2><span id="2csat-amp-ds-5-diff">2.CSAT &amp; DS-5 diff</span></h2><p>  CSAT:通过APB总线连接，CPU挂死之后还能连接上，不能访问到CPU内部的寄存器<br>  DS5：通过CPU连接，CPU挂死之后无法连接上，能够访问到CPU内部的寄存器</p>
+<h2><span id="3csat的命令">3.CSAT的命令</span></h2><ol>
+<li>打开DS5的命令行；</li>
+<li>输入以下命令：</li>
 </ol>
-<p><img src="/2018/06/25/cpu/cpu概述/cpu代码框架.png" alt="cpu拓扑图"><br>arch-depedent部分位于”arch\arm64\kernel”负责平台相关的控制操作，包括</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu 信息的获取（cpuinfo）</span><br><span class="line">cpu拓扑结构的获取（cpu topology）</span><br><span class="line">底层的CPU操作（init,disable等）的实现，cpu ops</span><br><span class="line">SMP相关的初始化（smp）</span><br></pre></td></tr></table></figure>
-<p>arch-independent负责实现平台无关的抽象，包括</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cpu control模块，屏蔽底层平台相关实现细节，提供控制CPU(enable,disable等)的统一API，供系统启动，进程调度等模块调用</span><br><span class="line">cpu subsystem driver像用户空间提供CPU hotplug有关的功能；</span><br><span class="line">cpuidle,处理CPU idle有关的逻辑</span><br><span class="line">cpufreq 处理CPU frequency调整有关的逻辑</span><br></pre></td></tr></table></figure>
-<h1><span id="cpu的状态表示">cpu的状态表示</span></h1><ol>
-<li><strong>possible CPU:</strong> 就是在DTS中指定了的，物理存在的CPU core</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;boot_cpu_init-&gt;smp_process_id用于获取cpu id</span><br><span class="line">		           -&gt;set_cpu_xxx,用于将指定的CPU设置为（或清除）指定状态</span><br><span class="line">	    -&gt;setup_arch-&gt;smp_init_cpus-&gt;sunxi_smp_init_cpus-&gt;set_cpu_possible(i, true)</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li><strong>present cpu:</strong> 被kernel标识的，具备执行代码条件，后续可以在需要的时候（如hotplug的时候），启动该CPU </li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">start_kernel-&gt;rest_init-&gt;kernel_init-&gt;kernel_init_freeable</span><br><span class="line">				     -&gt;smp_prepare_cpus</span><br><span class="line">			     	if (cpu_prepare(cpu)) /**/</span><br><span class="line">					set_cpu_present(cpu,true);</span><br></pre></td></tr></table></figure>
-<ol start="3">
-<li><strong>online CPU:</strong> 某个CPU是present的，不一定是boot,所谓CPU boot,就是让CPU执行（取指译码/执行）代码</li>
-<li><strong>active CPU</strong> 只是为了方便调度器操作</li>
-</ol>
-<h1><span id="参考资料">参考资料</span></h1><p><a href="https://www.cool3c.com/article/124149" target="_blank" rel="noopener">一图看懂ARM DynamIQ运作原理</a><br><a href="http://www.wowotech.net/pm_subsystem/cpu_core_pm_overview.html" target="_blank" rel="noopener">Linux CPU core的电源管理(1)概述</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">csat</span><br><span class="line">  con USB</span><br><span class="line">  chain dev=auto clk=A</span><br><span class="line">  dvo 0</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th style="text-align:right">short name</th>
+<th style="text-align:center">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dpmemread</td>
+<td style="text-align:right">dmr</td>
+<td style="text-align:center">Read mememory</td>
+</tr>
+<tr>
+<td>dpmemwrite</td>
+<td style="text-align:right">dmw</td>
+<td style="text-align:center">Write memory</td>
+</tr>
+<tr>
+<td>dpfileload</td>
+<td style="text-align:right">dfl</td>
+<td style="text-align:center">Load a file into memory</td>
+</tr>
+<tr>
+<td>dpfilesave</td>
+<td style="text-align:right">dfs</td>
+<td style="text-align:center">Save a block of memory to file.</td>
+</tr>
+</tbody>
+</table>
+<p>example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dmr 0 0x00010000 0x50</span><br><span class="line">#save a block of memory to file</span><br><span class="line">dfs 0 0x047fb000 0x350 dram2.bin</span><br><span class="line">#load a file into memory</span><br><span class="line">dfl 0 bin 0x8000 myfile.bin Load binary file into 0x8000 on AP 0</span><br></pre></td></tr></table></figure></p>
 
           
         
@@ -1978,163 +1978,6 @@ k_d 为求导，一般设置为0
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-hardware-md/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/17/memory/memory-hardware-md/" itemprop="url">内存管理（一）硬件篇</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-17T00:07:09+00:00">
-                2018-06-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/内存管理/" itemprop="url" rel="index">
-                    <span itemprop="name">内存管理</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2><span id="一经典存储结构图">一.经典存储结构图</span></h2><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaghCuOMjibmmJgymLicFZBkXdwOReYVV1WfJHPhsU23ibEzhSsbdK87aGg/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="avatar"> </p>
-<pre><code>L0(寄存器)-&gt;CPU 寄存器保存来自高速缓存的字
-L1(SRAM）-&gt;高速缓存取自L2高速缓存行
-L2(SRAM)-&gt;高速缓存取自L3高速缓存的高速缓存行
-L3(SRAM)-&gt;高速缓存保存自内存的高速缓存行
-L4(内存)-&gt;内存保存自磁盘缓存的磁盘块
-L5(磁盘缓存)-&gt;磁盘缓存保存取自磁盘的磁盘块
-L6磁盘
-</code></pre><p>cpu从磁盘中加载数据,放到内存，之后再放到告诉缓存</p>
-<h2><span id="二虚拟地址和物理地址">二.虚拟地址和物理地址</span></h2><p>在旧的手机中，内存可能只有1G,但是每个进程在执行的时候都仿佛手机有4g内存；<br><strong>物理地址(Physical Address)</strong>：CPU地址总线传来的地址，由硬件电路控制其含义。物理地址中有很大一部分是留给内存条中的内存的但也常被映射到其他存储器上如显存，BIOS等),在没有使用虚拟存储器的机器上，虚拟地址被直接送到内存总线上，使具有相同物理存储器被读写;而在使用了虚拟存储器的情况下，虚拟具体地址不是被直接送到内存地址总线上，而是送到存储器管理单元MMU，把虚拟地址映射为物理地址；我们把上面实际的1G内存叫做：物理地址<br><strong>虚拟地址(Virtual Address)</strong>:是逻辑地址到物理地址变换之间的中间层；进程访问到的叫做虚拟地址；<br>虚拟内存有以下几个作用：<br>1.内存访问保护<br>  有虚拟内存，我们可以通过设置段界限或页表想来设定软件运行时的访问空间，确保软件运行使不越界；<br>2.按需分页（lazy load技术）<br>  可以让软件在没有访问某虚拟内存地址时，不分配虚拟地址，在实际访问的时候，在动态分配物理内存<br>建立虚拟内存到物理内存的页映射关系；<br>3.页换入换出（page swap in/out)<br>  把不经常访问的数据所占的内存空间临时写到硬盘上，这样可以腾出更多的空闲空间出来给到经常访问的数据；当cpu访问到不经常访问的数据时，再把数据从硬件读入到内存中；<br>4.写时复制（copy on write）<br>  两个虚拟页的数据相同时，可只分配一个物理页框，这样如果对两个虚拟页的访问是只读方式，这两个虚拟页可以共享页框，节省空间；如果当CPU对其中一个虚拟页进行了写操作，那么这两个虚拟页的数据内容不同，需要分配一个新的物理页框，并将物理页框标记为可写，这样两个虚拟页面将映射到不同的物理页帧，确保整个内存空间的正确访问。</p>
-<h2><span id="二页页表mmu">二.页，页表，MMU</span></h2><p>在讲虚拟地址到物理地址之中再补充几个概念：<br>页(page)<br>  <em>把APP的虚拟地址切分程若干个大小相等（4K）的片，每一片就是我们说的页</em><br>页框（frame）<br>  *把物理内存页按“页”的大小切分为若干大小相等的片，每一片，就是我们所说的页框 </p>
-<h2><span id="三cpu寻找页面过程">三.cpu寻找页面过程</span></h2><pre><code>CPU获取数据主要有两步：
-a.通过虚拟地址获取物理地址
-b.根据物理地址获取数据
-</code></pre><h3><span id="获取物理地址">获取物理地址</span></h3><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaBdia2Vt94nvPcnj4aYqWRrLibeKQONayr9azNLWEeiabiay7ibIF3ooxibBw/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="获取物理地址"><br>    [a].CPU向MMU发送虚拟地址<br>    [b].MMU查询快表TLB<br>        块表命中：从块表中获取物理地址，由MMU继续根据物理地址匹配数据页步骤[a]<br>        块表不命中：查询页表步骤[c]<br>    [c]:从高速缓存查询页表<br>     “高速缓存”缓存页框，而页表存储于页框中，因此读取页表实际上也是读页（页表的物理地址有单独的寄存器保存）<br>     高速缓存命中：从高速缓存获取物理地址，并更新快表，进入[步骤a]<br>     高速缓存不命中：查询内存中的页表[步骤d]<br>     [d]从内存中查询页表<br>     页表保存了所有虚拟地址的映射关系，而不管页是否有映射物理页框。因此从内存页表中肯定能“命中”页。从页表获取虚拟地址的映射关系后，进入步骤e<br>     [e]把查询的页表想记录到高速缓存<br>     [f]MMU从高速缓存中获取页表项<br>        虚拟地址有分配物理页框；转换物理地址并更新块表，由MMU继续根据物理地址匹配数据页<br>        虚拟地址没分配物理页框：触发缺页中断<br>    [g]进入缺页中断处理程序<br>    [h]为虚拟页分配物理页框<br>        如果无空闲物理页框，则根据LRU算法选择需要淘汰的页，要淘汰的页如果是脏数据就回刷，否则直接丢弃或置换到磁盘的交换分区中<br>        然后，从磁盘中获取页信息更新到物理页框，更新内存页表<br>    [i]缺页中断处理的最后<br>        修改CPU寄存器，使得重新启动导致缺页的指令，返回[步骤a]重新执行</p>
-<h3><span id="根据物理地址获取实际数据">根据物理地址获取实际数据</span></h3><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaMfh510NLONxyc2CSvYr3Vrwqyf9tiajI1jPAuD16Kzm9mOvqQdZTiaJg/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="获取数据"><br>    [A]MMU获取到物理地址后，根据物理地址查询高速缓存<br>        高速缓存命中：CPU直接从高速缓存获取数据<br>        高速缓存不命中：查询物理内存[步骤B]<br>    [B]根据物理地址，获取物理内存中的数据<br>    [C]硬件实现把数据页记录到高速缓存中<br>    [D]cpu直接从高速缓存中获取数据</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-mtp/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2244,6 +2087,163 @@ b.根据物理地址获取数据
 <li>所有MTP命令均以Package(数据包)的方式在设备两端进行传递</li>
 <li>Initiator必须接收到前一条消息处理结果，无论是成功或者超时后，才能发送下一条消息</li>
 </ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-hardware-md/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/17/memory/memory-hardware-md/" itemprop="url">内存管理（一）硬件篇</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-17T00:07:09+00:00">
+                2018-06-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/内存管理/" itemprop="url" rel="index">
+                    <span itemprop="name">内存管理</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2><span id="一经典存储结构图">一.经典存储结构图</span></h2><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaghCuOMjibmmJgymLicFZBkXdwOReYVV1WfJHPhsU23ibEzhSsbdK87aGg/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="avatar"> </p>
+<pre><code>L0(寄存器)-&gt;CPU 寄存器保存来自高速缓存的字
+L1(SRAM）-&gt;高速缓存取自L2高速缓存行
+L2(SRAM)-&gt;高速缓存取自L3高速缓存的高速缓存行
+L3(SRAM)-&gt;高速缓存保存自内存的高速缓存行
+L4(内存)-&gt;内存保存自磁盘缓存的磁盘块
+L5(磁盘缓存)-&gt;磁盘缓存保存取自磁盘的磁盘块
+L6磁盘
+</code></pre><p>cpu从磁盘中加载数据,放到内存，之后再放到告诉缓存</p>
+<h2><span id="二虚拟地址和物理地址">二.虚拟地址和物理地址</span></h2><p>在旧的手机中，内存可能只有1G,但是每个进程在执行的时候都仿佛手机有4g内存；<br><strong>物理地址(Physical Address)</strong>：CPU地址总线传来的地址，由硬件电路控制其含义。物理地址中有很大一部分是留给内存条中的内存的但也常被映射到其他存储器上如显存，BIOS等),在没有使用虚拟存储器的机器上，虚拟地址被直接送到内存总线上，使具有相同物理存储器被读写;而在使用了虚拟存储器的情况下，虚拟具体地址不是被直接送到内存地址总线上，而是送到存储器管理单元MMU，把虚拟地址映射为物理地址；我们把上面实际的1G内存叫做：物理地址<br><strong>虚拟地址(Virtual Address)</strong>:是逻辑地址到物理地址变换之间的中间层；进程访问到的叫做虚拟地址；<br>虚拟内存有以下几个作用：<br>1.内存访问保护<br>  有虚拟内存，我们可以通过设置段界限或页表想来设定软件运行时的访问空间，确保软件运行使不越界；<br>2.按需分页（lazy load技术）<br>  可以让软件在没有访问某虚拟内存地址时，不分配虚拟地址，在实际访问的时候，在动态分配物理内存<br>建立虚拟内存到物理内存的页映射关系；<br>3.页换入换出（page swap in/out)<br>  把不经常访问的数据所占的内存空间临时写到硬盘上，这样可以腾出更多的空闲空间出来给到经常访问的数据；当cpu访问到不经常访问的数据时，再把数据从硬件读入到内存中；<br>4.写时复制（copy on write）<br>  两个虚拟页的数据相同时，可只分配一个物理页框，这样如果对两个虚拟页的访问是只读方式，这两个虚拟页可以共享页框，节省空间；如果当CPU对其中一个虚拟页进行了写操作，那么这两个虚拟页的数据内容不同，需要分配一个新的物理页框，并将物理页框标记为可写，这样两个虚拟页面将映射到不同的物理页帧，确保整个内存空间的正确访问。</p>
+<h2><span id="二页页表mmu">二.页，页表，MMU</span></h2><p>在讲虚拟地址到物理地址之中再补充几个概念：<br>页(page)<br>  <em>把APP的虚拟地址切分程若干个大小相等（4K）的片，每一片就是我们说的页</em><br>页框（frame）<br>  *把物理内存页按“页”的大小切分为若干大小相等的片，每一片，就是我们所说的页框 </p>
+<h2><span id="三cpu寻找页面过程">三.cpu寻找页面过程</span></h2><pre><code>CPU获取数据主要有两步：
+a.通过虚拟地址获取物理地址
+b.根据物理地址获取数据
+</code></pre><h3><span id="获取物理地址">获取物理地址</span></h3><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaBdia2Vt94nvPcnj4aYqWRrLibeKQONayr9azNLWEeiabiay7ibIF3ooxibBw/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="获取物理地址"><br>    [a].CPU向MMU发送虚拟地址<br>    [b].MMU查询快表TLB<br>        块表命中：从块表中获取物理地址，由MMU继续根据物理地址匹配数据页步骤[a]<br>        块表不命中：查询页表步骤[c]<br>    [c]:从高速缓存查询页表<br>     “高速缓存”缓存页框，而页表存储于页框中，因此读取页表实际上也是读页（页表的物理地址有单独的寄存器保存）<br>     高速缓存命中：从高速缓存获取物理地址，并更新快表，进入[步骤a]<br>     高速缓存不命中：查询内存中的页表[步骤d]<br>     [d]从内存中查询页表<br>     页表保存了所有虚拟地址的映射关系，而不管页是否有映射物理页框。因此从内存页表中肯定能“命中”页。从页表获取虚拟地址的映射关系后，进入步骤e<br>     [e]把查询的页表想记录到高速缓存<br>     [f]MMU从高速缓存中获取页表项<br>        虚拟地址有分配物理页框；转换物理地址并更新块表，由MMU继续根据物理地址匹配数据页<br>        虚拟地址没分配物理页框：触发缺页中断<br>    [g]进入缺页中断处理程序<br>    [h]为虚拟页分配物理页框<br>        如果无空闲物理页框，则根据LRU算法选择需要淘汰的页，要淘汰的页如果是脏数据就回刷，否则直接丢弃或置换到磁盘的交换分区中<br>        然后，从磁盘中获取页信息更新到物理页框，更新内存页表<br>    [i]缺页中断处理的最后<br>        修改CPU寄存器，使得重新启动导致缺页的指令，返回[步骤a]重新执行</p>
+<h3><span id="根据物理地址获取实际数据">根据物理地址获取实际数据</span></h3><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaMfh510NLONxyc2CSvYr3Vrwqyf9tiajI1jPAuD16Kzm9mOvqQdZTiaJg/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="获取数据"><br>    [A]MMU获取到物理地址后，根据物理地址查询高速缓存<br>        高速缓存命中：CPU直接从高速缓存获取数据<br>        高速缓存不命中：查询物理内存[步骤B]<br>    [B]根据物理地址，获取物理内存中的数据<br>    [C]硬件实现把数据页记录到高速缓存中<br>    [D]cpu直接从高速缓存中获取数据</p>
 
           
         
