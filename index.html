@@ -2263,11 +2263,11 @@ cat /proc/wakelocks
 在supend_device_irq的流程中能够wakeup系统的都会被置上IRQD_WAKEUP_ARMED的标志,然后就关闭中断;如果在中断处理流程里面的
 会通过synchronize_irq等待中断线程处理完；
 resume_irq的时候后重新enable_irq进入中断处理流程,通过pm_system_irq_wakeup标记第一次的唤醒源;
-</code></pre><p><strong>6.深度休眠中唤醒系统代码demo</strong></p>
+</code></pre><p><strong>6.具有唤醒系统能力设备代码demo</strong></p>
 <pre><code>static int gpio_keys_probe(struct platform_device *pdev)
 {
     ......
-    button-&gt;wakeup = of_property_read_bool(pp, &quot;wakeup-source&quot;); //获取dts中配置的设备唤醒能力
+    button-&gt;wakeup = of_property_read_bool(pp, &quot;wakeup-source&quot;); //获取dts中配置的设备是否需要从深度休眠中唤醒
 
     button-&gt;gpio = of_get_gpio_flags(pp, 0, (enum of_gpio_flags*)&amp;flags); 
 

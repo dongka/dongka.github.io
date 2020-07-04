@@ -89,7 +89,7 @@
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2018/12/13/standby/kernel_suspend/信号响应时机.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/12/13/standby/kernel_suspend/suspend_resume_trace.jpg">
-<meta property="og:updated_time" content="2020-07-04T11:58:03.958Z">
+<meta property="og:updated_time" content="2020-07-04T12:04:13.144Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="内核的休眠流程">
 <meta name="twitter:description" content="内核休眠流程当安卓合适的时机(wakeup_count = save_count &amp;amp;&amp;amp; inpr == 0),与内核一致，在没有wakeup事件的时候，走进一步的流程，发echo mem &amp;gt; /sys/power/state命令后，内核开始处理休眠流程 ./kernel/power/main.c  state_store     -&amp;gt;pm_suspend">
@@ -607,11 +607,11 @@ cat /proc/wakelocks
 在supend_device_irq的流程中能够wakeup系统的都会被置上IRQD_WAKEUP_ARMED的标志,然后就关闭中断;如果在中断处理流程里面的
 会通过synchronize_irq等待中断线程处理完；
 resume_irq的时候后重新enable_irq进入中断处理流程,通过pm_system_irq_wakeup标记第一次的唤醒源;
-</code></pre><p><strong>6.深度休眠中唤醒系统代码demo</strong></p>
+</code></pre><p><strong>6.具有唤醒系统能力设备代码demo</strong></p>
 <pre><code>static int gpio_keys_probe(struct platform_device *pdev)
 {
     ......
-    button-&gt;wakeup = of_property_read_bool(pp, &quot;wakeup-source&quot;); //获取dts中配置的设备唤醒能力
+    button-&gt;wakeup = of_property_read_bool(pp, &quot;wakeup-source&quot;); //获取dts中配置的设备是否需要从深度休眠中唤醒
 
     button-&gt;gpio = of_get_gpio_flags(pp, 0, (enum of_gpio_flags*)&amp;flags); 
 
