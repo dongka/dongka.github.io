@@ -1978,163 +1978,6 @@ k_d 为求导，一般设置为0
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-hardware-md/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="dongka">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="知识总结">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/17/memory/memory-hardware-md/" itemprop="url">内存管理（一）硬件篇</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-17T00:07:09+00:00">
-                2018-06-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/内存管理/" itemprop="url" rel="index">
-                    <span itemprop="name">内存管理</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2><span id="一经典存储结构图">一.经典存储结构图</span></h2><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaghCuOMjibmmJgymLicFZBkXdwOReYVV1WfJHPhsU23ibEzhSsbdK87aGg/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="avatar"> </p>
-<pre><code>L0(寄存器)-&gt;CPU 寄存器保存来自高速缓存的字
-L1(SRAM）-&gt;高速缓存取自L2高速缓存行
-L2(SRAM)-&gt;高速缓存取自L3高速缓存的高速缓存行
-L3(SRAM)-&gt;高速缓存保存自内存的高速缓存行
-L4(内存)-&gt;内存保存自磁盘缓存的磁盘块
-L5(磁盘缓存)-&gt;磁盘缓存保存取自磁盘的磁盘块
-L6磁盘
-</code></pre><p>cpu从磁盘中加载数据,放到内存，之后再放到告诉缓存</p>
-<h2><span id="二虚拟地址和物理地址">二.虚拟地址和物理地址</span></h2><p>在旧的手机中，内存可能只有1G,但是每个进程在执行的时候都仿佛手机有4g内存；<br><strong>物理地址(Physical Address)</strong>：CPU地址总线传来的地址，由硬件电路控制其含义。物理地址中有很大一部分是留给内存条中的内存的但也常被映射到其他存储器上如显存，BIOS等),在没有使用虚拟存储器的机器上，虚拟地址被直接送到内存总线上，使具有相同物理存储器被读写;而在使用了虚拟存储器的情况下，虚拟具体地址不是被直接送到内存地址总线上，而是送到存储器管理单元MMU，把虚拟地址映射为物理地址；我们把上面实际的1G内存叫做：物理地址<br><strong>虚拟地址(Virtual Address)</strong>:是逻辑地址到物理地址变换之间的中间层；进程访问到的叫做虚拟地址；<br>虚拟内存有以下几个作用：<br>1.内存访问保护<br>  有虚拟内存，我们可以通过设置段界限或页表想来设定软件运行时的访问空间，确保软件运行使不越界；<br>2.按需分页（lazy load技术）<br>  可以让软件在没有访问某虚拟内存地址时，不分配虚拟地址，在实际访问的时候，在动态分配物理内存<br>建立虚拟内存到物理内存的页映射关系；<br>3.页换入换出（page swap in/out)<br>  把不经常访问的数据所占的内存空间临时写到硬盘上，这样可以腾出更多的空闲空间出来给到经常访问的数据；当cpu访问到不经常访问的数据时，再把数据从硬件读入到内存中；<br>4.写时复制（copy on write）<br>  两个虚拟页的数据相同时，可只分配一个物理页框，这样如果对两个虚拟页的访问是只读方式，这两个虚拟页可以共享页框，节省空间；如果当CPU对其中一个虚拟页进行了写操作，那么这两个虚拟页的数据内容不同，需要分配一个新的物理页框，并将物理页框标记为可写，这样两个虚拟页面将映射到不同的物理页帧，确保整个内存空间的正确访问。</p>
-<h2><span id="二页页表mmu">二.页，页表，MMU</span></h2><p>在讲虚拟地址到物理地址之中再补充几个概念：<br>页(page)<br>  <em>把APP的虚拟地址切分程若干个大小相等（4K）的片，每一片就是我们说的页</em><br>页框（frame）<br>  *把物理内存页按“页”的大小切分为若干大小相等的片，每一片，就是我们所说的页框 </p>
-<h2><span id="三cpu寻找页面过程">三.cpu寻找页面过程</span></h2><pre><code>CPU获取数据主要有两步：
-a.通过虚拟地址获取物理地址
-b.根据物理地址获取数据
-</code></pre><h3><span id="获取物理地址">获取物理地址</span></h3><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaBdia2Vt94nvPcnj4aYqWRrLibeKQONayr9azNLWEeiabiay7ibIF3ooxibBw/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="获取物理地址"><br>    [a].CPU向MMU发送虚拟地址<br>    [b].MMU查询快表TLB<br>        块表命中：从块表中获取物理地址，由MMU继续根据物理地址匹配数据页步骤[a]<br>        块表不命中：查询页表步骤[c]<br>    [c]:从高速缓存查询页表<br>     “高速缓存”缓存页框，而页表存储于页框中，因此读取页表实际上也是读页（页表的物理地址有单独的寄存器保存）<br>     高速缓存命中：从高速缓存获取物理地址，并更新快表，进入[步骤a]<br>     高速缓存不命中：查询内存中的页表[步骤d]<br>     [d]从内存中查询页表<br>     页表保存了所有虚拟地址的映射关系，而不管页是否有映射物理页框。因此从内存页表中肯定能“命中”页。从页表获取虚拟地址的映射关系后，进入步骤e<br>     [e]把查询的页表想记录到高速缓存<br>     [f]MMU从高速缓存中获取页表项<br>        虚拟地址有分配物理页框；转换物理地址并更新块表，由MMU继续根据物理地址匹配数据页<br>        虚拟地址没分配物理页框：触发缺页中断<br>    [g]进入缺页中断处理程序<br>    [h]为虚拟页分配物理页框<br>        如果无空闲物理页框，则根据LRU算法选择需要淘汰的页，要淘汰的页如果是脏数据就回刷，否则直接丢弃或置换到磁盘的交换分区中<br>        然后，从磁盘中获取页信息更新到物理页框，更新内存页表<br>    [i]缺页中断处理的最后<br>        修改CPU寄存器，使得重新启动导致缺页的指令，返回[步骤a]重新执行</p>
-<h3><span id="根据物理地址获取实际数据">根据物理地址获取实际数据</span></h3><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaMfh510NLONxyc2CSvYr3Vrwqyf9tiajI1jPAuD16Kzm9mOvqQdZTiaJg/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="获取数据"><br>    [A]MMU获取到物理地址后，根据物理地址查询高速缓存<br>        高速缓存命中：CPU直接从高速缓存获取数据<br>        高速缓存不命中：查询物理内存[步骤B]<br>    [B]根据物理地址，获取物理内存中的数据<br>    [C]硬件实现把数据页记录到高速缓存中<br>    [D]cpu直接从高速缓存中获取数据</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-mtp/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2244,6 +2087,163 @@ b.根据物理地址获取数据
 <li>所有MTP命令均以Package(数据包)的方式在设备两端进行传递</li>
 <li>Initiator必须接收到前一条消息处理结果，无论是成功或者超时后，才能发送下一条消息</li>
 </ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/17/memory/memory-hardware-md/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="dongka">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="知识总结">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/17/memory/memory-hardware-md/" itemprop="url">内存管理（一）硬件篇</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-17T00:07:09+00:00">
+                2018-06-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/内存管理/" itemprop="url" rel="index">
+                    <span itemprop="name">内存管理</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2><span id="一经典存储结构图">一.经典存储结构图</span></h2><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaghCuOMjibmmJgymLicFZBkXdwOReYVV1WfJHPhsU23ibEzhSsbdK87aGg/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="avatar"> </p>
+<pre><code>L0(寄存器)-&gt;CPU 寄存器保存来自高速缓存的字
+L1(SRAM）-&gt;高速缓存取自L2高速缓存行
+L2(SRAM)-&gt;高速缓存取自L3高速缓存的高速缓存行
+L3(SRAM)-&gt;高速缓存保存自内存的高速缓存行
+L4(内存)-&gt;内存保存自磁盘缓存的磁盘块
+L5(磁盘缓存)-&gt;磁盘缓存保存取自磁盘的磁盘块
+L6磁盘
+</code></pre><p>cpu从磁盘中加载数据,放到内存，之后再放到告诉缓存</p>
+<h2><span id="二虚拟地址和物理地址">二.虚拟地址和物理地址</span></h2><p>在旧的手机中，内存可能只有1G,但是每个进程在执行的时候都仿佛手机有4g内存；<br><strong>物理地址(Physical Address)</strong>：CPU地址总线传来的地址，由硬件电路控制其含义。物理地址中有很大一部分是留给内存条中的内存的但也常被映射到其他存储器上如显存，BIOS等),在没有使用虚拟存储器的机器上，虚拟地址被直接送到内存总线上，使具有相同物理存储器被读写;而在使用了虚拟存储器的情况下，虚拟具体地址不是被直接送到内存地址总线上，而是送到存储器管理单元MMU，把虚拟地址映射为物理地址；我们把上面实际的1G内存叫做：物理地址<br><strong>虚拟地址(Virtual Address)</strong>:是逻辑地址到物理地址变换之间的中间层；进程访问到的叫做虚拟地址；<br>虚拟内存有以下几个作用：<br>1.内存访问保护<br>  有虚拟内存，我们可以通过设置段界限或页表想来设定软件运行时的访问空间，确保软件运行使不越界；<br>2.按需分页（lazy load技术）<br>  可以让软件在没有访问某虚拟内存地址时，不分配虚拟地址，在实际访问的时候，在动态分配物理内存<br>建立虚拟内存到物理内存的页映射关系；<br>3.页换入换出（page swap in/out)<br>  把不经常访问的数据所占的内存空间临时写到硬盘上，这样可以腾出更多的空闲空间出来给到经常访问的数据；当cpu访问到不经常访问的数据时，再把数据从硬件读入到内存中；<br>4.写时复制（copy on write）<br>  两个虚拟页的数据相同时，可只分配一个物理页框，这样如果对两个虚拟页的访问是只读方式，这两个虚拟页可以共享页框，节省空间；如果当CPU对其中一个虚拟页进行了写操作，那么这两个虚拟页的数据内容不同，需要分配一个新的物理页框，并将物理页框标记为可写，这样两个虚拟页面将映射到不同的物理页帧，确保整个内存空间的正确访问。</p>
+<h2><span id="二页页表mmu">二.页，页表，MMU</span></h2><p>在讲虚拟地址到物理地址之中再补充几个概念：<br>页(page)<br>  <em>把APP的虚拟地址切分程若干个大小相等（4K）的片，每一片就是我们说的页</em><br>页框（frame）<br>  *把物理内存页按“页”的大小切分为若干大小相等的片，每一片，就是我们所说的页框 </p>
+<h2><span id="三cpu寻找页面过程">三.cpu寻找页面过程</span></h2><pre><code>CPU获取数据主要有两步：
+a.通过虚拟地址获取物理地址
+b.根据物理地址获取数据
+</code></pre><h3><span id="获取物理地址">获取物理地址</span></h3><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaBdia2Vt94nvPcnj4aYqWRrLibeKQONayr9azNLWEeiabiay7ibIF3ooxibBw/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="获取物理地址"><br>    [a].CPU向MMU发送虚拟地址<br>    [b].MMU查询快表TLB<br>        块表命中：从块表中获取物理地址，由MMU继续根据物理地址匹配数据页步骤[a]<br>        块表不命中：查询页表步骤[c]<br>    [c]:从高速缓存查询页表<br>     “高速缓存”缓存页框，而页表存储于页框中，因此读取页表实际上也是读页（页表的物理地址有单独的寄存器保存）<br>     高速缓存命中：从高速缓存获取物理地址，并更新快表，进入[步骤a]<br>     高速缓存不命中：查询内存中的页表[步骤d]<br>     [d]从内存中查询页表<br>     页表保存了所有虚拟地址的映射关系，而不管页是否有映射物理页框。因此从内存页表中肯定能“命中”页。从页表获取虚拟地址的映射关系后，进入步骤e<br>     [e]把查询的页表想记录到高速缓存<br>     [f]MMU从高速缓存中获取页表项<br>        虚拟地址有分配物理页框；转换物理地址并更新块表，由MMU继续根据物理地址匹配数据页<br>        虚拟地址没分配物理页框：触发缺页中断<br>    [g]进入缺页中断处理程序<br>    [h]为虚拟页分配物理页框<br>        如果无空闲物理页框，则根据LRU算法选择需要淘汰的页，要淘汰的页如果是脏数据就回刷，否则直接丢弃或置换到磁盘的交换分区中<br>        然后，从磁盘中获取页信息更新到物理页框，更新内存页表<br>    [i]缺页中断处理的最后<br>        修改CPU寄存器，使得重新启动导致缺页的指令，返回[步骤a]重新执行</p>
+<h3><span id="根据物理地址获取实际数据">根据物理地址获取实际数据</span></h3><p><img src="https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bysOaeD9VG5JiaTNMibYPxicZnaMfh510NLONxyc2CSvYr3Vrwqyf9tiajI1jPAuD16Kzm9mOvqQdZTiaJg/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1" alt="获取数据"><br>    [A]MMU获取到物理地址后，根据物理地址查询高速缓存<br>        高速缓存命中：CPU直接从高速缓存获取数据<br>        高速缓存不命中：查询物理内存[步骤B]<br>    [B]根据物理地址，获取物理内存中的数据<br>    [C]硬件实现把数据页记录到高速缓存中<br>    [D]cpu直接从高速缓存中获取数据</p>
 
           
         
